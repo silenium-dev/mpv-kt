@@ -7,8 +7,8 @@ pub struct Mpv {
 }
 
 impl Mpv {
-    pub fn new(evn: &mut jni::Env, event_callback: Box<dyn EventCallback>) -> Result<Self, String> {
-        let jvm = evn
+    pub fn new(env: &mut jni::Env, event_callback: Box<dyn EventCallback>) -> Result<Self, String> {
+        let jvm = env
             .get_java_vm()
             .map_err(|e| format!("Failed to get Java VM: {}", e))?;
         let core = core::create(jvm, event_callback)
@@ -29,6 +29,28 @@ impl Mpv {
     }
 
     pub fn terminate(self) {
-        self.core.terminate().expect("Failed to shutdown event loop");
+        self.core
+            .terminate()
+            .expect("Failed to shutdown event loop");
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::events::handler::NoopEventCallback;
+    use crate::mpv::Mpv;
+    use crate::test_utils::create_jvm;
+
+    #[test]
+    fn it_works() {
+        let jvm = create_jvm();
+        jvm.attach_current_thread(|env| {
+            let mpv = Mpv::new(env, Box::new(NoopEventCallback)).expect("Failed to create mpv instance");
+            mpv.initialize().expect("Failed to initialize mpv");
+            println!("mpv initialized: {:?}", mpv.core.mpv_handle());
+            mpv.terminate();
+            jni::errors::Result::Ok(())
+        }).expect("Failed to attach thread");
+        unsafe { jvm.destroy() }.expect("Failed to destroy JVM");
     }
 }

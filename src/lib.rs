@@ -11,6 +11,7 @@ mod core;
 pub mod events;
 mod handle;
 pub mod mpv;
+mod test_utils;
 
 struct TestCallback;
 impl EventCallback for TestCallback {
