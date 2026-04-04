@@ -1,6 +1,7 @@
 import jetbrains.buildServer.configs.kotlin.BuildType
 import jetbrains.buildServer.configs.kotlin.DslContext
 import jetbrains.buildServer.configs.kotlin.buildSteps.exec
+import jetbrains.buildServer.configs.kotlin.buildSteps.script
 import jetbrains.buildServer.configs.kotlin.project
 import jetbrains.buildServer.configs.kotlin.projectFeatures.UntrustedBuildsSettings
 import jetbrains.buildServer.configs.kotlin.projectFeatures.untrustedBuildsSettings
@@ -41,11 +42,11 @@ object NixBuild : BuildType({
     }
 
     steps {
-        exec {
+        script {
             name = "Build"
-            path = "nix"
-            arguments = "build -L --rebuild"
-            formatStderrAsError = false
+            scriptContent = """
+                |nix build -L --rebuild 2>&1
+            """.trimMargin()
         }
     }
 })
