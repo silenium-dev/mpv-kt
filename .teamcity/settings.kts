@@ -44,7 +44,7 @@ object NixBuild : BuildType({
         exec {
             name = "Build"
             path = "nix"
-            arguments = "build -L"
+            arguments = "build -L --rebuild"
             formatStderrAsError = false
         }
     }
