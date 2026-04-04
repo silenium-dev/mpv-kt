@@ -45,6 +45,7 @@ object NixBuild : BuildType({
             name = "Build"
             path = "nix"
             arguments = "build -L"
+            formatStderrAsError = false
         }
     }
 })
