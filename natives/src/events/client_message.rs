@@ -1,5 +1,5 @@
 use crate::events::types::Event;
-use libmpv2_sys::{mpv_event, mpv_event_client_message, mpv_event_log_message};
+use libmpv2_sys::{mpv_event, mpv_event_client_message};
 use std::bstr::{ByteStr, ByteString};
 use std::ffi::CStr;
 

@@ -1,7 +1,7 @@
-use std::bstr::ByteStr;
-use std::ffi::CStr;
 use crate::events::types::Event;
 use libmpv2_sys::{mpv_event, mpv_event_log_message, mpv_log_level};
+use std::bstr::ByteStr;
+use std::ffi::CStr;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum LogLevel {
