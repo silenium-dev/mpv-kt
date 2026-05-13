@@ -3,18 +3,35 @@
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs?ref=fe416aaedd397cacb33a610b33d60ff2b431b127";
+    rust-overlay = {
+      url = "github:oxalica/rust-overlay";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     flake-parts.url = "github:hercules-ci/flake-parts";
   };
 
   outputs =
-    { flake-parts, nixpkgs, ... } @ inputs: flake-parts.lib.mkFlake { inherit inputs; } (
+    { flake-parts, nixpkgs, rust-overlay, ... } @ inputs: flake-parts.lib.mkFlake { inherit inputs; } (
       let
         fs = nixpkgs.lib.fileset;
       in
       {
         perSystem = { config, self', inputs', pkgs, system, ... }: rec {
-          packages = {
-            mpv-jni-rs = pkgs.rustPlatform.buildRustPackage {
+          _module.args.pkgs = import inputs.nixpkgs {
+            inherit system;
+            overlays = [
+              (import rust-overlay)
+            ];
+          };
+          packages =
+          let
+            rustPlatform = pkgs.makeRustPlatform {
+              cargo = pkgs.rust-bin.nightly.latest.minimal;
+              rustc = pkgs.rust-bin.nightly.latest.minimal;
+            };
+          in
+          {
+            mpv-jni-rs = rustPlatform.buildRustPackage {
               name = "mpv-jni-rs";
               version = "0.1.0";
               src = (builtins.path {
