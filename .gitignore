@@ -1,5 +1,9 @@
-/target
+target/
 .idea/
 .direnv/
 *.iml
 /result
+
+.gradle
+.kotlin
+build/

@@ -1,12 +1,12 @@
 [package]
-name = "mpv-rs"
+name = "mpv-jni-rs"
 version = "0.1.0"
 edition = "2024"
 
 [dependencies]
 libmpv2-sys = "4.0.1"
 jni = { version = "0.22.4", features = ["invocation"] }
-libc = "0.2.184"
+libc = "0.2.186"
 
 [lib]
 crate-type = ["cdylib"]

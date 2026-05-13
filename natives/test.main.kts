@@ -1,7 +1,7 @@
 import kotlin.io.path.Path
 import kotlin.io.path.absolutePathString
 
-System.load(Path("target/debug/libmpv_rs.so").absolutePathString())
+System.load(Path("natives/target/debug/libmpv_jni_rs.so").absolutePathString())
 object TestNatives {
     @JvmStatic
     external fun testN()

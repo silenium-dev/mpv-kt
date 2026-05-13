@@ -1,14 +1,18 @@
-use std::thread::sleep;
-use std::time::Duration;
+#![feature(bstr)]
+
 use crate::events::handler::EventCallback;
 use crate::events::types::Event;
 use crate::mpv::Mpv;
 use jni::objects::{JObject, JString};
 use jni::strings::JNIString;
-use jni::{Env, EnvUnowned, JValue, jni_mangle, jni_sig};
+use jni::{jni_mangle, jni_sig, Env, EnvUnowned, JValue};
+use libmpv2_sys::mpv_format_MPV_FORMAT_NODE;
+use std::thread::sleep;
+use std::time::Duration;
 
 mod core;
 pub mod events;
+pub mod nodes;
 mod handle;
 pub mod mpv;
 mod test_utils;
@@ -26,6 +30,8 @@ pub fn testN<'local>(mut env: EnvUnowned<'local>, _this: JObject<'local>) {
         println!("testN");
         let mpv = Mpv::new(env, Box::new(TestCallback)).expect("Failed to create mpv");
         mpv.initialize().expect("Failed to initialize mpv");
+        let request_id = mpv.get_property_async("track-list", mpv_format_MPV_FORMAT_NODE).expect("Failed to get property");
+        println!("request_id: {}", request_id);
         sleep(Duration::from_secs(1));
         mpv.terminate();
 
