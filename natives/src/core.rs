@@ -1,7 +1,7 @@
-use crate::events::handler::EventCallback;
+use crate::events::callback::EventCallback;
 use crate::events::types::Event;
 use crate::handle::MpvHandle;
-use libc::{LC_NUMERIC, setlocale};
+use libc::{setlocale, LC_NUMERIC};
 use libmpv2_sys::{
     mpv_event_id_MPV_EVENT_NONE, mpv_set_wakeup_callback, mpv_terminate_destroy, mpv_wait_event,
 };

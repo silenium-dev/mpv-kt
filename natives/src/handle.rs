@@ -1,5 +1,5 @@
-use std::ptr::NonNull;
 use libmpv2_sys::mpv_handle;
+use std::ptr::NonNull;
 
 pub(crate) struct MpvHandle(NonNull<mpv_handle>);
 // mpv_handle is safe for concurrent use

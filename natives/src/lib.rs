@@ -1,6 +1,6 @@
 #![feature(bstr)]
 
-use crate::events::handler::EventCallback;
+use crate::events::callback::EventCallback;
 use crate::events::types::Event;
 use crate::mpv::Mpv;
 use jni::objects::{JObject, JString};
@@ -11,10 +11,11 @@ use std::thread::sleep;
 use std::time::Duration;
 
 mod core;
+pub mod errors;
 pub mod events;
-pub mod nodes;
 mod handle;
 pub mod mpv;
+pub mod nodes;
 mod test_utils;
 
 struct TestCallback;
@@ -30,7 +31,9 @@ pub fn testN<'local>(mut env: EnvUnowned<'local>, _this: JObject<'local>) {
         println!("testN");
         let mpv = Mpv::new(env, Box::new(TestCallback)).expect("Failed to create mpv");
         mpv.initialize().expect("Failed to initialize mpv");
-        let request_id = mpv.get_property_async("track-list", mpv_format_MPV_FORMAT_NODE).expect("Failed to get property");
+        let request_id = mpv
+            .get_property_async("track-list", mpv_format_MPV_FORMAT_NODE)
+            .expect("Failed to get property");
         println!("request_id: {}", request_id);
         sleep(Duration::from_secs(1));
         mpv.terminate();

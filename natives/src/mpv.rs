@@ -1,7 +1,8 @@
 use crate::core;
-use crate::events::handler::EventCallback;
+use crate::errors::MpvError;
+use crate::events::callback::EventCallback;
 use libmpv2_sys::{
-    mpv_error, mpv_error_MPV_ERROR_SUCCESS, mpv_format, mpv_get_property_async, mpv_initialize,
+    mpv_error_MPV_ERROR_SUCCESS, mpv_format, mpv_get_property_async, mpv_initialize,
 };
 use std::ffi::CString;
 use std::sync::atomic::{AtomicU64, Ordering};
@@ -26,25 +27,25 @@ impl Mpv {
     }
 
     // TODO: introduce proper error type
-    pub fn initialize(&self) -> Result<(), mpv_error> {
+    pub fn initialize(&self) -> Result<(), MpvError> {
         let handle = self.core.mpv_handle();
         let ret = unsafe { mpv_initialize(handle.as_ptr()) };
         if ret < mpv_error_MPV_ERROR_SUCCESS {
-            Err(ret)
+            Err(ret.into())
         } else {
             Ok(())
         }
     }
 
     // TODO: introduce proper format enum type
-    pub fn get_property_async(&self, name: &str, format: mpv_format) -> Result<u64, mpv_error> {
+    pub fn get_property_async(&self, name: &str, format: mpv_format) -> Result<u64, MpvError> {
         let handle = self.core.mpv_handle();
         let userdata = self.userdata_counter.fetch_add(1, Ordering::Relaxed);
         let name = CString::new(name).expect("invalid property name");
         let ret =
             unsafe { mpv_get_property_async(handle.as_ptr(), userdata, name.into_raw(), format) };
         if ret < mpv_error_MPV_ERROR_SUCCESS {
-            Err(ret)
+            Err(ret.into())
         } else {
             Ok(userdata)
         }
@@ -59,7 +60,7 @@ impl Mpv {
 
 #[cfg(test)]
 mod tests {
-    use crate::events::handler::NoopEventCallback;
+    use crate::events::callback::NoopEventCallback;
     use crate::mpv::Mpv;
     use crate::test_utils::create_jvm;
 

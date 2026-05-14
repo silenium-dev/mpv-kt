@@ -1,15 +1,16 @@
+use crate::errors::MpvError;
 use crate::events::client_message::event_client_message;
 use crate::events::command_reply::event_command_reply;
-use crate::events::end_file::{EndFileReason, event_end_file};
+use crate::events::end_file::{event_end_file, EndFileReason};
 use crate::events::hook::event_hook;
-use crate::events::log_message::{LogLevel, event_log_message};
-use crate::events::property::{EventProperty, event_property};
+use crate::events::log_message::{event_log_message, LogLevel};
+use crate::events::property::{event_property, EventProperty};
 use crate::events::start_file::event_start_file;
 use crate::nodes::node::MpvNode;
-use libmpv2_sys::{mpv_error, mpv_event};
+use libmpv2_sys::mpv_event;
 use std::bstr::ByteString;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum Event {
     None,
     Shutdown,
@@ -19,16 +20,16 @@ pub enum Event {
         message: ByteString,
     },
     GetPropertyReply {
-        error: EventError,
+        error: MpvError,
         user_data: u64,
         property: EventProperty,
     },
     SetPropertyReply {
-        error: EventError,
+        error: MpvError,
         user_data: u64,
     },
     CommandReply {
-        error: EventError,
+        error: MpvError,
         user_data: u64,
         reply: MpvNode,
     },
@@ -37,7 +38,7 @@ pub enum Event {
     },
     EndFile {
         reason: EndFileReason,
-        error: EventError,
+        error: MpvError,
         playlist_entry_id: i64,
         playlist_insert_id: i64,
         playlist_insert_num_entries: i32,
@@ -64,22 +65,6 @@ pub enum Event {
     },
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum EventError {
-    Ok,
-    Err(mpv_error),
-}
-
-impl From<mpv_error> for EventError {
-    fn from(value: mpv_error) -> Self {
-        if value >= 0 {
-            EventError::Ok
-        } else {
-            EventError::Err(value)
-        }
-    }
-}
-
 impl From<&mpv_event> for Event {
     fn from(raw: &mpv_event) -> Self {
         match raw.event_id {
@@ -87,16 +72,16 @@ impl From<&mpv_event> for Event {
             libmpv2_sys::mpv_event_id_MPV_EVENT_SHUTDOWN => Event::Shutdown,
             libmpv2_sys::mpv_event_id_MPV_EVENT_LOG_MESSAGE => unsafe { event_log_message(raw) },
             libmpv2_sys::mpv_event_id_MPV_EVENT_GET_PROPERTY_REPLY => Event::GetPropertyReply {
-                error: EventError::from(raw.error),
+                error: MpvError::from(raw.error),
                 user_data: raw.reply_userdata,
                 property: unsafe { event_property(raw) },
             },
             libmpv2_sys::mpv_event_id_MPV_EVENT_SET_PROPERTY_REPLY => Event::SetPropertyReply {
-                error: EventError::from(raw.error),
+                error: MpvError::from(raw.error),
                 user_data: raw.reply_userdata,
             },
             libmpv2_sys::mpv_event_id_MPV_EVENT_COMMAND_REPLY => Event::CommandReply {
-                error: EventError::from(raw.error),
+                error: MpvError::from(raw.error),
                 user_data: raw.reply_userdata,
                 reply: unsafe { event_command_reply(raw) },
             },

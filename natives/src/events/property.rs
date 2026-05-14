@@ -3,7 +3,7 @@ use libmpv2_sys::{mpv_event, mpv_event_property};
 use std::bstr::{ByteStr, ByteString};
 use std::ffi::CStr;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct EventProperty {
     name: ByteString,
     value: MpvNode,
