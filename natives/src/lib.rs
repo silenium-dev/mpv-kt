@@ -3,18 +3,17 @@
 use crate::events::callback::EventCallback;
 use crate::events::types::Event;
 use crate::mpv::Mpv;
+use crate::types::Format;
 use jni::objects::{JObject, JString};
 use jni::strings::JNIString;
 use jni::{jni_mangle, jni_sig, Env, EnvUnowned, JValue};
-use libmpv2_sys::{mpv_format_MPV_FORMAT_FLAG, mpv_format_MPV_FORMAT_NODE, mpv_format_MPV_FORMAT_OSD_STRING, mpv_format_MPV_FORMAT_STRING, mpv_node};
+use libmpv2_sys::mpv_node;
 use std::ffi::c_void;
 use std::thread::sleep;
 use std::time::Duration;
-use crate::types::Node;
 
 #[macro_use]
 mod macros;
-mod alloc;
 mod core;
 pub mod events;
 mod handle;
@@ -54,15 +53,15 @@ pub fn testN<'local>(mut env: EnvUnowned<'local>, _this: JObject<'local>) {
         let mpv = Mpv::new(env, Box::new(TestCallback)).expect("Failed to create mpv");
         mpv.initialize().expect("Failed to initialize mpv");
         let request_id = mpv
-            .get_property_async("track-list", mpv_format_MPV_FORMAT_NODE)
+            .get_property_async("track-list", Format::NODE)
             .expect("Failed to get property");
         println!("request_id: {}", request_id);
         let request_id = mpv
-            .get_property_async("pid", mpv_format_MPV_FORMAT_NODE)
+            .get_property_async("pid", Format::NODE)
             .expect("Failed to get property");
         println!("request_id: {}", request_id);
         let request_id = mpv
-            .get_property_async("mpv-version", mpv_format_MPV_FORMAT_OSD_STRING)
+            .get_property_async("mpv-version", Format::OSD_STRING)
             .expect("Failed to get property");
         println!("request_id: {}", request_id);
         let request_id = mpv
@@ -71,7 +70,7 @@ pub fn testN<'local>(mut env: EnvUnowned<'local>, _this: JObject<'local>) {
         println!("request_id: {}", request_id);
         sleep(Duration::from_secs(1));
         let request_id = mpv
-            .get_property_async("hwdec", mpv_format_MPV_FORMAT_OSD_STRING)
+            .get_property_async("hwdec", Format::OSD_STRING)
             .expect("Failed to get property");
         println!("request_id: {}", request_id);
         sleep(Duration::from_secs(1));

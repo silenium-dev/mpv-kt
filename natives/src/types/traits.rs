@@ -6,11 +6,13 @@ pub trait MpvFormat: Sized {
     const MPV_FORMAT: Format;
 }
 
+#[allow(private_bounds)]
 pub trait MpvSend: MpvSendInternal {}
 pub(crate) trait MpvSendInternal: MpvFormat {
     fn to_mpv<R, F: Fn(*mut c_void) -> Result<R>>(&self, fun: F) -> Result<R>;
 }
 
+#[allow(private_bounds)]
 pub trait MpvRecv: MpvRecvInternal {}
 pub(crate) trait MpvRecvInternal: MpvFormat {
     unsafe fn from_ptr(ptr: *const c_void) -> Result<Self>;

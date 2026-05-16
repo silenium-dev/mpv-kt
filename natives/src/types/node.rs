@@ -5,18 +5,16 @@ use crate::types::node_map::{MpvNodeMap, NodeMap};
 use crate::types::traits::{
     MpvFormat, MpvRecv, MpvRecvInternal, MpvRepr, MpvSend, MpvSendInternal, ToMpvRepr,
 };
-use crate::types::{Format, OsdString};
+use crate::types::Format;
 use libmpv2_sys::{
-    mpv_format_MPV_FORMAT_NONE as MPV_FORMAT_NONE,
-    mpv_format_MPV_FORMAT_STRING as MPV_FORMAT_STRING,
-    mpv_format_MPV_FORMAT_OSD_STRING as MPV_FORMAT_OSD_STRING,
-    mpv_format_MPV_FORMAT_FLAG as MPV_FORMAT_FLAG,
-    mpv_format_MPV_FORMAT_INT64 as MPV_FORMAT_INT64,
+    mpv_format_MPV_FORMAT_BYTE_ARRAY as MPV_FORMAT_BYTE_ARRAY,
     mpv_format_MPV_FORMAT_DOUBLE as MPV_FORMAT_DOUBLE,
+    mpv_format_MPV_FORMAT_FLAG as MPV_FORMAT_FLAG, mpv_format_MPV_FORMAT_INT64 as MPV_FORMAT_INT64,
     mpv_format_MPV_FORMAT_NODE_ARRAY as MPV_FORMAT_NODE_ARRAY,
     mpv_format_MPV_FORMAT_NODE_MAP as MPV_FORMAT_NODE_MAP,
-    mpv_format_MPV_FORMAT_BYTE_ARRAY as MPV_FORMAT_BYTE_ARRAY,
-    mpv_node, mpv_node__bindgen_ty_1,
+    mpv_format_MPV_FORMAT_NONE as MPV_FORMAT_NONE,
+    mpv_format_MPV_FORMAT_OSD_STRING as MPV_FORMAT_OSD_STRING,
+    mpv_format_MPV_FORMAT_STRING as MPV_FORMAT_STRING, mpv_node, mpv_node__bindgen_ty_1,
 };
 use std::ffi::{c_int, c_void, CStr, CString};
 use std::marker::PhantomData;

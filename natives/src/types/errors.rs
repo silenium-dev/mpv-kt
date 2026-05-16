@@ -3,14 +3,6 @@ use std::str::Utf8Error;
 
 pub type Result<T> = std::result::Result<T, Error>;
 
-pub(crate) fn error_to_result_code(value: c_int) -> Result<i32> {
-    if value >= 0 {
-        Ok(value)
-    } else {
-        Err(Error::from(value))
-    }
-}
-
 pub(crate) fn error_to_result(value: c_int) -> Result<()> {
     if value >= 0 {
         Ok(())

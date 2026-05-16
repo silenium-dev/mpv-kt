@@ -2,12 +2,12 @@ use crate::core;
 use crate::events::callback::EventCallback;
 use crate::types::traits::MpvSendInternal;
 use crate::types::Error::Rust;
-use crate::types::Result;
 use crate::types::RustError::JniError;
 use crate::types::{error_to_result, Node};
+use crate::types::{Format, Result};
 use libmpv2_sys::{
-    mpv_error_MPV_ERROR_SUCCESS, mpv_format, mpv_format_MPV_FORMAT_NODE, mpv_get_property_async,
-    mpv_initialize, mpv_set_property_async,
+    mpv_format_MPV_FORMAT_NODE, mpv_get_property_async, mpv_initialize,
+    mpv_set_property_async,
 };
 use std::ffi::CString;
 use std::sync::atomic::{AtomicU64, Ordering};
@@ -30,25 +30,20 @@ impl Mpv {
         })
     }
 
-    // TODO: introduce proper error type
     pub fn initialize(&self) -> Result<()> {
         let handle = self.core.mpv_handle();
         let ret = unsafe { mpv_initialize(handle.as_ptr()) };
         error_to_result(ret)
     }
 
-    // TODO: introduce proper format enum type
-    pub fn get_property_async(&self, name: &str, format: mpv_format) -> Result<u64> {
+    pub fn get_property_async(&self, name: &str, format: Format) -> Result<u64> {
         let handle = self.core.mpv_handle();
         let userdata = self.userdata_counter.fetch_add(1, Ordering::Relaxed);
         let name = CString::new(name)?;
-        let ret =
-            unsafe { mpv_get_property_async(handle.as_ptr(), userdata, name.as_ptr(), format) };
-        if ret < mpv_error_MPV_ERROR_SUCCESS {
-            Err(ret.into())
-        } else {
-            Ok(userdata)
-        }
+        let ret = unsafe {
+            mpv_get_property_async(handle.as_ptr(), userdata, name.as_ptr(), format.mpv_format)
+        };
+        error_to_result(ret).map(|_| userdata)
     }
 
     pub fn set_property_async(&self, name: &str, value: Node) -> Result<u64> {
