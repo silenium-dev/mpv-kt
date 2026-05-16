@@ -1,8 +1,13 @@
 use crate::core;
 use crate::events::callback::EventCallback;
-use crate::types::errors::Error;
+use crate::types::traits::MpvSendInternal;
+use crate::types::Error::Rust;
+use crate::types::Result;
+use crate::types::RustError::JniError;
+use crate::types::{error_to_result, Node};
 use libmpv2_sys::{
-    mpv_error_MPV_ERROR_SUCCESS, mpv_format, mpv_get_property_async, mpv_initialize,
+    mpv_error_MPV_ERROR_SUCCESS, mpv_format, mpv_format_MPV_FORMAT_NODE, mpv_get_property_async,
+    mpv_initialize, mpv_set_property_async,
 };
 use std::ffi::CString;
 use std::sync::atomic::{AtomicU64, Ordering};
@@ -13,12 +18,11 @@ pub struct Mpv {
 }
 
 impl Mpv {
-    pub fn new(env: &mut jni::Env, event_callback: Box<dyn EventCallback>) -> Result<Self, String> {
+    pub fn new(env: &mut jni::Env, event_callback: Box<dyn EventCallback>) -> Result<Self> {
         let jvm = env
             .get_java_vm()
-            .map_err(|e| format!("Failed to get Java VM: {}", e))?;
-        let core = core::create(jvm, event_callback)
-            .map_err(|e| format!("Failed to create core: {}", e))?;
+            .map_err(|e| Rust(JniError(format!("Failed to get Java VM: {}", e))))?;
+        let core = core::create(jvm, event_callback)?;
 
         Ok(Self {
             core,
@@ -27,28 +31,43 @@ impl Mpv {
     }
 
     // TODO: introduce proper error type
-    pub fn initialize(&self) -> Result<(), Error> {
+    pub fn initialize(&self) -> Result<()> {
         let handle = self.core.mpv_handle();
         let ret = unsafe { mpv_initialize(handle.as_ptr()) };
-        if ret < mpv_error_MPV_ERROR_SUCCESS {
-            Err(ret.into())
-        } else {
-            Ok(())
-        }
+        error_to_result(ret)
     }
 
     // TODO: introduce proper format enum type
-    pub fn get_property_async(&self, name: &str, format: mpv_format) -> Result<u64, Error> {
+    pub fn get_property_async(&self, name: &str, format: mpv_format) -> Result<u64> {
         let handle = self.core.mpv_handle();
         let userdata = self.userdata_counter.fetch_add(1, Ordering::Relaxed);
-        let name = CString::new(name).expect("invalid property name");
+        let name = CString::new(name)?;
         let ret =
-            unsafe { mpv_get_property_async(handle.as_ptr(), userdata, name.into_raw(), format) };
+            unsafe { mpv_get_property_async(handle.as_ptr(), userdata, name.as_ptr(), format) };
         if ret < mpv_error_MPV_ERROR_SUCCESS {
             Err(ret.into())
         } else {
             Ok(userdata)
         }
+    }
+
+    pub fn set_property_async(&self, name: &str, value: Node) -> Result<u64> {
+        let handle = self.core.mpv_handle();
+        let userdata = self.userdata_counter.fetch_add(1, Ordering::Relaxed);
+        let name = CString::new(name)?;
+        unsafe {
+            value.to_mpv(|raw_value| {
+                let ret = mpv_set_property_async(
+                    handle.as_ptr(),
+                    userdata,
+                    name.as_ptr(),
+                    mpv_format_MPV_FORMAT_NODE,
+                    raw_value,
+                );
+                error_to_result(ret)
+            })?
+        };
+        Ok(userdata)
     }
 
     pub fn terminate(self) {

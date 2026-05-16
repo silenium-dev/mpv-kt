@@ -10,6 +10,7 @@ use libmpv2_sys::{mpv_format_MPV_FORMAT_FLAG, mpv_format_MPV_FORMAT_NODE, mpv_fo
 use std::ffi::c_void;
 use std::thread::sleep;
 use std::time::Duration;
+use crate::types::Node;
 
 #[macro_use]
 mod macros;
@@ -58,6 +59,19 @@ pub fn testN<'local>(mut env: EnvUnowned<'local>, _this: JObject<'local>) {
         println!("request_id: {}", request_id);
         let request_id = mpv
             .get_property_async("pid", mpv_format_MPV_FORMAT_NODE)
+            .expect("Failed to get property");
+        println!("request_id: {}", request_id);
+        let request_id = mpv
+            .get_property_async("mpv-version", mpv_format_MPV_FORMAT_OSD_STRING)
+            .expect("Failed to get property");
+        println!("request_id: {}", request_id);
+        let request_id = mpv
+            .set_property_async("hwdec", "vaapi".into())
+            .expect("Failed to set property");
+        println!("request_id: {}", request_id);
+        sleep(Duration::from_secs(1));
+        let request_id = mpv
+            .get_property_async("hwdec", mpv_format_MPV_FORMAT_OSD_STRING)
             .expect("Failed to get property");
         println!("request_id: {}", request_id);
         sleep(Duration::from_secs(1));

@@ -39,6 +39,8 @@ pub enum RustError {
     InteriorNull(NulError),
     VersionMismatch(VersionError),
     Pointer(Option<DebugLoc>),
+    JniError(String),
+    AlreadyRunning,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]

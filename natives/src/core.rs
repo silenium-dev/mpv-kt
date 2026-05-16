@@ -1,6 +1,8 @@
 use crate::events::callback::EventCallback;
 use crate::events::types::Event;
 use crate::handle::MpvHandle;
+use crate::types::Result;
+use crate::types::{Error, RustError};
 use libc::{setlocale, LC_NUMERIC};
 use libmpv2_sys::{
     mpv_event_id_MPV_EVENT_NONE, mpv_set_wakeup_callback, mpv_terminate_destroy, mpv_wait_event,
@@ -48,17 +50,17 @@ impl CoreHandle {
 pub(crate) fn create(
     jvm: jni::JavaVM,
     callback: Box<dyn EventCallback>,
-) -> Result<CoreHandle, String> {
-    let locale = CString::new("C").unwrap();
+) -> Result<CoreHandle> {
+    let locale = CString::new("C")?;
     unsafe { setlocale(LC_NUMERIC, locale.as_ptr()) };
 
     let raw_handle = unsafe { libmpv2_sys::mpv_create() };
-    let mpv_handle = NonNull::new(raw_handle).ok_or("Failed to create mpv handle")?;
+    if raw_handle.is_null() {
+        return Err(Error::Uninitialized)
+    }
+    let mpv_handle = NonNull::new(raw_handle).unwrap();
     let core = Core::new(jvm, mpv_handle.into(), callback);
-    let handle = core
-        .start()
-        .map_err(|e| format!("Failed to start core: {}", e))?;
-    Ok(handle)
+    core.start()
 }
 
 impl Core {
@@ -77,13 +79,13 @@ impl Core {
         result
     }
 
-    fn start(self: &Arc<Core>) -> Result<CoreHandle, &str> {
+    fn start(self: &Arc<Core>) -> Result<CoreHandle> {
         let mut state = self
             .event_loop_state
             .lock()
             .expect("Failed to lock event loop state");
         if state.running {
-            return Err("Event loop already running");
+            return Err(Error::Rust(RustError::AlreadyRunning));
         }
         state.running = true;
         drop(state);
