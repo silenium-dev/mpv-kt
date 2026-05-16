@@ -6,17 +6,38 @@ use crate::mpv::Mpv;
 use jni::objects::{JObject, JString};
 use jni::strings::JNIString;
 use jni::{jni_mangle, jni_sig, Env, EnvUnowned, JValue};
-use libmpv2_sys::mpv_format_MPV_FORMAT_NODE;
+use libmpv2_sys::{mpv_format_MPV_FORMAT_FLAG, mpv_format_MPV_FORMAT_NODE, mpv_format_MPV_FORMAT_OSD_STRING, mpv_format_MPV_FORMAT_STRING, mpv_node};
+use std::ffi::c_void;
 use std::thread::sleep;
 use std::time::Duration;
 
+#[macro_use]
+mod macros;
+mod alloc;
 mod core;
-pub mod errors;
 pub mod events;
 mod handle;
 pub mod mpv;
-pub mod nodes;
 mod test_utils;
+pub mod types;
+
+pub(crate) unsafe fn mpv_free(data: *mut c_void) {
+    #[cfg(not(test))]
+    unsafe {
+        libmpv2_sys::mpv_free(data);
+    }
+    #[cfg(test)]
+    test_utils::mpv_free_stub(data);
+}
+
+pub(crate) unsafe fn mpv_free_node_contents(node: *mut mpv_node) {
+    #[cfg(not(test))]
+    unsafe {
+        libmpv2_sys::mpv_free_node_contents(node)
+    }
+    #[cfg(test)]
+    test_utils::mpv_free_node_contents_stub(node);
+}
 
 struct TestCallback;
 impl EventCallback for TestCallback {
@@ -33,6 +54,10 @@ pub fn testN<'local>(mut env: EnvUnowned<'local>, _this: JObject<'local>) {
         mpv.initialize().expect("Failed to initialize mpv");
         let request_id = mpv
             .get_property_async("track-list", mpv_format_MPV_FORMAT_NODE)
+            .expect("Failed to get property");
+        println!("request_id: {}", request_id);
+        let request_id = mpv
+            .get_property_async("pid", mpv_format_MPV_FORMAT_NODE)
             .expect("Failed to get property");
         println!("request_id: {}", request_id);
         sleep(Duration::from_secs(1));

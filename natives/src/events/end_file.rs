@@ -1,5 +1,5 @@
-use crate::errors::MpvError;
 use crate::events::types::Event;
+use crate::types::errors::Error;
 use libmpv2_sys::{mpv_end_file_reason, mpv_event};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -29,7 +29,7 @@ pub(super) unsafe fn event_end_file(raw: &mpv_event) -> Event {
         let raw_data = raw.data as *mut libmpv2_sys::mpv_event_end_file;
         Event::EndFile {
             reason: EndFileReason::from((*raw_data).reason),
-            error: MpvError::from(raw.error),
+            error: Error::from(raw.error),
             playlist_entry_id: (*raw_data).playlist_entry_id,
             playlist_insert_id: (*raw_data).playlist_insert_id,
             playlist_insert_num_entries: (*raw_data).playlist_insert_num_entries,

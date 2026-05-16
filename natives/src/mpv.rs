@@ -1,6 +1,6 @@
 use crate::core;
-use crate::errors::MpvError;
 use crate::events::callback::EventCallback;
+use crate::types::errors::Error;
 use libmpv2_sys::{
     mpv_error_MPV_ERROR_SUCCESS, mpv_format, mpv_get_property_async, mpv_initialize,
 };
@@ -27,7 +27,7 @@ impl Mpv {
     }
 
     // TODO: introduce proper error type
-    pub fn initialize(&self) -> Result<(), MpvError> {
+    pub fn initialize(&self) -> Result<(), Error> {
         let handle = self.core.mpv_handle();
         let ret = unsafe { mpv_initialize(handle.as_ptr()) };
         if ret < mpv_error_MPV_ERROR_SUCCESS {
@@ -38,7 +38,7 @@ impl Mpv {
     }
 
     // TODO: introduce proper format enum type
-    pub fn get_property_async(&self, name: &str, format: mpv_format) -> Result<u64, MpvError> {
+    pub fn get_property_async(&self, name: &str, format: mpv_format) -> Result<u64, Error> {
         let handle = self.core.mpv_handle();
         let userdata = self.userdata_counter.fetch_add(1, Ordering::Relaxed);
         let name = CString::new(name).expect("invalid property name");

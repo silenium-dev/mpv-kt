@@ -139,8 +139,12 @@ impl Core {
                     break;
                 }
 
-                let event = Event::from(raw_event);
-                self.event_callback.on_event(jni_env, &event);
+                let event = Event::try_from(raw_event);
+                if event.is_err() {
+                    println!("ERROR: Failed to convert event: {:?}", event);
+                    continue;
+                }
+                self.event_callback.on_event(jni_env, &event.unwrap());
             }
         }
     }
