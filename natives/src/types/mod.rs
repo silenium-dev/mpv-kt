@@ -31,6 +31,28 @@ impl Format {
     }
 }
 
+impl TryFrom<mpv_format> for Format {
+    type Error = Error;
+    fn try_from(value: mpv_format) -> Result<Self> {
+        match value {
+            libmpv2_sys::mpv_format_MPV_FORMAT_NONE => Ok(Format::NONE),
+            libmpv2_sys::mpv_format_MPV_FORMAT_STRING => Ok(Format::STRING),
+            libmpv2_sys::mpv_format_MPV_FORMAT_OSD_STRING => Ok(Format::OSD_STRING),
+            libmpv2_sys::mpv_format_MPV_FORMAT_FLAG => Ok(Format::FLAG),
+            libmpv2_sys::mpv_format_MPV_FORMAT_INT64 => Ok(Format::INT64),
+            libmpv2_sys::mpv_format_MPV_FORMAT_DOUBLE => Ok(Format::DOUBLE),
+            libmpv2_sys::mpv_format_MPV_FORMAT_NODE => Ok(Format::NODE),
+            libmpv2_sys::mpv_format_MPV_FORMAT_NODE_ARRAY => Ok(Format::NODE_ARRAY),
+            libmpv2_sys::mpv_format_MPV_FORMAT_NODE_MAP => Ok(Format::NODE_MAP),
+            libmpv2_sys::mpv_format_MPV_FORMAT_BYTE_ARRAY => Ok(Format::BYTE_ARRAY),
+            f => {
+                let msg = format!("unknown format: {:?}", f);
+                Err(Error::Rust(RustError::Generic(msg)))
+            }
+        }
+    }
+}
+
 impl Format {
     pub const NONE: Format = Format::from(libmpv2_sys::mpv_format_MPV_FORMAT_NONE);
     pub const STRING: Format = Format::from(libmpv2_sys::mpv_format_MPV_FORMAT_STRING);

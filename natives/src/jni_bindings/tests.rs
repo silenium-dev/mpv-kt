@@ -4,7 +4,7 @@ use crate::mpv::Mpv;
 use crate::types::Format;
 use jni::objects::{JObject, JString};
 use jni::strings::JNIString;
-use jni::{jni_mangle, jni_sig, Env, EnvUnowned, JValue};
+use jni::{jni_mangle, jni_sig, jni_str, Env, EnvUnowned, JValue};
 use std::thread::sleep;
 use std::time::Duration;
 
@@ -15,7 +15,7 @@ impl EventCallback for TestCallback {
     }
 }
 
-#[jni_mangle("Test_main$TestNatives", "testN")]
+#[jni_mangle("dev.silenium.mpv.Bindings", "testN")]
 pub fn testN<'local>(mut env: EnvUnowned<'local>, _this: JObject<'local>) {
     env.with_env(|env| {
         println!("testN");
@@ -46,7 +46,7 @@ pub fn testN<'local>(mut env: EnvUnowned<'local>, _this: JObject<'local>) {
         mpv.terminate();
 
         let class = env
-            .find_class(JNIString::new("Test_main$TestNatives"))
+            .find_class(jni_str!("dev/silenium/mpv/Bindings"))
             .expect("Failed to find class");
         let str = JString::from_str(env, "hello from rust").expect("Failed to create string");
         env.call_static_method(

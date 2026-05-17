@@ -5,8 +5,8 @@ use crate::events::hook::event_hook;
 use crate::events::log_message::{event_log_message, LogLevel};
 use crate::events::property::{event_property, EventProperty};
 use crate::events::start_file::event_start_file;
-use crate::types::errors::Error;
-use crate::types::Node;
+use crate::types::errors::MpvError;
+use crate::types::{Error, Node};
 use libmpv2_sys::mpv_event;
 use std::bstr::ByteString;
 
@@ -20,16 +20,16 @@ pub enum Event {
         message: ByteString,
     },
     GetPropertyReply {
-        error: Error,
+        error: MpvError,
         user_data: u64,
         property: EventProperty,
     },
     SetPropertyReply {
-        error: Error,
+        error: MpvError,
         user_data: u64,
     },
     CommandReply {
-        error: Error,
+        error: MpvError,
         user_data: u64,
         reply: Node,
     },
@@ -38,7 +38,7 @@ pub enum Event {
     },
     EndFile {
         reason: EndFileReason,
-        error: Error,
+        error: MpvError,
         playlist_entry_id: i64,
         playlist_insert_id: i64,
         playlist_insert_num_entries: i32,
@@ -76,16 +76,16 @@ impl TryFrom<&mpv_event> for Event {
                 Ok(unsafe { event_log_message(raw) })
             }
             libmpv2_sys::mpv_event_id_MPV_EVENT_GET_PROPERTY_REPLY => Ok(Event::GetPropertyReply {
-                error: Error::from(raw.error),
+                error: MpvError::from(raw.error),
                 user_data: raw.reply_userdata,
                 property: unsafe { event_property(raw)? },
             }),
             libmpv2_sys::mpv_event_id_MPV_EVENT_SET_PROPERTY_REPLY => Ok(Event::SetPropertyReply {
-                error: Error::from(raw.error),
+                error: MpvError::from(raw.error),
                 user_data: raw.reply_userdata,
             }),
             libmpv2_sys::mpv_event_id_MPV_EVENT_COMMAND_REPLY => Ok(Event::CommandReply {
-                error: Error::from(raw.error),
+                error: MpvError::from(raw.error),
                 user_data: raw.reply_userdata,
                 reply: unsafe { event_command_reply(raw)? },
             }),

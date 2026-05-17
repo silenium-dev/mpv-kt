@@ -10,6 +10,7 @@ repositories {
 
 dependencies {
     implementation("dev.silenium.libs.jni:jni-utils:0.4.1")
+    testImplementation(kotlin("test"))
 }
 
 kotlin {
@@ -44,6 +45,10 @@ tasks {
         inputs.dir(templateSrc)
         inputs.properties(templateProps)
         outputs.dir(templateDst)
+    }
+
+    test {
+        useJUnitPlatform()
     }
 
     withType<Jar> {

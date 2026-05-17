@@ -31,12 +31,12 @@ pub enum RustError {
     InteriorNull(NulError),
     VersionMismatch(VersionError),
     Pointer(Option<DebugLoc>),
-    JniError(String),
+    Generic(String),
     AlreadyRunning,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub enum Error {
+pub enum MpvError {
     Success(i32),
     EventQueueFull,
     NoMemory,
@@ -58,7 +58,13 @@ pub enum Error {
     Unsupported,
     NotImplemented,
     Generic,
+}
+
+#[derive(Debug)]
+pub enum Error {
+    Mpv(MpvError),
     Rust(RustError),
+    Jni(jni::errors::Error),
 }
 
 impl From<Utf8Error> for Error {
@@ -73,60 +79,83 @@ impl From<NulError> for Error {
     }
 }
 
+impl From<jni::errors::Error> for Error {
+    fn from(value: jni::errors::Error) -> Self {
+        Self::Jni(value)
+    }
+}
+
+impl From<MpvError> for Error {
+    fn from(value: MpvError) -> Self {
+        Self::Mpv(value)
+    }
+}
+
+impl From<RustError> for Error {
+    fn from(value: RustError) -> Self {
+        Self::Rust(value)
+    }
+}
+
 impl From<c_int> for Error {
     fn from(value: c_int) -> Self {
+        Self::Mpv(value.into())
+    }
+}
+
+impl From<c_int> for MpvError {
+    fn from(value: c_int) -> Self {
         match value {
-            value @ 0.. => Error::Success(value),
-            libmpv2_sys::mpv_error_MPV_ERROR_EVENT_QUEUE_FULL => Error::EventQueueFull,
-            libmpv2_sys::mpv_error_MPV_ERROR_NOMEM => Error::NoMemory,
-            libmpv2_sys::mpv_error_MPV_ERROR_UNINITIALIZED => Error::Uninitialized,
-            libmpv2_sys::mpv_error_MPV_ERROR_INVALID_PARAMETER => Error::InvalidParameter,
-            libmpv2_sys::mpv_error_MPV_ERROR_OPTION_NOT_FOUND => Error::OptionNotFound,
-            libmpv2_sys::mpv_error_MPV_ERROR_OPTION_FORMAT => Error::OptionFormat,
-            libmpv2_sys::mpv_error_MPV_ERROR_OPTION_ERROR => Error::OptionError,
-            libmpv2_sys::mpv_error_MPV_ERROR_PROPERTY_NOT_FOUND => Error::PropertyNotFound,
-            libmpv2_sys::mpv_error_MPV_ERROR_PROPERTY_FORMAT => Error::PropertyFormat,
-            libmpv2_sys::mpv_error_MPV_ERROR_PROPERTY_UNAVAILABLE => Error::PropertyUnavailable,
-            libmpv2_sys::mpv_error_MPV_ERROR_PROPERTY_ERROR => Error::PropertyError,
-            libmpv2_sys::mpv_error_MPV_ERROR_COMMAND => Error::Command,
-            libmpv2_sys::mpv_error_MPV_ERROR_LOADING_FAILED => Error::LoadingFailed,
-            libmpv2_sys::mpv_error_MPV_ERROR_AO_INIT_FAILED => Error::AoInitFailed,
-            libmpv2_sys::mpv_error_MPV_ERROR_VO_INIT_FAILED => Error::VoInitFailed,
-            libmpv2_sys::mpv_error_MPV_ERROR_NOTHING_TO_PLAY => Error::NothingToPlay,
-            libmpv2_sys::mpv_error_MPV_ERROR_UNKNOWN_FORMAT => Error::UnknownFormat,
-            libmpv2_sys::mpv_error_MPV_ERROR_UNSUPPORTED => Error::Unsupported,
-            libmpv2_sys::mpv_error_MPV_ERROR_NOT_IMPLEMENTED => Error::NotImplemented,
-            libmpv2_sys::mpv_error_MPV_ERROR_GENERIC => Error::Generic,
+            value @ 0.. => MpvError::Success(value),
+            libmpv2_sys::mpv_error_MPV_ERROR_EVENT_QUEUE_FULL => MpvError::EventQueueFull,
+            libmpv2_sys::mpv_error_MPV_ERROR_NOMEM => MpvError::NoMemory,
+            libmpv2_sys::mpv_error_MPV_ERROR_UNINITIALIZED => MpvError::Uninitialized,
+            libmpv2_sys::mpv_error_MPV_ERROR_INVALID_PARAMETER => MpvError::InvalidParameter,
+            libmpv2_sys::mpv_error_MPV_ERROR_OPTION_NOT_FOUND => MpvError::OptionNotFound,
+            libmpv2_sys::mpv_error_MPV_ERROR_OPTION_FORMAT => MpvError::OptionFormat,
+            libmpv2_sys::mpv_error_MPV_ERROR_OPTION_ERROR => MpvError::OptionError,
+            libmpv2_sys::mpv_error_MPV_ERROR_PROPERTY_NOT_FOUND => MpvError::PropertyNotFound,
+            libmpv2_sys::mpv_error_MPV_ERROR_PROPERTY_FORMAT => MpvError::PropertyFormat,
+            libmpv2_sys::mpv_error_MPV_ERROR_PROPERTY_UNAVAILABLE => MpvError::PropertyUnavailable,
+            libmpv2_sys::mpv_error_MPV_ERROR_PROPERTY_ERROR => MpvError::PropertyError,
+            libmpv2_sys::mpv_error_MPV_ERROR_COMMAND => MpvError::Command,
+            libmpv2_sys::mpv_error_MPV_ERROR_LOADING_FAILED => MpvError::LoadingFailed,
+            libmpv2_sys::mpv_error_MPV_ERROR_AO_INIT_FAILED => MpvError::AoInitFailed,
+            libmpv2_sys::mpv_error_MPV_ERROR_VO_INIT_FAILED => MpvError::VoInitFailed,
+            libmpv2_sys::mpv_error_MPV_ERROR_NOTHING_TO_PLAY => MpvError::NothingToPlay,
+            libmpv2_sys::mpv_error_MPV_ERROR_UNKNOWN_FORMAT => MpvError::UnknownFormat,
+            libmpv2_sys::mpv_error_MPV_ERROR_UNSUPPORTED => MpvError::Unsupported,
+            libmpv2_sys::mpv_error_MPV_ERROR_NOT_IMPLEMENTED => MpvError::NotImplemented,
+            libmpv2_sys::mpv_error_MPV_ERROR_GENERIC => MpvError::Generic,
             _ => unimplemented!(),
         }
     }
 }
 
-impl From<&Error> for c_int {
-    fn from(value: &Error) -> Self {
+impl From<&MpvError> for c_int {
+    fn from(value: &MpvError) -> Self {
         match value {
-            Error::EventQueueFull => libmpv2_sys::mpv_error_MPV_ERROR_EVENT_QUEUE_FULL,
-            Error::NoMemory => libmpv2_sys::mpv_error_MPV_ERROR_NOMEM,
-            Error::Uninitialized => libmpv2_sys::mpv_error_MPV_ERROR_UNINITIALIZED,
-            Error::InvalidParameter => libmpv2_sys::mpv_error_MPV_ERROR_INVALID_PARAMETER,
-            Error::OptionNotFound => libmpv2_sys::mpv_error_MPV_ERROR_OPTION_NOT_FOUND,
-            Error::OptionFormat => libmpv2_sys::mpv_error_MPV_ERROR_OPTION_FORMAT,
-            Error::OptionError => libmpv2_sys::mpv_error_MPV_ERROR_OPTION_ERROR,
-            Error::PropertyNotFound => libmpv2_sys::mpv_error_MPV_ERROR_PROPERTY_NOT_FOUND,
-            Error::PropertyFormat => libmpv2_sys::mpv_error_MPV_ERROR_PROPERTY_FORMAT,
-            Error::PropertyUnavailable => libmpv2_sys::mpv_error_MPV_ERROR_PROPERTY_UNAVAILABLE,
-            Error::PropertyError => libmpv2_sys::mpv_error_MPV_ERROR_PROPERTY_ERROR,
-            Error::Command => libmpv2_sys::mpv_error_MPV_ERROR_COMMAND,
-            Error::LoadingFailed => libmpv2_sys::mpv_error_MPV_ERROR_LOADING_FAILED,
-            Error::AoInitFailed => libmpv2_sys::mpv_error_MPV_ERROR_AO_INIT_FAILED,
-            Error::VoInitFailed => libmpv2_sys::mpv_error_MPV_ERROR_VO_INIT_FAILED,
-            Error::NothingToPlay => libmpv2_sys::mpv_error_MPV_ERROR_NOTHING_TO_PLAY,
-            Error::UnknownFormat => libmpv2_sys::mpv_error_MPV_ERROR_UNKNOWN_FORMAT,
-            Error::Unsupported => libmpv2_sys::mpv_error_MPV_ERROR_UNSUPPORTED,
-            Error::NotImplemented => libmpv2_sys::mpv_error_MPV_ERROR_NOT_IMPLEMENTED,
-            Error::Generic => libmpv2_sys::mpv_error_MPV_ERROR_GENERIC,
-            Error::Rust(_) => libmpv2_sys::mpv_error_MPV_ERROR_GENERIC,
-            Error::Success(x) => *x as c_int,
+            MpvError::EventQueueFull => libmpv2_sys::mpv_error_MPV_ERROR_EVENT_QUEUE_FULL,
+            MpvError::NoMemory => libmpv2_sys::mpv_error_MPV_ERROR_NOMEM,
+            MpvError::Uninitialized => libmpv2_sys::mpv_error_MPV_ERROR_UNINITIALIZED,
+            MpvError::InvalidParameter => libmpv2_sys::mpv_error_MPV_ERROR_INVALID_PARAMETER,
+            MpvError::OptionNotFound => libmpv2_sys::mpv_error_MPV_ERROR_OPTION_NOT_FOUND,
+            MpvError::OptionFormat => libmpv2_sys::mpv_error_MPV_ERROR_OPTION_FORMAT,
+            MpvError::OptionError => libmpv2_sys::mpv_error_MPV_ERROR_OPTION_ERROR,
+            MpvError::PropertyNotFound => libmpv2_sys::mpv_error_MPV_ERROR_PROPERTY_NOT_FOUND,
+            MpvError::PropertyFormat => libmpv2_sys::mpv_error_MPV_ERROR_PROPERTY_FORMAT,
+            MpvError::PropertyUnavailable => libmpv2_sys::mpv_error_MPV_ERROR_PROPERTY_UNAVAILABLE,
+            MpvError::PropertyError => libmpv2_sys::mpv_error_MPV_ERROR_PROPERTY_ERROR,
+            MpvError::Command => libmpv2_sys::mpv_error_MPV_ERROR_COMMAND,
+            MpvError::LoadingFailed => libmpv2_sys::mpv_error_MPV_ERROR_LOADING_FAILED,
+            MpvError::AoInitFailed => libmpv2_sys::mpv_error_MPV_ERROR_AO_INIT_FAILED,
+            MpvError::VoInitFailed => libmpv2_sys::mpv_error_MPV_ERROR_VO_INIT_FAILED,
+            MpvError::NothingToPlay => libmpv2_sys::mpv_error_MPV_ERROR_NOTHING_TO_PLAY,
+            MpvError::UnknownFormat => libmpv2_sys::mpv_error_MPV_ERROR_UNKNOWN_FORMAT,
+            MpvError::Unsupported => libmpv2_sys::mpv_error_MPV_ERROR_UNSUPPORTED,
+            MpvError::NotImplemented => libmpv2_sys::mpv_error_MPV_ERROR_NOT_IMPLEMENTED,
+            MpvError::Generic => libmpv2_sys::mpv_error_MPV_ERROR_GENERIC,
+            MpvError::Success(x) => *x as c_int,
         }
     }
 }

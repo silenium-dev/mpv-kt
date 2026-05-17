@@ -1,4 +1,4 @@
-use crate::mpv_free;
+use crate::ffi::mpv_free;
 use crate::types::traits::{MpvRecvInternal, MpvSendInternal};
 use crate::types::{Format, MpvFormat, MpvRecv, MpvSend, Node};
 use std::ffi::{c_char, c_int, c_void, CStr, CString};

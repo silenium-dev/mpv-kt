@@ -1,14 +1,12 @@
 package dev.silenium.mpv
 
-//import dev.silenium.libs.jni.NativeLoader
+import dev.silenium.libs.jni.NativeLoader
 import dev.silenium.libs.jni.Platform
-//import dev.silenium.mpv.build.BuildConstants
-import kotlin.io.path.Path
-import kotlin.io.path.absolutePathString
+import dev.silenium.mpv.build.BuildConstants
 
 
 object Natives {
-    private var loaded = false
+    internal var loaded = false
 
     private val platformDeps = mapOf(
         Platform.OS.LINUX to listOf(
@@ -25,17 +23,14 @@ object Natives {
         ),
     )
 
-    @Synchronized
-    fun ensureLoaded() {
+    fun ensureLoaded() = synchronized(this) {
         if (!loaded) {
-//            val deps = platformDeps[NativeLoader.nativePlatform.os]
-//                ?: error("Unsupported platform: ${NativeLoader.nativePlatform}")
-//            deps.forEach {
-//                NativeLoader.loadLibraryFromClasspath(it).getOrThrow()
-//            }
-//            NativeLoader.loadLibraryFromClasspath(BuildConstants.LIBRARY_NAME).getOrThrow()
-            System.load("/nix/store/q2ca1157v5641ll2ghq926yq83sqvfkl-mpv-0.41.0/lib/libmpv.so")
-            System.load(Path("natives/target/debug/libmpv_jni_rs.so").absolutePathString())
+            val deps = platformDeps[NativeLoader.nativePlatform.os]
+                ?: error("Unsupported platform: ${NativeLoader.nativePlatform}")
+            deps.forEach {
+                NativeLoader.loadLibraryFromClasspath(it).getOrThrow()
+            }
+            NativeLoader.loadLibraryFromClasspath(BuildConstants.LIBRARY_NAME).getOrThrow()
             loaded = true
         }
     }

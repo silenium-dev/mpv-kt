@@ -1,4 +1,4 @@
-use crate::mpv_free_node_contents;
+use crate::ffi::mpv_free_node_contents;
 use crate::types::byte_array::{ByteArray, MpvByteArray};
 use crate::types::node_array::{MpvNodeArray, NodeArray};
 use crate::types::node_map::{MpvNodeMap, NodeMap};

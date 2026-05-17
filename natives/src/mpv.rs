@@ -2,7 +2,7 @@ use crate::core;
 use crate::events::callback::EventCallback;
 use crate::types::traits::MpvSendInternal;
 use crate::types::Error::Rust;
-use crate::types::RustError::JniError;
+use crate::types::RustError::Generic;
 use crate::types::{error_to_result, Node};
 use crate::types::{Format, Result};
 use libmpv2_sys::{
@@ -21,7 +21,7 @@ impl Mpv {
     pub fn new(env: &mut jni::Env, event_callback: Box<dyn EventCallback>) -> Result<Self> {
         let jvm = env
             .get_java_vm()
-            .map_err(|e| Rust(JniError(format!("Failed to get Java VM: {}", e))))?;
+            .map_err(|e| Rust(Generic(format!("Failed to get Java VM: {}", e))))?;
         let core = core::create(jvm, event_callback)?;
 
         Ok(Self {

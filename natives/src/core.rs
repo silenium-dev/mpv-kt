@@ -2,7 +2,7 @@ use crate::events::callback::EventCallback;
 use crate::events::types::Event;
 use crate::handle::MpvHandle;
 use crate::types::Result;
-use crate::types::{Error, RustError};
+use crate::types::{MpvError, RustError};
 use libc::{setlocale, LC_NUMERIC};
 use libmpv2_sys::{
     mpv_event_id_MPV_EVENT_NONE, mpv_set_wakeup_callback, mpv_terminate_destroy, mpv_wait_event,
@@ -56,7 +56,7 @@ pub(crate) fn create(
 
     let raw_handle = unsafe { libmpv2_sys::mpv_create() };
     if raw_handle.is_null() {
-        return Err(Error::Uninitialized)
+        return Err(MpvError::Uninitialized.into())
     }
     let mpv_handle = NonNull::new(raw_handle).unwrap();
     let core = Core::new(jvm, mpv_handle.into(), callback);
@@ -85,7 +85,7 @@ impl Core {
             .lock()
             .expect("Failed to lock event loop state");
         if state.running {
-            return Err(Error::Rust(RustError::AlreadyRunning));
+            return Err(RustError::AlreadyRunning.into());
         }
         state.running = true;
         drop(state);
