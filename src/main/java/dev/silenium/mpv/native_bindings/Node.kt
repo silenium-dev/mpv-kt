@@ -1,6 +1,8 @@
-package dev.silenium.mpv.types
+package dev.silenium.mpv.native_bindings
 
-enum class Format(val value: Int) {
+import dev.silenium.mpv.native_bindings.api.NativeEnum
+
+enum class Format(override val value: Int): NativeEnum<Format> {
     None(0),
     String(1),
     OsdString(2),
