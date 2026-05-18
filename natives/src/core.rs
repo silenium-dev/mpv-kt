@@ -5,7 +5,8 @@ use crate::types::Result;
 use crate::types::{MpvError, RustError};
 use libc::{setlocale, LC_NUMERIC};
 use libmpv2_sys::{
-    mpv_event_id_MPV_EVENT_NONE, mpv_set_wakeup_callback, mpv_terminate_destroy, mpv_wait_event,
+    mpv_create, mpv_event_id_MPV_EVENT_NONE, mpv_handle, mpv_set_wakeup_callback,
+    mpv_terminate_destroy, mpv_wait_event,
 };
 use std::ffi::CString;
 use std::ops::Deref;
@@ -42,21 +43,18 @@ impl CoreHandle {
         result
     }
 
-    pub fn mpv_handle(&self) -> NonNull<libmpv2_sys::mpv_handle> {
+    pub fn mpv_handle(&self) -> NonNull<mpv_handle> {
         self.core.get_handle().deref().into()
     }
 }
 
-pub(crate) fn create(
-    jvm: jni::JavaVM,
-    callback: Box<dyn EventCallback>,
-) -> Result<CoreHandle> {
+pub(crate) fn create(jvm: jni::JavaVM, callback: Box<dyn EventCallback>) -> Result<CoreHandle> {
     let locale = CString::new("C")?;
     unsafe { setlocale(LC_NUMERIC, locale.as_ptr()) };
 
-    let raw_handle = unsafe { libmpv2_sys::mpv_create() };
+    let raw_handle = unsafe { mpv_create() };
     if raw_handle.is_null() {
-        return Err(MpvError::Uninitialized.into())
+        return Err(MpvError::Uninitialized.into());
     }
     let mpv_handle = NonNull::new(raw_handle).unwrap();
     let core = Core::new(jvm, mpv_handle.into(), callback);
