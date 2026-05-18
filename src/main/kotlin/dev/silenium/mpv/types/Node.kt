@@ -69,15 +69,31 @@ sealed class Node {
         override val format = Format.NodeArray
     }
 
-    data class Map(val value: kotlin.collections.Map<kotlin.String, Node>) : Node() {
-        // Used by JNI
-        @Suppress("unused")
-        constructor(pairs: kotlin.Array<Pair<kotlin.String, Node>>) : this(mapOf(*pairs))
-
-        // Used by JNI
-        @Suppress("unused")
-        private fun asPairs() = value.map { it.key to it.value }.toTypedArray()
+    data class Map(val keys: kotlin.Array<kotlin.String>, val values: kotlin.Array<Node>) : Node() {
+        val map = keys.zip(values).toMap()
 
         override val format = Format.NodeMap
+
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            if (javaClass != other?.javaClass) return false
+
+            other as Map
+
+            if (!keys.contentEquals(other.keys)) return false
+            if (!values.contentEquals(other.values)) return false
+            if (map != other.map) return false
+            if (format != other.format) return false
+
+            return true
+        }
+
+        override fun hashCode(): Int {
+            var result = keys.contentHashCode()
+            result = 31 * result + values.contentHashCode()
+            result = 31 * result + map.hashCode()
+            result = 31 * result + format.hashCode()
+            return result
+        }
     }
 }
