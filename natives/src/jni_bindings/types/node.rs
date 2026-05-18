@@ -115,10 +115,10 @@ impl<'a> JniUtils<'a> {
         let array = self
             .env
             .new_object_array(value.len() as jsize, node_class, JObject::null())?;
-        for (i, node) in value.iter().enumerate() {
-            let jni_node: JObject<'a> = node.as_jni(self.env)?;
-            array.set_element(self.env, i, jni_node)?;
-        }
+        // for (i, node) in value.iter().enumerate() {
+            // let jni_node: JObject<'a> = node.as_jni(self.env)?;
+            // array.set_element(self.env, i, jni_node)?;
+        // }
         Ok(array)
     }
 
