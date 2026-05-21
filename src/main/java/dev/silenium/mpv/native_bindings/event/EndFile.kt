@@ -1,6 +1,7 @@
 package dev.silenium.mpv.native_bindings.event
 
 import dev.silenium.mpv.native_bindings.Error
+import dev.silenium.mpv.native_bindings.api.InstantiableLayout
 import dev.silenium.mpv.native_bindings.api.NativeEnum
 import dev.silenium.mpv.native_bindings.api.NativeStructLayout
 import dev.silenium.mpv.native_bindings.api.get
@@ -12,7 +13,7 @@ data class EndFile(
     val playlistEntryId: Long,
     val playlistInsertId: Long,
     val playlistInsertNumEntries: Long
-) {
+): EventData {
     constructor(struct: MemorySegment) : this(
         struct[Layout.reason],
         struct[Layout.error],
@@ -29,7 +30,7 @@ data class EndFile(
         REDIRECT(5),
     }
 
-    companion object Layout : NativeStructLayout<EndFile>() {
+    companion object Layout : NativeStructLayout(), InstantiableLayout<EndFile> {
         val reason = enum<Reason>("reason")
         val error = enum<Error>("error")
         val playlistEntryId = long("playlist_entry_id")

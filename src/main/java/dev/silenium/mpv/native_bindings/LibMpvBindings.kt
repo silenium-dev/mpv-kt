@@ -2,9 +2,9 @@
 
 package dev.silenium.mpv.native_bindings
 
+import dev.silenium.mpv.native_bindings.api.parse
 import dev.silenium.mpv.native_bindings.event.Event
 import java.lang.foreign.*
-import java.lang.foreign.MemoryLayout.PathElement.groupElement
 import java.lang.invoke.MethodHandles
 import kotlin.reflect.jvm.javaMethod
 
@@ -51,6 +51,33 @@ class LibMpvBindings(val arena: Arena) {
         )
     }
 
+    private val handle_mpv_get_property_async by lazy {
+        val symbol = lookup.find("mpv_get_property_async").orElseThrow()
+        linker.downcallHandle(
+            symbol,
+            FunctionDescriptor.of(
+                ValueLayout.JAVA_INT,
+                AddressLayout.ADDRESS,
+                AddressLayout.JAVA_LONG,
+                AddressLayout.ADDRESS,
+                AddressLayout.JAVA_INT,
+            )
+        )
+    }
+
+    private val handle_mpv_command_async by lazy {
+        val symbol = lookup.find("mpv_command_async").orElseThrow()
+        linker.downcallHandle(
+            symbol,
+            FunctionDescriptor.of(
+                ValueLayout.JAVA_INT,
+                AddressLayout.ADDRESS,
+                ValueLayout.JAVA_LONG,
+                AddressLayout.ADDRESS,
+            )
+        )
+    }
+
     interface WakeupCallback : () -> Unit {
     }
 
@@ -60,7 +87,7 @@ class LibMpvBindings(val arena: Arena) {
 
     fun mpv_create(): Handle = Handle(handle_mpv_create() as MemorySegment)
     fun mpv_terminate_destroy(handle: Handle) = handle_mpv_terminate_destroy(handle.pointer) as Unit
-    fun mpv_initialize(handle: Handle): Int = handle_mpv_initialize(handle.pointer) as Int
+    fun mpv_initialize(handle: Handle): Error = Error.fromValue(handle_mpv_initialize(handle.pointer) as Int)
 
     fun mpv_set_wakeup_callback(handle: Handle, callback: WakeupCallback) {
         val wrapper = CallbackWrapper(callback)
@@ -72,76 +99,28 @@ class LibMpvBindings(val arena: Arena) {
     fun mpv_wait_event(handle: Handle, timeout: Double): Event {
         val rawEvent = handle_mpv_wait_event(handle.pointer, timeout)
             .let { it as MemorySegment }
-            .reinterpret(Definitions.MPV_EVENT_LAYOUT.byteSize())
-        return Event(rawEvent)
+        return Event.parse(rawEvent)
     }
+
+    fun mpv_get_property_async(handle: Handle, userData: ULong, property: String): Error =
+        Arena.ofConfined().use { arena ->
+            val propertyStr = arena.allocateFrom(property)
+            val ret = handle_mpv_get_property_async(handle.pointer, userData.toLong(), propertyStr, Format.Node.value)
+            return Error.fromValue(ret as Int)
+        }
+
+    fun mpv_command_async(handle: Handle, userData: ULong, command: List<String>): Error =
+        Arena.ofConfined().use { arena ->
+            val commandArray = arena.allocate(AddressLayout.ADDRESS, (command.size + 1).toLong())
+            command.forEachIndexed { idx, cmd ->
+                commandArray.setAtIndex(AddressLayout.ADDRESS, idx.toLong(), arena.allocateFrom(cmd))
+            }
+            commandArray.setAtIndex(AddressLayout.ADDRESS, command.size.toLong(), MemorySegment.NULL)
+            val ret = handle_mpv_command_async(handle.pointer, userData.toLong(), commandArray)
+            return Error.fromValue(ret as Int)
+        }
 
     companion object {
         private const val LIBMPV_PATH: String = "/nix/store/q2ca1157v5641ll2ghq926yq83sqvfkl-mpv-0.41.0/lib/libmpv.so"
-    }
-
-    object Definitions {
-        val MPV_NODE_LAYOUT = MemoryLayout.structLayout(
-            /* u: union */
-            MemoryLayout.unionLayout(
-                /* string: char* */ ValueLayout.ADDRESS.withName("string"),
-                /* flag: int */ ValueLayout.JAVA_INT.withName("flag"),
-                /* int64: int64_t */ ValueLayout.JAVA_LONG.withName("int64"),
-                /* double_: double */ ValueLayout.JAVA_DOUBLE.withName("double_"),
-                /* list: mpv_node_list* */ ValueLayout.ADDRESS.withName("list"),
-                /* ba: mpv_byte_array* */ ValueLayout.ADDRESS.withName("ba"),
-            ).withName("u"),
-            /* format: mpv_format */ ValueLayout.JAVA_INT.withName("format"),
-        )
-        val MPV_NODE_LIST_LAYOUT = MemoryLayout.structLayout(
-            /* num: int */ ValueLayout.JAVA_INT.withName("num"),
-            /* values: mpv_node* */ ValueLayout.ADDRESS.withName("values"),
-            /* keys: char** */ ValueLayout.ADDRESS.withName("keys"),
-        )
-        val MPV_BYTE_ARRAY_LAYOUT = MemoryLayout.structLayout(
-            /* data: void* */ ValueLayout.ADDRESS.withName("data"),
-            /* size: size_t */ ValueLayout.JAVA_LONG.withName("size"),
-        )
-
-        val MPV_EVENT_LAYOUT = MemoryLayout.structLayout(
-            ValueLayout.JAVA_INT.withName("event_id"),  // offset 0,  4 bytes
-            ValueLayout.JAVA_INT.withName("error"),                 // offset 4,  4 bytes
-            ValueLayout.JAVA_LONG.withName("reply_userdata"),       // offset 8,  8 bytes
-            ValueLayout.ADDRESS.withName("data"),                   // offset 16, 8 bytes (on 64-bit)
-        )                                                                   // total: 24 bytes
-
-        val MPV_EVENT_PROPERTY_LAYOUT = MemoryLayout.structLayout(
-            /* name: char* */ ValueLayout.ADDRESS.withName("name"),
-            /* format: mpv_format */ValueLayout.JAVA_INT.withName("format"),
-            MemoryLayout.paddingLayout(4),
-            /* value: void* */ ValueLayout.ADDRESS.withName("value"),
-        )
-        val MPV_EVENT_LOG_MESSAGE_LAYOUT = MemoryLayout.structLayout(
-            /* prefix: char* */ ValueLayout.ADDRESS.withName("prefix"),
-            /* level: char* */ ValueLayout.ADDRESS.withName("level"),
-            /* text: char* */ ValueLayout.ADDRESS.withName("text"),
-            /* log_level: mpv_log_level */ValueLayout.JAVA_INT.withName("log_level"),
-        )
-        val MPV_EVENT_CLIENT_MESSAGE_LAYOUT = MemoryLayout.structLayout(
-            /* num_args: int */ ValueLayout.JAVA_INT.withName("num_args"),
-            /* args: void** */ ValueLayout.ADDRESS.withName("args"),
-        )
-        val MPV_EVENT_START_FILE_LAYOUT = MemoryLayout.structLayout(
-            /* playlist_entry_id: int64_t */ValueLayout.JAVA_LONG.withName("playlist_entry_id"),
-        )
-        val MPV_EVENT_END_FILE_LAYOUT = MemoryLayout.structLayout(
-            /* reason: mpv_end_file_reason */ValueLayout.JAVA_INT.withName("reason"),
-            /* error: int */ ValueLayout.JAVA_INT.withName("error"),
-            /* playlist_entry_id: int64_t */ ValueLayout.JAVA_LONG.withName("playlist_entry_id"),
-            /* playlist_insert_id: int64_t */ ValueLayout.JAVA_LONG.withName("playlist_insert_id"),
-            /* playlist_insert_num_entries: int64_t */ ValueLayout.JAVA_LONG.withName("playlist_insert_num_entries"),
-        )
-        val MPV_EVENT_HOOK_LAYOUT = MemoryLayout.structLayout(
-            /* name: char* */ ValueLayout.ADDRESS.withName("name"),
-            /* id: uint64_t */ ValueLayout.JAVA_LONG.withName("id"),
-        )
-        val MPV_EVENT_COMMAND_REPLY_LAYOUT = MemoryLayout.structLayout(
-            /* result: mpv_node */ MPV_NODE_LAYOUT.withName("result"),
-        )
     }
 }

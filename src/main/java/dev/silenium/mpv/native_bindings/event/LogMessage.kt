@@ -1,10 +1,11 @@
 package dev.silenium.mpv.native_bindings.event
 
+import dev.silenium.mpv.native_bindings.api.InstantiableLayout
 import dev.silenium.mpv.native_bindings.api.get
 import dev.silenium.mpv.native_bindings.api.NativeStructLayout
 import java.lang.foreign.MemorySegment
 
-data class LogMessage(val prefix: String, val level: String, val text: String, val logLevel: UInt) {
+data class LogMessage(val prefix: String, val level: String, val text: String, val logLevel: UInt): EventData {
     constructor(struct: MemorySegment) : this(
         struct[Layout.prefix],
         struct[Layout.level],
@@ -23,7 +24,7 @@ data class LogMessage(val prefix: String, val level: String, val text: String, v
         TRACE(70),
     }
 
-    companion object Layout : NativeStructLayout<LogMessage>() {
+    companion object Layout : NativeStructLayout(), InstantiableLayout<LogMessage> {
         val prefix = string("prefix")
         val level = string("level")
         val text = string("text")

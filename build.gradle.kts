@@ -14,6 +14,7 @@ dependencies {
     implementation(kotlin("reflect"))
     implementation("dev.silenium.libs.jni:jni-utils:0.4.1")
     testImplementation(kotlin("test"))
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.11.0")
 }
 
 kotlin {

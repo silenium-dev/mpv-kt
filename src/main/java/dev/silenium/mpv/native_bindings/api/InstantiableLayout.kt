@@ -7,3 +7,5 @@ interface InstantiableLayout<T> {
     val layout: MemoryLayout
     fun from(segment: MemorySegment): T
 }
+
+fun <T> InstantiableLayout<T>.parse(segment: MemorySegment) = from(segment.asReadOnly().reinterpret(layout.byteSize()))
