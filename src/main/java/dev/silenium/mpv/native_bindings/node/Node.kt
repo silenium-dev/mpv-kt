@@ -69,6 +69,7 @@ sealed interface Node {
     companion object Layout : NativeStructLayout(), InstantiableLayout<Node> {
         val union = union("u", UnionLayout)
         val format = enum<Format>("format")
+        val padding_ = padding(4)
 
         override fun from(segment: MemorySegment): Node = when (segment[Layout.format]) {
             Format.None -> None

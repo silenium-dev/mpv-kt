@@ -14,16 +14,16 @@ class NativePointerList<E>(
     val mapper: (MemorySegment) -> E
 ) :
     NativeStructField<List<E>> {
-    override val layout: MemoryLayout = ValueLayout.ADDRESS_UNALIGNED
+    override val layout: MemoryLayout = ValueLayout.ADDRESS
     override val varHandle: VarHandle by lazy {
         struct.value.varHandle(groupElement(name))
     }
 
     override fun get(segment: MemorySegment): List<E> {
         val length = lengthField.get(segment)
-        val array = (varHandle.get(segment, 0L) as MemorySegment).reinterpret(AddressLayout.ADDRESS_UNALIGNED.byteSize() * length)
+        val array = (varHandle.get(segment, 0L) as MemorySegment).reinterpret(AddressLayout.ADDRESS.byteSize() * length)
         return List(length) { i ->
-            val raw = array.getAtIndex(AddressLayout.ADDRESS_UNALIGNED, i.toLong())
+            val raw = array.getAtIndex(AddressLayout.ADDRESS, i.toLong())
             mapper(raw)
         }
     }
@@ -37,7 +37,7 @@ class NativeList<E>(
     val mapper: (MemorySegment) -> E
 ) :
     NativeStructField<List<E>> {
-    override val layout: MemoryLayout = ValueLayout.ADDRESS_UNALIGNED
+    override val layout: MemoryLayout = ValueLayout.ADDRESS
     override val varHandle: VarHandle by lazy {
         struct.value.varHandle(groupElement(name))
     }

@@ -40,35 +40,35 @@ abstract class NativeStructLayout {
     }
 
     protected inline fun <reified E> enum(name: String): NativeStructField<E> where E : Enum<E>, E : NativeEnum<E> =
-        register<Int, E>(name, ValueLayout.JAVA_INT_UNALIGNED) { raw ->
+        register<Int, E>(name, ValueLayout.JAVA_INT) { raw ->
             enumValues<E>().first { it.value == raw }
         }
 
     protected fun string(name: String): NativeStructField<String> =
-        register<MemorySegment, String>(name, ValueLayout.ADDRESS_UNALIGNED) { raw ->
+        register<MemorySegment, String>(name, ValueLayout.ADDRESS) { raw ->
             raw.reinterpret(Long.MAX_VALUE).getString(0)
         }
 
     protected fun bool(name: String): NativeStructField<Boolean> =
-        register<Int, Boolean>(name, ValueLayout.JAVA_INT_UNALIGNED) { it != 0 }
+        register<Int, Boolean>(name, ValueLayout.JAVA_INT) { it != 0 }
 
     protected fun double(name: String): NativeStructField<Double> =
-        register<Double, Double>(name, ValueLayout.JAVA_DOUBLE_UNALIGNED) { it }
+        register<Double, Double>(name, ValueLayout.JAVA_DOUBLE) { it }
 
     protected fun int(name: String): NativeStructField<Int> =
-        register<Int, Int>(name, ValueLayout.JAVA_INT_UNALIGNED) { it }
+        register<Int, Int>(name, ValueLayout.JAVA_INT) { it }
 
     protected fun uint(name: String): NativeStructField<UInt> =
-        register<Int, UInt>(name, ValueLayout.JAVA_INT_UNALIGNED, Int::toUInt)
+        register<Int, UInt>(name, ValueLayout.JAVA_INT, Int::toUInt)
 
     protected fun long(name: String): NativeStructField<Long> =
-        register<Long, Long>(name, ValueLayout.JAVA_LONG_UNALIGNED) { it }
+        register<Long, Long>(name, ValueLayout.JAVA_LONG) { it }
 
     protected fun ulong(name: String): NativeStructField<ULong> =
-        register<Long, ULong>(name, ValueLayout.JAVA_LONG_UNALIGNED, Long::toULong)
+        register<Long, ULong>(name, ValueLayout.JAVA_LONG, Long::toULong)
 
     protected fun pointer(name: String): NativeStructField<MemorySegment> =
-        register<MemorySegment, MemorySegment>(name, ValueLayout.ADDRESS_UNALIGNED) { it }
+        register<MemorySegment, MemorySegment>(name, ValueLayout.ADDRESS) { it }
 
     protected fun pointerArray(
         name: String,
