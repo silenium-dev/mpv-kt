@@ -20,7 +20,7 @@
                 gradle_9
               ];
               buildInputs = with pkgs; [
-                mpv
+                mpv-unwrapped
               ];
             };
             default = mpv-java;

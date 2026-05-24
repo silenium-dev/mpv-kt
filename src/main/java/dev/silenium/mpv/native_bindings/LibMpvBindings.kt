@@ -191,6 +191,6 @@ class LibMpvBindings(val arena: Arena) {
         }
 
     companion object {
-        private const val LIBMPV_PATH: String = "/nix/store/q2ca1157v5641ll2ghq926yq83sqvfkl-mpv-0.41.0/lib/libmpv.so"
+        private const val LIBMPV_PATH: String = "/nix/store/5cli1434b5882638yksclkpipw09inix-mpv-0.41.0/lib/libmpv.so"
     }
 }
