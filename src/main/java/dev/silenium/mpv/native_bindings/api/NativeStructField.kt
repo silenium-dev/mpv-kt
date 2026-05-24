@@ -20,6 +20,7 @@ internal class MappedNativeStructField<T, M>(
     private val struct: Lazy<MemoryLayout>,
     val name: String,
     override val layout: MemoryLayout,
+    private val rawType: Class<T>,
     private val mapper: (T) -> M,
     private val reverseMapper: (M, Arena) -> T,
 ) : NativeStructField<M> {
@@ -27,7 +28,7 @@ internal class MappedNativeStructField<T, M>(
         struct.value.varHandle(groupElement(name))
     }
 
-    override fun get(segment: MemorySegment) = mapper(varHandle.get(segment, 0L) as T)
+    override fun get(segment: MemorySegment) = mapper(rawType.cast(varHandle.get(segment, 0L)))
     override fun set(segment: MemorySegment, value: M, arena: Arena) =
         varHandle.set(segment, 0L, reverseMapper(value, arena))
 }

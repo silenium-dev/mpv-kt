@@ -32,7 +32,7 @@ abstract class NativeStructLayout {
     ): NativeStructField<M> {
         if (isRealized) error("Cannot register fields after struct layout has been realized")
         entries.add(name to fieldLayout)
-        return MappedNativeStructField(layoutLazy, name, fieldLayout, mapper, reverseMapper)
+        return MappedNativeStructField(layoutLazy, name, fieldLayout, T::class.java, mapper, reverseMapper)
     }
 
     @PublishedApi

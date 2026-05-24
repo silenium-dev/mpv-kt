@@ -54,8 +54,10 @@ class Playground {
             CoroutineScope(Dispatchers.Default).launch {
                 libmpv.mpv_set_property_async(handle, 3u, "vo", Node.String("null"))
                 delay(3.seconds)
-                libmpv.mpv_get_property(handle, "metadata").getOrThrow().let {
+                libmpv.mpv_get_property(handle, "metadata").onSuccess {
                     println("Metadata: $it")
+                }.onFailure {
+                    println("Failed to get metadata: ${it.message}")
                 }
                 libmpv.mpv_get_property_async(handle, 2u, "metadata")
             }
