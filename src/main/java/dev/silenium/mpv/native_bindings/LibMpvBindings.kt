@@ -4,6 +4,8 @@ package dev.silenium.mpv.native_bindings
 
 import dev.silenium.mpv.native_bindings.api.parse
 import dev.silenium.mpv.native_bindings.event.Event
+import dev.silenium.mpv.native_bindings.node.Format
+import dev.silenium.mpv.native_bindings.node.Node
 import java.lang.foreign.*
 import java.lang.invoke.MethodHandles
 import kotlin.reflect.jvm.javaMethod
@@ -65,6 +67,35 @@ class LibMpvBindings(val arena: Arena) {
         )
     }
 
+    private val handle_mpv_set_property by lazy {
+        val symbol = lookup.find("mpv_set_property").orElseThrow()
+        linker.downcallHandle(
+            symbol,
+            FunctionDescriptor.of(
+                ValueLayout.JAVA_INT,
+                AddressLayout.ADDRESS,
+                AddressLayout.ADDRESS,
+                AddressLayout.JAVA_INT,
+                AddressLayout.ADDRESS,
+            )
+        )
+    }
+
+    private val handle_mpv_set_property_async by lazy {
+        val symbol = lookup.find("mpv_set_property_async").orElseThrow()
+        linker.downcallHandle(
+            symbol,
+            FunctionDescriptor.of(
+                ValueLayout.JAVA_INT,
+                AddressLayout.ADDRESS,
+                ValueLayout.JAVA_LONG,
+                AddressLayout.ADDRESS,
+                AddressLayout.JAVA_INT,
+                AddressLayout.ADDRESS,
+            )
+        )
+    }
+
     private val handle_mpv_command_async by lazy {
         val symbol = lookup.find("mpv_command_async").orElseThrow()
         linker.downcallHandle(
@@ -106,6 +137,22 @@ class LibMpvBindings(val arena: Arena) {
         Arena.ofConfined().use { arena ->
             val propertyStr = arena.allocateFrom(property)
             val ret = handle_mpv_get_property_async(handle.pointer, userData.toLong(), propertyStr, Format.Node.value)
+            return Error.fromValue(ret as Int)
+        }
+
+    fun mpv_set_property_async(handle: Handle, userData: ULong, name: String, data: Node): Error =
+        Arena.ofConfined().use { arena ->
+            val name = arena.allocateFrom(name)
+            val rawNode = data.into(arena)
+            val ret = handle_mpv_set_property_async(handle.pointer, userData.toLong(), name, Format.Node.value, rawNode)
+            return Error.fromValue(ret as Int)
+        }
+
+    fun mpv_set_property(handle: Handle, name: String, data: Node): Error =
+        Arena.ofConfined().use { arena ->
+            val name = arena.allocateFrom(name)
+            val rawNode = data.into(arena)
+            val ret = handle_mpv_set_property(handle.pointer, name, Format.Node.value, rawNode)
             return Error.fromValue(ret as Int)
         }
 

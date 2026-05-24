@@ -1,5 +1,6 @@
 package dev.silenium.mpv.native_bindings.api
 
+import java.lang.foreign.Arena
 import java.lang.foreign.MemoryLayout
 import java.lang.foreign.MemoryLayout.PathElement.groupElement
 import java.lang.foreign.MemorySegment
@@ -9,6 +10,7 @@ interface NativeStructField<T> {
     val varHandle: VarHandle?
     val layout: MemoryLayout
     fun get(segment: MemorySegment): T
+    fun set(segment: MemorySegment, value: T, arena: Arena)
 }
 
 fun <T> NativeStructField<T>.nullable(): NativeStructField<T?> = NullableNativeStructField(this)
@@ -19,12 +21,15 @@ internal class MappedNativeStructField<T, M>(
     val name: String,
     override val layout: MemoryLayout,
     private val mapper: (T) -> M,
+    private val reverseMapper: (M, Arena) -> T,
 ) : NativeStructField<M> {
     override val varHandle: VarHandle by lazy {
         struct.value.varHandle(groupElement(name))
     }
 
     override fun get(segment: MemorySegment) = mapper(varHandle.get(segment, 0L) as T)
+    override fun set(segment: MemorySegment, value: M, arena: Arena) =
+        varHandle.set(segment, 0L, reverseMapper(value, arena))
 }
 
 @PublishedApi
@@ -33,7 +38,8 @@ internal class EmbeddedStructField<T>(
     val name: String,
     override val layout: MemoryLayout,
     private val mapper: (MemorySegment) -> T,
-): NativeStructField<T> {
+    private val reverseMapper: (T, Arena) -> MemorySegment,
+) : NativeStructField<T> {
     override val varHandle: VarHandle? = null
     private val byteOffset by lazy {
         parentLayout.value.byteOffset(groupElement(name))
@@ -42,6 +48,11 @@ internal class EmbeddedStructField<T>(
     override fun get(segment: MemorySegment): T {
         val slice = segment.asSlice(byteOffset, layout.byteSize())
         return mapper(slice)
+    }
+
+    override fun set(segment: MemorySegment, value: T, arena: Arena) {
+        val slice = segment.asSlice(byteOffset, layout.byteSize())
+        slice.copyFrom(reverseMapper(value, arena))
     }
 }
 
@@ -58,5 +69,15 @@ internal class NullableNativeStructField<T>(
             if (raw == null || raw == MemorySegment.NULL) return null
         }
         return wrapped.get(segment)
+    }
+
+    override fun set(segment: MemorySegment, value: T?, arena: Arena) {
+        wrapped.varHandle?.let {
+            if (value == null) {
+                it.set(segment, 0L, MemorySegment.NULL)
+            } else {
+                wrapped.set(segment, value, arena)
+            }
+        }
     }
 }

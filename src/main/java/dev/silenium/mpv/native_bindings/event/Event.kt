@@ -7,7 +7,7 @@ import java.lang.foreign.MemorySegment
 
 sealed interface EventData
 
-data class Event(val eventId: Id, val error: Error, val replyUserdata: ULong, private val data: EventData? = null) {
+data class Event(val eventId: Id, val error: Error, val replyUserdata: ULong, val data: EventData? = null) {
     constructor(struct: MemorySegment) : this(
         struct[Layout.eventId],
         struct[Layout.error],

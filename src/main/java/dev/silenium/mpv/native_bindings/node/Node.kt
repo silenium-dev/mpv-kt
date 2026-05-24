@@ -1,18 +1,96 @@
 package dev.silenium.mpv.native_bindings.node
 
-import dev.silenium.mpv.native_bindings.Format
 import dev.silenium.mpv.native_bindings.api.*
+import java.lang.foreign.Arena
+import java.lang.foreign.MemoryLayout
 import java.lang.foreign.MemorySegment
 import java.nio.ByteBuffer
 
-sealed interface Node {
-    data object None : Node
-    data class String(val string: kotlin.String) : Node
-    data class OsdString(val string: kotlin.String) : Node
-    data class Flag(val flag: Boolean) : Node
-    data class Int64(val int64: Long) : Node
-    data class Double(val double: kotlin.Double) : Node
+sealed interface Node : InstantiatedStruct {
+    override val layout: MemoryLayout get() = Layout.layout
+
+    data object None : Node {
+        override fun into(arena: Arena): MemorySegment {
+            val segment = arena.allocate(Layout.layout)
+            segment[Layout.format, arena] = Format.None
+            val u = arena.allocate(UnionLayout.layout)
+            u[UnionLayout.flag, arena] = false
+            segment[Layout.union, arena] = u
+            return segment
+        }
+    }
+
+    data class String(val string: kotlin.String) : Node {
+        override fun into(arena: Arena): MemorySegment {
+            val segment = arena.allocate(Layout.layout)
+            segment[Layout.format, arena] = Format.String
+            val u = arena.allocate(UnionLayout.layout)
+            u[UnionLayout.string, arena] = string
+            segment[Layout.union, arena] = u
+            return segment
+        }
+    }
+
+    data class OsdString(val string: kotlin.String) : Node {
+        override fun into(arena: Arena): MemorySegment {
+            val segment = arena.allocate(Layout.layout)
+            segment[Layout.format, arena] = Format.OsdString
+            val u = arena.allocate(UnionLayout.layout)
+            u[UnionLayout.string, arena] = string
+            segment[Layout.union, arena] = u
+            return segment
+        }
+    }
+
+    data class Flag(val flag: Boolean) : Node {
+        override fun into(arena: Arena): MemorySegment {
+            val segment = arena.allocate(Layout.layout)
+            segment[Layout.format, arena] = Format.Flag
+            val u = arena.allocate(UnionLayout.layout)
+            u[UnionLayout.flag, arena] = flag
+            segment[Layout.union, arena] = u
+            return segment
+        }
+    }
+
+    data class Int64(val int64: Long) : Node {
+        override fun into(arena: Arena): MemorySegment {
+            val segment = arena.allocate(Layout.layout)
+            segment[Layout.format, arena] = Format.Int64
+            val u = arena.allocate(UnionLayout.layout)
+            u[UnionLayout.int64, arena] = int64
+            segment[Layout.union, arena] = u
+            return segment
+        }
+    }
+
+    data class Double(val double: kotlin.Double) : Node {
+        override fun into(arena: Arena): MemorySegment {
+            val segment = arena.allocate(Layout.layout)
+            segment[Layout.format, arena] = Format.Double
+            val u = arena.allocate(UnionLayout.layout)
+            u[UnionLayout.double, arena] = double
+            segment[Layout.union, arena] = u
+            return segment
+        }
+    }
+
     data class List(val list: kotlin.collections.List<Node>) : Node {
+        override fun into(arena: Arena): MemorySegment {
+            val segment = arena.allocate(Node.Layout.layout)
+            segment[Node.Layout.format, arena] = Format.NodeArray
+            val u = arena.allocate(UnionLayout.layout)
+
+            val values = list.map { it.into(arena) }
+            val rawList = arena.allocate(ListLayout.layout)
+            rawList[ListLayout.values, arena] = values
+
+            u[UnionLayout.list, arena] = rawList
+            segment[Node.Layout.union, arena] = u
+
+            return segment
+        }
+
         companion object Layout : InstantiableLayout<List> {
             override val layout by ListLayout::layout
             override fun from(segment: MemorySegment): List {
@@ -23,6 +101,23 @@ sealed interface Node {
     }
 
     data class Map(val map: kotlin.collections.Map<kotlin.String, Node>) : Node {
+        override fun into(arena: Arena): MemorySegment {
+            val segment = arena.allocate(Node.Layout.layout)
+            segment[Node.Layout.format, arena] = Format.NodeMap
+            val u = arena.allocate(UnionLayout.layout)
+
+            val keys = map.keys.toList()
+            val values = keys.map { map[it]!! }.map { it.into(arena) }
+            val rawList = arena.allocate(ListLayout.layout)
+            rawList[ListLayout.keys, arena] = keys
+            rawList[ListLayout.values, arena] = values
+
+            u[UnionLayout.list, arena] = rawList
+            segment[Node.Layout.union, arena] = u
+
+            return segment
+        }
+
         companion object Layout : InstantiableLayout<Map> {
             override val layout by ListLayout::layout
             override fun from(segment: MemorySegment): Map {
@@ -35,7 +130,24 @@ sealed interface Node {
         }
     }
 
-    data class ByteArray(val bytes: ByteBuffer) : Node {
+    data class ByteArray(val bytes: kotlin.ByteArray) : Node {
+        override fun into(arena: Arena): MemorySegment {
+            val segment = arena.allocate(Node.Layout.layout)
+            segment[Node.Layout.format, arena] = Format.ByteArray
+            val u = arena.allocate(UnionLayout.layout)
+
+            val ba = arena.allocate(Layout.layout)
+            val data = arena.allocate(bytes.size.toLong())
+            data.copyFrom(MemorySegment.ofArray(bytes))
+            ba[Layout.data, arena] = data
+            ba[Layout.size, arena] = bytes.size.toULong()
+
+            u[UnionLayout.ba, arena] = ba
+            segment[Node.Layout.union, arena] = u
+
+            return segment
+        }
+
         companion object Layout : NativeStructLayout(), InstantiableLayout<ByteArray> {
             val data = pointer("data")
             val size = ulong("size")
@@ -44,7 +156,7 @@ sealed interface Node {
                 val size = segment[Layout.size]
                 val buf = ByteBuffer.allocate(size.toInt())
                 buf.put(segment[Layout.data].asByteBuffer())
-                return ByteArray(buf)
+                return ByteArray(buf.array())
             }
         }
     }
@@ -62,7 +174,7 @@ sealed interface Node {
     object ListLayout : NativeStructLayout() {
         val num = int("num")
         val padding_ = padding(4)
-        val values = array("values", num, Layout.layout)
+        val values = array("values", num, Node.layout)
         val keys = stringArray("keys", num)
     }
 
