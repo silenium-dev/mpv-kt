@@ -86,10 +86,11 @@ object BuildRelease : BuildType({
         gradle {
             tasks = """
                 |build
+                |publish
             """.trimMargin().replace("\n", " ")
             gradleParams = """
                 |-Pdeploy.version=%release.version%
-                |-Pdeploy.enabled=true
+                |-Pdeploy.enabled=false
                 |-Pdeploy.repo-url=%deploy.repo-url%
                 |-Pdeploy.username=%deploy.username%
                 |-Pdeploy.password=%deploy.password%
@@ -156,10 +157,11 @@ object BuildSnapshot : BuildType({
         gradle {
             tasks = """
                 |build
+                |publish
             """.trimMargin().replace("\n", " ")
             gradleParams = """
                 |-Pci=true
-                |-Pdeploy.enabled=true
+                |-Pdeploy.enabled=false
                 |-Pdeploy.repo-url=%deploy.repo-url%
                 |-Pdeploy.username=%deploy.username%
                 |-Pdeploy.password=%deploy.password%
@@ -205,6 +207,7 @@ object BuildPR : BuildType({
         gradle {
             tasks = """
                 |build
+                |publish
             """.trimMargin().replace("\n", " ")
             gradleParams = """
                 |-Pdeploy.enabled=false
