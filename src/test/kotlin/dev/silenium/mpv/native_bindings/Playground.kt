@@ -44,7 +44,7 @@ class Playground {
             println("MPV Handle: $handle")
             ret = libmpv.mpv_command_async(
                 handle, 1u,
-                listOf("loadfile", "https://www.youtube.com/watch?v=dQw4w9WgXcQ"),
+                listOf("loadfile", "https://upload.wikimedia.org/wikipedia/commons/transcoded/7/73/Mandelbrot_Set_Color_Cycling_Video_1080p_3.webm/Mandelbrot_Set_Color_Cycling_Video_1080p_3.webm.1080p.vp9.webm"),
             )
             if (ret != Error.SUCCESS) {
                 println("MPV command failed: $ret")
