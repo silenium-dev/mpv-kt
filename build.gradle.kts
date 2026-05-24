@@ -17,7 +17,7 @@ allprojects {
     val gitVersionProvider = providers.gradleProperty("ci").flatMap {
         if (it.toBoolean()) {
             providers.exec {
-                commandLine("git", "describe", "--tags")
+                commandLine("git", "describe", "--tags", "--always", "--dirty", "--abbrev=8")
                 workingDir = layout.projectDirectory.asFile
             }.standardOutput.asText.map(String::trim)
         } else null
