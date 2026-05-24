@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <project>
   <modelVersion>4.0.0</modelVersion>
-  <name>Public_MpvJniRs Config DSL Script</name>
-  <groupId>Public_MpvJniRs</groupId>
-  <artifactId>Public_MpvJniRs_dsl</artifactId>
+  <name>Public_MpvKt Config DSL Script</name>
+  <groupId>Public_MpvKt</groupId>
+  <artifactId>Public_MpvKt_dsl</artifactId>
   <version>1.0-SNAPSHOT</version>
 
   <parent>

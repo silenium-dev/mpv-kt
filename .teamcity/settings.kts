@@ -1,35 +1,33 @@
-import jetbrains.buildServer.configs.kotlin.BuildType
-import jetbrains.buildServer.configs.kotlin.DslContext
+import jetbrains.buildServer.configs.kotlin.*
 import jetbrains.buildServer.configs.kotlin.buildFeatures.commitStatusPublisher
 import jetbrains.buildServer.configs.kotlin.buildFeatures.perfmon
 import jetbrains.buildServer.configs.kotlin.buildFeatures.pullRequests
-import jetbrains.buildServer.configs.kotlin.buildSteps.exec
+import jetbrains.buildServer.configs.kotlin.buildFeatures.vcsLabeling
 import jetbrains.buildServer.configs.kotlin.buildSteps.gradle
-import jetbrains.buildServer.configs.kotlin.buildSteps.script
-import jetbrains.buildServer.configs.kotlin.project
 import jetbrains.buildServer.configs.kotlin.projectFeatures.UntrustedBuildsSettings
 import jetbrains.buildServer.configs.kotlin.projectFeatures.untrustedBuildsSettings
 import jetbrains.buildServer.configs.kotlin.triggers.vcs
-import jetbrains.buildServer.configs.kotlin.version
 
-version = "2025.11"
+version = "2026.1"
 
 project {
+    buildType(BuildSnapshot)
+    buildType(BuildRelease)
+
     features {
         untrustedBuildsSettings {
-            id = "PROJECT_EXT_9"
-            defaultAction = UntrustedBuildsSettings.DefaultAction.APPROVE
             enableLog = true
-            approvalRules = "(groups:MAINTAINERS):1"
             manualRunsApproved = true
+            defaultAction = UntrustedBuildsSettings.DefaultAction.APPROVE
+            approvalRules = """
+                (groups:MAINTAINERS):1
+            """.trimIndent()
         }
     }
-
-    buildType(NixBuild)
 }
 
-object NixBuild : BuildType({
-    name = "Nix Build"
+object BuildRelease : BuildType({
+    name = "Build Release"
 
     vcs {
         root(DslContext.settingsRoot)
@@ -37,12 +35,148 @@ object NixBuild : BuildType({
             |+:*
         """.trimMargin()
     }
+
+    features {
+        perfmon {
+        }
+
+        vcsLabeling {
+            vcsRootId = "${DslContext.settingsRoot.id}"
+            labelingPattern = "%release.version%"
+            successfulOnly = true
+            branchFilter = """
+                |+:*
+            """.trimMargin()
+        }
+    }
+
+    requirements {
+        exists("system.nix.store")
+    }
+
+    params {
+        text(
+            "release.version",
+            "",
+            description = "Version to release",
+            display = ParameterDisplay.PROMPT,
+            allowEmpty = false
+        )
+        text(
+            "deploy.repo-url",
+            "https://nexus.silenium.dev/repository/maven-releases",
+            display = ParameterDisplay.HIDDEN,
+            readOnly = true
+        )
+        text(
+            "deploy.username",
+            "teamcity-ci",
+            display = ParameterDisplay.HIDDEN,
+            readOnly = true
+        )
+        password(
+            "deploy.password",
+            "credentialsJSON:149ec97d-3f03-4588-b740-38f933c0d1e2",
+            display = ParameterDisplay.HIDDEN,
+            readOnly = true
+        )
+    }
+
+    steps {
+        gradle {
+            tasks = """
+                |build
+                |publish
+            """.trimMargin().replace("\n", " ")
+            gradleParams = """
+                |-Pdeploy.version=%release.version%
+                |-Pdeploy.enabled=true
+                |-Pdeploy.repo-url=%deploy.repo-url%
+                |-Pdeploy.username=%deploy.username%
+                |-Pdeploy.password=%deploy.password%
+                |--scan
+                |--info
+            """.trimMargin().replace("\n", " ")
+        }
+    }
+})
+
+object BuildSnapshot : BuildType({
+    name = "Build Snapshot"
+
+    vcs {
+        root(DslContext.settingsRoot)
+    }
+
     triggers {
         vcs {
             branchFilter = """
                 |+:*
             """.trimMargin()
         }
+    }
+
+    features {
+        perfmon {
+        }
+
+        commitStatusPublisher {
+            publisher = github {
+                githubUrl = "https://api.github.com"
+                authType = vcsRoot()
+            }
+        }
+    }
+
+    requirements {
+        exists("system.nix.store")
+    }
+
+    params {
+        text(
+            "deploy.repo-url",
+            "https://nexus.silenium.dev/repository/maven-snapshots",
+            display = ParameterDisplay.HIDDEN,
+            readOnly = true
+        )
+        text(
+            "deploy.username",
+            "teamcity-ci",
+            display = ParameterDisplay.HIDDEN,
+            readOnly = true
+        )
+        password(
+            "deploy.password",
+            "credentialsJSON:149ec97d-3f03-4588-b740-38f933c0d1e2",
+            display = ParameterDisplay.HIDDEN,
+            readOnly = true
+        )
+    }
+
+    steps {
+        gradle {
+            tasks = """
+                |build
+                |publish
+            """.trimMargin().replace("\n", " ")
+            gradleParams = """
+                |-Pci=true
+                |-Pdeploy.enabled=true
+                |-Pdeploy.repo-url=%deploy.repo-url%
+                |-Pdeploy.username=%deploy.username%
+                |-Pdeploy.password=%deploy.password%
+                |--scan
+                |--info
+            """.trimMargin().replace("\n", " ")
+        }
+    }
+})
+
+object BuildPR : BuildType({
+    name = "Build Pull Request"
+
+    vcs {
+        root(DslContext.settingsRoot)
     }
 
     features {
@@ -65,17 +199,21 @@ object NixBuild : BuildType({
         }
     }
 
+    requirements {
+        exists("system.nix.store")
+    }
+
     steps {
-        script {
-            scriptContent = """
-                |source <(nix print-dev-env)
-            """.trimMargin()
-            formatStderrAsError = false
-        }
         gradle {
-            jdkHome = "%env.JDK_25_0%"
-            tasks = "clean build"
-            useGradleWrapper = true
+            tasks = """
+                |build
+                |publish
+            """.trimMargin().replace("\n", " ")
+            gradleParams = """
+                |-Pdeploy.enabled=false
+                |--scan
+                |--info
+            """.trimMargin().replace("\n", " ")
         }
     }
 })
