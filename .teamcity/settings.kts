@@ -86,7 +86,6 @@ object BuildRelease : BuildType({
         gradle {
             tasks = """
                 |build
-                |publish
             """.trimMargin().replace("\n", " ")
             gradleParams = """
                 |-Pdeploy.version=%release.version%
@@ -157,7 +156,6 @@ object BuildSnapshot : BuildType({
         gradle {
             tasks = """
                 |build
-                |publish
             """.trimMargin().replace("\n", " ")
             gradleParams = """
                 |-Pci=true
@@ -207,7 +205,6 @@ object BuildPR : BuildType({
         gradle {
             tasks = """
                 |build
-                |publish
             """.trimMargin().replace("\n", " ")
             gradleParams = """
                 |-Pdeploy.enabled=false

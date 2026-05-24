@@ -4,11 +4,49 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 plugins {
     kotlin("jvm") version "2.3.21"
     id("dev.silenium.libs.jni.nix-natives") version "0.5.1" apply false
+    `maven-publish`
 }
 
-repositories {
-    mavenCentral()
-    maven("https://nexus.silenium.dev/repository/maven-releases/")
+val deployEnabled = (findProperty("deploy.enabled") as String?)?.toBoolean() ?: false
+
+allprojects {
+    apply<MavenPublishPlugin>()
+    apply<BasePlugin>()
+
+    group = "dev.silenium.libs.mpv"
+    val gitVersionProvider = providers.gradleProperty("ci").flatMap {
+        if (it.toBoolean()) {
+            providers.exec {
+                commandLine("git", "describe", "--tags")
+                workingDir = layout.projectDirectory.asFile
+            }.standardOutput.asText.map(String::trim)
+        } else null
+    }
+    version = providers
+        .gradleProperty("deploy.version")
+        .orElse(gitVersionProvider)
+        .orElse("0.0.0-SNAPSHOT")
+        .get()
+
+    repositories {
+        mavenCentral()
+        maven("https://nexus.silenium.dev/repository/maven-releases/")
+    }
+
+    publishing {
+        repositories {
+            if (deployEnabled) {
+                val url = findProperty("deploy.repo-url") as? String ?: error("No deploy.repo-url specified")
+                maven(url) {
+                    name = "nexus"
+                    credentials {
+                        username = findProperty("deploy.username") as? String ?: ""
+                        password = findProperty("deploy.password") as? String ?: ""
+                    }
+                }
+            }
+        }
+    }
 }
 
 dependencies {
@@ -28,23 +66,7 @@ java {
     toolchain.languageVersion = JavaLanguageVersion.of(25)
 }
 
-val templateSrc = layout.projectDirectory.dir("src/main/templates")
-val templateDst = layout.buildDirectory.dir("generated/templates")
-val templateProps = mapOf(
-    "LIBRARY_NAME" to rootProject.name,
-)
 tasks {
-    val generateTemplates = register<Copy>("generateTemplates") {
-        description = "generate BuildConstants"
-        from(templateSrc)
-        into(templateDst)
-        expand(templateProps)
-
-        inputs.dir(templateSrc)
-        inputs.properties(templateProps)
-        outputs.dir(templateDst)
-    }
-
     test {
         useJUnitPlatform()
         javaLauncher = nixJavaLauncher()
@@ -52,18 +74,8 @@ tasks {
     }
 
     withType<Jar> {
-        dependsOn(generateTemplates)
         manifest {
             from("src/main/resources/META-INF/MANIFEST.MF")
         }
-    }
-
-    compileKotlin {
-        dependsOn(generateTemplates)
-    }
-}
-sourceSets.main {
-    kotlin {
-        srcDir(templateDst)
     }
 }
