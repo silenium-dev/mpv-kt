@@ -67,6 +67,7 @@ object NixBuild : BuildType({
 
     steps {
         gradle {
+            jdkHome = "%env.JDK_25%"
             tasks = "clean build"
             useGradleWrapper = true
         }
