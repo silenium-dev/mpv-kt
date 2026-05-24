@@ -66,6 +66,12 @@ object NixBuild : BuildType({
     }
 
     steps {
+        script {
+            scriptContent = """
+                |source <(nix print-dev-env)
+            """.trimMargin()
+            formatStderrAsError = false
+        }
         gradle {
             jdkHome = "%env.JDK_25_0%"
             tasks = "clean build"
