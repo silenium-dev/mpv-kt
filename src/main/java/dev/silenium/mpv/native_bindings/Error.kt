@@ -2,7 +2,7 @@ package dev.silenium.mpv.native_bindings
 
 import dev.silenium.mpv.native_bindings.api.NativeEnum
 
-enum class Error(override val value: Int): NativeEnum<Error> {
+enum class Error(override val value: Int) : NativeEnum<Error> {
     SUCCESS(0),
     EVENT_QUEUE_FULL(-1),
     NOMEM(-2),
@@ -34,3 +34,12 @@ enum class Error(override val value: Int): NativeEnum<Error> {
         }
     }
 }
+
+class MpvException(val error: Error) : RuntimeException("MPV error: $error")
+
+fun <T> Result.Companion.mpv(error: Error, value: () -> T) =
+    if (error == Error.SUCCESS) {
+        Result.success(value())
+    } else {
+        Result.failure(MpvException(error))
+    }

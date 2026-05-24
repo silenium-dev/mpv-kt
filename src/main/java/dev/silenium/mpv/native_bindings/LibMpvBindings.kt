@@ -81,6 +81,20 @@ class LibMpvBindings(val arena: Arena) {
         )
     }
 
+    private val handle_mpv_get_property by lazy {
+        val symbol = lookup.find("mpv_get_property").orElseThrow()
+        linker.downcallHandle(
+            symbol,
+            FunctionDescriptor.of(
+                ValueLayout.JAVA_INT,
+                AddressLayout.ADDRESS,
+                AddressLayout.ADDRESS,
+                AddressLayout.JAVA_INT,
+                AddressLayout.ADDRESS,
+            )
+        )
+    }
+
     private val handle_mpv_set_property_async by lazy {
         val symbol = lookup.find("mpv_set_property_async").orElseThrow()
         linker.downcallHandle(
@@ -155,6 +169,15 @@ class LibMpvBindings(val arena: Arena) {
             val ret = handle_mpv_set_property(handle.pointer, name, Format.Node.value, rawNode)
             return Error.fromValue(ret as Int)
         }
+
+    fun mpv_get_property(handle: Handle, name: String): Result<Node> = Arena.ofConfined().use { arena ->
+        val name = arena.allocateFrom(name)
+        val rawNode = arena.allocate(Node.layout)
+        val ret = handle_mpv_get_property(handle.pointer, name, Format.Node.value, rawNode)
+        return Result.mpv(Error.fromValue(ret as Int)) {
+            Node.parse(rawNode)
+        }
+    }
 
     fun mpv_command_async(handle: Handle, userData: ULong, command: List<String>): Error =
         Arena.ofConfined().use { arena ->

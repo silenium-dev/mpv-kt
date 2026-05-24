@@ -52,10 +52,11 @@ class Playground {
             }
 
             CoroutineScope(Dispatchers.Default).launch {
-                libmpv.mpv_set_property_async(handle, 3u, "vo", Node.String("gpu"))
+                libmpv.mpv_set_property_async(handle, 3u, "vo", Node.String("null"))
                 delay(3.seconds)
-                libmpv.mpv_set_property_async(handle, 3u, "vo", Node.Map(mapOf("null" to Node.ByteArray(byteArrayOf(0)))))
-                delay(1.seconds)
+                libmpv.mpv_get_property(handle, "metadata").getOrThrow().let {
+                    println("Metadata: $it")
+                }
                 libmpv.mpv_get_property_async(handle, 2u, "metadata")
             }
             while (true) {
