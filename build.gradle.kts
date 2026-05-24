@@ -1,8 +1,9 @@
+import dev.silenium.libs.jni.nixJavaLauncher
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     kotlin("jvm") version "2.3.21"
-//    id("dev.silenium.libs.jni.nix-natives") version "0.4.1"
+    id("dev.silenium.libs.jni.nix-natives") version "0.5.1" apply false
 }
 
 repositories {
@@ -12,7 +13,6 @@ repositories {
 
 dependencies {
     implementation(kotlin("reflect"))
-//    implementation("dev.silenium.libs.jni:jni-utils:0.4.1")
     testImplementation(kotlin("test"))
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.11.0")
 }
@@ -27,19 +27,6 @@ java {
     targetCompatibility = JavaVersion.VERSION_25
     toolchain.languageVersion = JavaLanguageVersion.of(25)
 }
-
-//nixNatives {
-//    libName = "mpv-jni-rs"
-//    libVersion = "0.1.0"
-//    nixFlake = file("flake.nix")
-//    nixFlakeLock = file("flake.lock")
-//    showLogs = true
-//    sourceFiles.from(
-//        file("natives/Cargo.toml"),
-//        file("natives/Cargo.lock"),
-//        file("natives/src"),
-//    )
-//}
 
 val templateSrc = layout.projectDirectory.dir("src/main/templates")
 val templateDst = layout.buildDirectory.dir("generated/templates")
@@ -60,6 +47,7 @@ tasks {
 
     test {
         useJUnitPlatform()
+        javaLauncher = nixJavaLauncher()
         jvmArgs("--enable-native-access=ALL-UNNAMED")
     }
 

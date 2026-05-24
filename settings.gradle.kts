@@ -1,6 +1,7 @@
 pluginManagement {
     repositories {
         gradlePluginPortal()
+        mavenLocal()
         maven("https://nexus.silenium.dev/repository/maven-releases/")
     }
 }
