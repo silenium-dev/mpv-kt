@@ -47,7 +47,7 @@ abstract class NativeStructLayout {
             name,
             ValueLayout.JAVA_INT,
             mapper = { raw ->
-                enumMap[raw] ?: error("Invalid enum value: $raw")
+                enumMap[raw] ?: throw NoSuchElementException("Invalid enum value: $raw")
             },
             reverseMapper = { value, _ ->
                 value.value
