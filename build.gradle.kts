@@ -2,9 +2,9 @@ import dev.silenium.libs.jni.nixJavaLauncher
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
-    kotlin("jvm") version "2.3.21"
-    kotlin("plugin.atomicfu") version "2.3.21"
-    id("dev.silenium.libs.jni.nix-natives") version "0.5.1" apply false
+    alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.kotlin.atomicfu)
+    alias(libs.plugins.nix.natives) apply false
     `maven-publish`
 }
 
@@ -52,10 +52,10 @@ allprojects {
 
 dependencies {
     implementation(kotlin("reflect"))
-    implementation("org.slf4j:slf4j-api:2.0.18")
-    implementation("ch.qos.logback:logback-classic:1.5.32")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.11.0")
-    implementation("org.jetbrains.kotlinx:atomicfu:0.32.1")
+    implementation(libs.slf4j.api)
+    implementation(libs.logback.classic)
+    implementation(libs.kotlinx.coroutines.core)
+    implementation(libs.kotlinx.atomicfu)
 
     testImplementation(kotlin("test"))
 }
