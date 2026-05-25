@@ -123,6 +123,16 @@ class LibMpvBindings(val arena: Arena) {
         )
     }
 
+    private val handle_mpv_free_node_contents by lazy {
+        val symbol = lookup.find("mpv_free_node_contents").orElseThrow()
+        linker.downcallHandle(
+            symbol,
+            FunctionDescriptor.ofVoid(
+                AddressLayout.ADDRESS,
+            )
+        )
+    }
+
     interface WakeupCallback : () -> Unit {
     }
 
@@ -174,9 +184,12 @@ class LibMpvBindings(val arena: Arena) {
         val name = arena.allocateFrom(name)
         val rawNode = arena.allocate(Node.layout)
         val ret = handle_mpv_get_property(handle.pointer, name, Format.Node.value, rawNode)
-        return Result.mpv(Error.fromValue(ret as Int)) {
-            Node.parse(rawNode)
+        val result = Result.mpv(Error.fromValue(ret as Int)) {
+            Node.parse(rawNode).also {
+                mpv_free_node_contents(rawNode)
+            }
         }
+        return result
     }
 
     fun mpv_command_async(handle: Handle, userData: ULong, command: List<String>): Error =
@@ -189,6 +202,10 @@ class LibMpvBindings(val arena: Arena) {
             val ret = handle_mpv_command_async(handle.pointer, userData.toLong(), commandArray)
             return Error.fromValue(ret as Int)
         }
+
+    private fun mpv_free_node_contents(node: MemorySegment) {
+        handle_mpv_free_node_contents(node)
+    }
 
     companion object {
         private const val LIBMPV_PATH: String = "/nix/store/5cli1434b5882638yksclkpipw09inix-mpv-0.41.0/lib/libmpv.so"
