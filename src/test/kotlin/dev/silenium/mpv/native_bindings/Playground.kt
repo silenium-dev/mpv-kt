@@ -81,6 +81,7 @@ class Playground {
     @Test
     fun apiPlayground(): Unit = runBlocking {
         val mpv = Mpv()
+        mpv.setProperty("vo", Node.String("null")).getOrThrow()
         mpv.initialize().getOrThrow()
         val eventJob = launch {
             mpv.events.collect {
