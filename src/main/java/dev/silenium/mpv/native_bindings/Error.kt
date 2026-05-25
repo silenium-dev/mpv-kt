@@ -43,3 +43,11 @@ fun <T> Result.Companion.mpv(error: Error, value: () -> T) =
     } else {
         Result.failure(MpvException(error))
     }
+
+fun Result.Companion.mpv(error: Error) = if (error == Error.SUCCESS) {
+    Result.success(Unit)
+} else {
+    Result.failure(MpvException(error))
+}
+
+fun <T> Result.Companion.mpvFailure(error: Error): Result<T> = Result.failure(MpvException(error))

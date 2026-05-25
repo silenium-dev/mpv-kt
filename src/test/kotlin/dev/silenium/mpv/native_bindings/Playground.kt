@@ -1,18 +1,20 @@
 package dev.silenium.mpv.native_bindings
 
+import dev.silenium.mpv.Mpv
 import dev.silenium.mpv.native_bindings.event.Event.Id
 import dev.silenium.mpv.native_bindings.event.EventProperty
 import dev.silenium.mpv.native_bindings.node.Node
-import kotlinx.coroutines.CoroutineName
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.timeout
 import java.lang.foreign.Arena
+import kotlin.io.path.Path
+import kotlin.io.path.absolutePathString
 import kotlin.system.exitProcess
 import kotlin.test.Test
 import kotlin.time.Duration.Companion.seconds
-import kotlin.time.toJavaDuration
 
 class MyCallback : LibMpvBindings.WakeupCallback {
     override fun invoke() {
@@ -20,9 +22,10 @@ class MyCallback : LibMpvBindings.WakeupCallback {
     }
 }
 
+@OptIn(FlowPreview::class)
 class Playground {
     @Test
-    fun playground() {
+    fun nativePlayground() {
         Arena.ofShared().use { arena ->
             val libc = LibcBindings()
             libc.setlocale(libc.LC_NUMERIC, "C")
@@ -44,7 +47,10 @@ class Playground {
             println("MPV Handle: $handle")
             ret = libmpv.mpv_command_async(
                 handle, 1u,
-                listOf("loadfile", "https://upload.wikimedia.org/wikipedia/commons/transcoded/7/73/Mandelbrot_Set_Color_Cycling_Video_1080p_3.webm/Mandelbrot_Set_Color_Cycling_Video_1080p_3.webm.1080p.vp9.webm"),
+                listOf(
+                    "loadfile",
+                    "https://upload.wikimedia.org/wikipedia/commons/transcoded/7/73/Mandelbrot_Set_Color_Cycling_Video_1080p_3.webm/Mandelbrot_Set_Color_Cycling_Video_1080p_3.webm.1080p.vp9.webm"
+                ),
             )
             if (ret != Error.SUCCESS) {
                 println("MPV command failed: $ret")
@@ -73,5 +79,23 @@ class Playground {
 
             libmpv.mpv_terminate_destroy(handle)
         }
+    }
+
+    @Test
+    fun apiPlayground(): Unit = runBlocking {
+        val mpv = Mpv()
+        mpv.initialize().getOrThrow()
+        val eventJob = launch {
+            mpv.events.collect {
+                println("Event: $it")
+            }
+        }
+        mpv.commandAsync("loadfile", "src/test/resources/test.webm").getOrThrow()
+        val metadata = mpv.getPropertyAsync("metadata").getOrThrow()
+        println("Metadata: $metadata")
+        mpv.setPropertyAsync("vo", Node.String("gpu")).getOrThrow()
+        delay(5.seconds)
+        eventJob.cancel()
+        mpv.close()
     }
 }

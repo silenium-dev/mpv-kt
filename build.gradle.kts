@@ -3,6 +3,7 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     kotlin("jvm") version "2.3.21"
+    kotlin("plugin.atomicfu") version "2.3.21"
     id("dev.silenium.libs.jni.nix-natives") version "0.5.1" apply false
     `maven-publish`
 }
@@ -51,8 +52,12 @@ allprojects {
 
 dependencies {
     implementation(kotlin("reflect"))
+    implementation("org.slf4j:slf4j-api:2.0.18")
+    implementation("ch.qos.logback:logback-classic:1.5.32")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.11.0")
+    implementation("org.jetbrains.kotlinx:atomicfu:0.32.1")
+
     testImplementation(kotlin("test"))
-    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.11.0")
 }
 
 kotlin {

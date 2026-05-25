@@ -11,12 +11,10 @@ import java.lang.foreign.ValueLayout
 
 data class EventProperty(
     val name: String,
-    val format: Format,
     val data: Node,
 ) : EventData {
     constructor(struct: MemorySegment) : this(
         struct[Layout.name],
-        struct[Layout.format],
         when (struct[Layout.format]) {
             Format.None -> Node.None
             Format.String -> Node.String(struct[Layout.data].reinterpret(Long.MAX_VALUE).getString(0))
