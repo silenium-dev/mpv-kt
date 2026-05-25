@@ -93,7 +93,7 @@ class Playground {
         mpv.commandAsync("loadfile", "src/test/resources/test.webm").getOrThrow()
         val metadata = mpv.getPropertyAsync("metadata").getOrThrow()
         println("Metadata: $metadata")
-        mpv.setPropertyAsync("vo", Node.String("gpu")).getOrThrow()
+        mpv.setPropertyAsync("vo", Node.String("null")).getOrThrow()
         delay(5.seconds)
         eventJob.cancel()
         mpv.close()
