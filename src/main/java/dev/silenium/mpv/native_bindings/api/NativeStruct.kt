@@ -41,17 +41,19 @@ abstract class NativeStructLayout {
         entries.add(name to field.layout)
     }
 
-    protected inline fun <reified E> enum(name: String): NativeStructField<E> where E : Enum<E>, E : NativeEnum<E> =
-        register<Int, E>(
+    protected inline fun <reified E> enum(name: String): NativeStructField<E> where E : Enum<E>, E : NativeEnum<E> {
+        val enumMap = enumValues<E>().associateBy { it.value }
+        return register<Int, E>(
             name,
             ValueLayout.JAVA_INT,
             mapper = { raw ->
-                enumValues<E>().first { it.value == raw }
+                enumMap[raw] ?: error("Invalid enum value: $raw")
             },
-            reverseMapper = { value, arena ->
+            reverseMapper = { value, _ ->
                 value.value
             },
         )
+    }
 
     protected fun string(name: String): NativeStructField<String> =
         register<MemorySegment, String>(
