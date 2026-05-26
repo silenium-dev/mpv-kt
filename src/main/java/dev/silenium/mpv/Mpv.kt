@@ -7,17 +7,18 @@ import dev.silenium.mpv.native_bindings.LibMpvBindings
 import dev.silenium.mpv.native_bindings.event.CommandReply
 import dev.silenium.mpv.native_bindings.event.Event
 import dev.silenium.mpv.native_bindings.event.Event.Id
-import dev.silenium.mpv.native_bindings.event.EventData
 import dev.silenium.mpv.native_bindings.event.EventProperty
 import dev.silenium.mpv.native_bindings.mpv
 import dev.silenium.mpv.native_bindings.mpvFailure
 import dev.silenium.mpv.native_bindings.node.Node
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.onStart
 
 class Mpv : EventCallback, AutoCloseable {
     internal val core: Core = Core(this)
@@ -52,10 +53,14 @@ class Mpv : EventCallback, AutoCloseable {
         crossinline request: LibMpvBindings.(requestId: ULong) -> Error,
     ): Result<ED> = coroutineScope {
         val requestId = core.nextRequestId()
+        val subscribed = CompletableDeferred<Unit>()
         val reply = async {
-            events.first { it.eventId == eventId && it.replyUserdata == requestId }
+            events
+                .onStart { subscribed.complete(Unit) }
+                .first { it.eventId == eventId && it.replyUserdata == requestId }
         }
 
+        subscribed.await()
         val ret = Core.mpv.request(requestId)
         if (ret != Error.SUCCESS) {
             reply.cancelAndJoin()
