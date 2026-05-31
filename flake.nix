@@ -20,6 +20,7 @@
                 gradle_9
               ];
               buildInputs = with pkgs; [
+                mesa
                 mpv-unwrapped
               ];
             };

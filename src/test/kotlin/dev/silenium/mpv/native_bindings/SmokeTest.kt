@@ -25,10 +25,9 @@ class MyUpdateCallback : LibMpvBindings.RenderUpdateCallback {
     }
 }
 
-@OptIn(FlowPreview::class)
-class Playground {
+class SmokeTest {
     @Test
-    fun nativePlayground() {
+    fun nativeSmokeTest() {
         Arena.ofShared().use { arena ->
             val libc = LibcBindings()
             libc.setlocale(libc.LC_NUMERIC, "C")
@@ -93,7 +92,7 @@ class Playground {
     }
 
     @Test
-    fun apiPlayground(): Unit = runBlocking {
+    fun apiSmokeTest(): Unit = runBlocking {
         val mpv = Mpv()
         mpv.setProperty("vo", Node.String("null")).getOrThrow()
         mpv.initialize().getOrThrow()
