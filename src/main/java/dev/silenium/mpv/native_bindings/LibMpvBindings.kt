@@ -169,14 +169,49 @@ class LibMpvBindings(val arena: Arena) {
         )
     }
 
+    private val handle_mpv_render_context_update by lazy {
+        val symbol = lookup.find("mpv_render_context_update").orElseThrow()
+        linker.downcallHandle(
+            symbol,
+            FunctionDescriptor.of(
+                ValueLayout.JAVA_LONG,
+                AddressLayout.ADDRESS,
+            )
+        )
+    }
+
+    private val handle_mpv_render_context_report_swap by lazy {
+        val symbol = lookup.find("mpv_render_context_report_swap").orElseThrow()
+        linker.downcallHandle(
+            symbol,
+            FunctionDescriptor.ofVoid(
+                AddressLayout.ADDRESS,
+            )
+        )
+    }
+
+    private val handle_mpv_render_context_render by lazy {
+        val symbol = lookup.find("mpv_render_context_render").orElseThrow()
+        linker.downcallHandle(
+            symbol,
+            FunctionDescriptor.of(
+                ValueLayout.JAVA_INT,
+                AddressLayout.ADDRESS,
+                AddressLayout.ADDRESS,
+            )
+        )
+    }
+
     interface WakeupCallback : () -> Unit {
     }
 
     interface RenderUpdateCallback : () -> Unit {
     }
+
     private class CallbackWrapper(val callback: WakeupCallback) {
         fun invoke(unused: MemorySegment) = callback.invoke()
     }
+
     private class UpdateCallbackWrapper(val callback: RenderUpdateCallback) {
         fun invoke(unused: MemorySegment) = callback.invoke()
     }
@@ -250,11 +285,7 @@ class LibMpvBindings(val arena: Arena) {
 
     fun mpv_render_context_create(handle: Handle, params: List<RenderParam<*>>): Result<RenderContext> =
         Arena.ofConfined().use { arena ->
-            val paramsArray = arena.allocate(RenderParam.layout, params.size.toLong() + 1)
-            params.forEachIndexed { idx, param ->
-                val target = paramsArray.asSlice(RenderParam.layout.byteSize() * idx, RenderParam.layout.byteSize())
-                target.copyFrom(param.into(arena))
-            }
+            val paramsArray = params.into(arena)
             val output = arena.allocate(AddressLayout.ADDRESS)
             val ret = handle_mpv_render_context_create(output, handle.pointer, paramsArray)
             Result.mpv(Error.fromValue(ret as Int)) {
@@ -271,6 +302,30 @@ class LibMpvBindings(val arena: Arena) {
         val method = MethodHandles.lookup().unreflect(wrapper::invoke.javaMethod!!).bindTo(wrapper)
         val upcall = linker.upcallStub(method, FunctionDescriptor.ofVoid(AddressLayout.ADDRESS), arena)
         handle_mpv_render_context_set_update_callback(context.pointer, upcall, MemorySegment.NULL)
+    }
+
+    fun mpv_render_context_update(context: RenderContext): ULong {
+        return (handle_mpv_render_context_update(context.pointer) as Long).toULong()
+    }
+
+    fun mpv_render_context_report_swap(context: RenderContext) {
+        handle_mpv_render_context_report_swap(context.pointer)
+    }
+
+    fun mpv_render_context_render(context: RenderContext, params: List<RenderParam<*>>) =
+        Arena.ofConfined().use { arena ->
+            val paramsArray = params.into(arena)
+            val ret = handle_mpv_render_context_render(context.pointer, paramsArray)
+            Result.mpv(Error.fromValue(ret as Int))
+        }
+
+    private fun List<RenderParam<*>>.into(arena: Arena): MemorySegment {
+        val paramsArray = arena.allocate(RenderParam.layout, size.toLong() + 1)
+        forEachIndexed { idx, param ->
+            val target = paramsArray.asSlice(RenderParam.layout.byteSize() * idx, RenderParam.layout.byteSize())
+            target.copyFrom(param.into(arena))
+        }
+        return paramsArray
     }
 
     companion object {

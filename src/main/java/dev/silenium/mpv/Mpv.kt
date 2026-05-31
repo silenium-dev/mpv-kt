@@ -5,7 +5,6 @@ import dev.silenium.mpv.core.EventCallback
 import dev.silenium.mpv.core.RenderCore
 import dev.silenium.mpv.native_bindings.Error
 import dev.silenium.mpv.native_bindings.LibMpvBindings
-import dev.silenium.mpv.native_bindings.RenderContext
 import dev.silenium.mpv.native_bindings.event.CommandReply
 import dev.silenium.mpv.native_bindings.event.Event
 import dev.silenium.mpv.native_bindings.event.Event.Id
@@ -22,6 +21,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.onStart
+import java.util.*
 
 class Mpv : EventCallback, AutoCloseable {
     internal val core: Core = Core(this)
@@ -80,14 +80,32 @@ class Mpv : EventCallback, AutoCloseable {
     private suspend fun asyncRequest(eventId: Id, request: LibMpvBindings.(requestId: ULong) -> Error): Result<Unit> =
         asyncRequest<Any?>(eventId, request).map {}
 
-    override suspend fun onEvent(event: Event) {
-        _events.emit(event)
-    }
+    override suspend fun onEvent(event: Event) = _events.emit(event)
 
-    override fun close() {
-        core.close()
-    }
+    override fun close() = core.close()
 
-    fun createRender(vararg params: RenderParam<*>, updateCallback: () -> Unit = {}) =
-        RenderCore(core.handle, params.toList(), updateCallback)
+    fun createRender(vararg params: RenderParam.Create<*>, updateCallback: () -> Unit = {}) =
+        RenderCore(core.handle, params.toList(), updateCallback).map(::Render)
+
+    class Render(private val renderCore: RenderCore) : AutoCloseable {
+        override fun close() = renderCore.close()
+
+        enum class UpdateFlags(val value: ULong) {
+            UpdateFrame(1UL shl 0),
+        }
+
+        fun update(): EnumSet<UpdateFlags> {
+            val raw = Core.mpv.mpv_render_context_update(renderCore.context)
+            val result = EnumSet.noneOf(UpdateFlags::class.java)
+            for (flag in UpdateFlags.entries) {
+                if (raw and flag.value != 0UL) result.add(flag)
+            }
+            return result
+        }
+
+        fun render(vararg params: RenderParam.Render<*>) =
+            Core.mpv.mpv_render_context_render(renderCore.context, params.toList())
+
+        fun reportSwap() = Core.mpv.mpv_render_context_report_swap(renderCore.context)
+    }
 }

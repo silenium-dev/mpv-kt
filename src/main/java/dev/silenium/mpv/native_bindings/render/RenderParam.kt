@@ -23,6 +23,10 @@ sealed class RenderParam<T> : InstantiatedStruct {
 
     abstract fun dataInto(arena: Arena): MemorySegment
 
+    sealed class Create<T>: RenderParam<T>()
+
+    sealed class Render<T>: RenderParam<T>()
+
     data object Invalid : RenderParam<Nothing?>() {
         override val value: Nothing? = null
 
@@ -31,7 +35,7 @@ sealed class RenderParam<T> : InstantiatedStruct {
         override fun dataInto(arena: Arena): MemorySegment = MemorySegment.NULL
     }
 
-    data class ApiType(override val value: Api) : RenderParam<ApiType.Api>() {
+    data class ApiType(override val value: Api) : Create<ApiType.Api>() {
         override val type: RenderParamType = RenderParamType.API_TYPE
 
         enum class Api(internal val value: String) {
@@ -42,7 +46,7 @@ sealed class RenderParam<T> : InstantiatedStruct {
         override fun dataInto(arena: Arena): MemorySegment = arena.allocateFrom(value.value)
     }
 
-    data class OpenGLInitParams(val getProcAddress: GLGetProcAddress) : RenderParam<OpenGLInitParams>() {
+    data class OpenGLInitParams(val getProcAddress: GLGetProcAddress) : Create<OpenGLInitParams>() {
         override val type: RenderParamType = RenderParamType.OPENGL_INIT_PARAMS
         override val value: OpenGLInitParams get() = this
         private val wrapper = GLGetProcAddressWrapper(getProcAddress)
@@ -72,7 +76,7 @@ sealed class RenderParam<T> : InstantiatedStruct {
         val width: Int,
         val height: Int,
         val internalFormat: Int,
-    ) : RenderParam<OpenGLFBO>() {
+    ) : Render<OpenGLFBO>() {
         override val type: RenderParamType = RenderParamType.OPENGL_FBO
         override val value: OpenGLFBO get() = this
         override fun dataInto(arena: Arena): MemorySegment {
@@ -92,14 +96,14 @@ sealed class RenderParam<T> : InstantiatedStruct {
         }
     }
 
-    data class FlipY(override val value: Boolean) : RenderParam<Boolean>() {
+    data class FlipY(override val value: Boolean) : Render<Boolean>() {
         override val type: RenderParamType = RenderParamType.FLIP_Y
         override fun dataInto(arena: Arena): MemorySegment {
             return arena.allocateFrom(ValueLayout.JAVA_INT, if (value) 1 else 0)
         }
     }
 
-    data class Depth(override val value: Int) : RenderParam<Int>() {
+    data class Depth(override val value: Int) : Render<Int>() {
         override val type: RenderParamType = RenderParamType.DEPTH
         override fun dataInto(arena: Arena): MemorySegment {
             return arena.allocateFrom(ValueLayout.JAVA_INT, value)
@@ -121,21 +125,21 @@ sealed class RenderParam<T> : InstantiatedStruct {
         }
     }
 
-    data class X11Display(override val value: MemorySegment) : RenderParam<MemorySegment>() {
+    data class X11Display(override val value: MemorySegment) : Create<MemorySegment>() {
         override val type: RenderParamType = RenderParamType.X11_DISPLAY
         override fun dataInto(arena: Arena): MemorySegment {
             return value
         }
     }
 
-    data class WLDisplay(override val value: MemorySegment) : RenderParam<MemorySegment>() {
+    data class WLDisplay(override val value: MemorySegment) : Create<MemorySegment>() {
         override val type: RenderParamType = RenderParamType.WL_DISPLAY
         override fun dataInto(arena: Arena): MemorySegment {
             return value
         }
     }
 
-    data class AdvancedControl(override val value: Boolean) : RenderParam<Boolean>() {
+    data class AdvancedControl(override val value: Boolean) : Create<Boolean>() {
         override val type: RenderParamType = RenderParamType.ADVANCED_CONTROL
         override fun dataInto(arena: Arena): MemorySegment {
             return arena.allocateFrom(ValueLayout.JAVA_INT, if (value) 1 else 0)
@@ -163,21 +167,21 @@ sealed class RenderParam<T> : InstantiatedStruct {
         }
     }
 
-    data class BlockForTargetTime(override val value: Boolean) : RenderParam<Boolean>() {
+    data class BlockForTargetTime(override val value: Boolean) : Render<Boolean>() {
         override val type: RenderParamType = RenderParamType.BLOCK_FOR_TARGET_TIME
         override fun dataInto(arena: Arena): MemorySegment {
             return arena.allocateFrom(ValueLayout.JAVA_INT, if (value) 1 else 0)
         }
     }
 
-    data class SkipRendering(override val value: Boolean) : RenderParam<Boolean>() {
+    data class SkipRendering(override val value: Boolean) : Render<Boolean>() {
         override val type: RenderParamType = RenderParamType.SKIP_RENDERING
         override fun dataInto(arena: Arena): MemorySegment {
             return arena.allocateFrom(ValueLayout.JAVA_INT, if (value) 1 else 0)
         }
     }
 
-    data class SWSize(val width: Int, val height: Int) : RenderParam<SWSize>() {
+    data class SWSize(val width: Int, val height: Int) : Render<SWSize>() {
         override val type: RenderParamType = RenderParamType.SW_SIZE
         override val value: SWSize get() = this
         override fun dataInto(arena: Arena): MemorySegment {
@@ -188,7 +192,7 @@ sealed class RenderParam<T> : InstantiatedStruct {
         }
     }
 
-    data class SWFormat(override val value: Format) : RenderParam<SWFormat.Format>() {
+    data class SWFormat(override val value: Format) : Render<SWFormat.Format>() {
         sealed interface Format {
             val value: String
 
@@ -221,14 +225,14 @@ sealed class RenderParam<T> : InstantiatedStruct {
         }
     }
 
-    data class SWStride(override val value: ULong) : RenderParam<ULong>() {
+    data class SWStride(override val value: ULong) : Render<ULong>() {
         override val type: RenderParamType = RenderParamType.SW_STRIDE
         override fun dataInto(arena: Arena): MemorySegment {
             return arena.allocateFrom(ValueLayout.JAVA_LONG, value.toLong())
         }
     }
 
-    data class SWPointer(override val value: MemorySegment) : RenderParam<MemorySegment>() {
+    data class SWPointer(override val value: MemorySegment) : Render<MemorySegment>() {
         override val type: RenderParamType = RenderParamType.SW_POINTER
         override fun dataInto(arena: Arena): MemorySegment {
             return value
@@ -247,5 +251,6 @@ interface GLGetProcAddress {
 }
 
 private class GLGetProcAddressWrapper(val glGetProcAddress: GLGetProcAddress) {
-    fun call(unused: MemorySegment, name: MemorySegment) = glGetProcAddress.getProcAddress(name.reinterpret(Long.MAX_VALUE).getString(0L))
+    fun call(unused: MemorySegment, name: MemorySegment) =
+        glGetProcAddress.getProcAddress(name.reinterpret(Long.MAX_VALUE).getString(0L))
 }

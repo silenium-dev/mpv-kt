@@ -3,8 +3,6 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     alias(libs.plugins.kotlin.jvm)
-    alias(libs.plugins.compose)
-    alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.atomicfu)
     alias(libs.plugins.nix.natives) apply false
     `maven-publish`
@@ -32,7 +30,6 @@ allprojects {
         .get()
 
     repositories {
-        google()
         mavenCentral()
         maven("https://nexus.silenium.dev/repository/maven-releases/")
     }
@@ -56,16 +53,16 @@ allprojects {
 dependencies {
     implementation(kotlin("reflect"))
     implementation(libs.slf4j.api)
-    implementation(libs.logback.classic)
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.kotlinx.atomicfu)
 
     testImplementation(kotlin("test"))
-    testImplementation(compose.desktop.currentOs)
-    implementation(compose.desktop.common)
-    implementation(compose.runtime)
-    implementation(compose.material3)
-    testImplementation("dev.silenium.compose.gl:compose-gl:0.11.0-rc.3")
+    testImplementation(libs.logback.classic)
+    testImplementation(platform(libs.lwjgl.bom))
+    testImplementation(libs.bundles.lwjgl)
+    libs.bundles.lwjgl.get().forEach {
+        testRuntimeOnly(variantOf(provider { it }) { classifier("natives-linux") })
+    }
 }
 
 kotlin {

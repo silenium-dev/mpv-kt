@@ -32,7 +32,6 @@ class RenderCore private constructor(
         Core.mpv.mpv_render_context_free(context)
     }
 
-
     private suspend fun CoroutineScope.eventLoop() {
         while (isActive) {
             val receiveResult = updateCh.receiveCatching()

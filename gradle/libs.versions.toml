@@ -1,6 +1,5 @@
 [versions]
 kotlin = "2.3.21"
-compose = "1.11.0"
 nix-natives = "0.5.1"
 
 slf4j = "2.0.18"
@@ -9,6 +8,8 @@ logback = "1.5.32"
 kotlinx-coroutines = "1.11.0"
 atomicfu = "0.32.1"
 
+lwjgl = "3.3.6"
+
 [libraries]
 slf4j-api = { module = "org.slf4j:slf4j-api", version.ref = "slf4j" }
 logback-classic = { module = "ch.qos.logback:logback-classic", version.ref = "logback" }
@@ -16,9 +17,19 @@ logback-classic = { module = "ch.qos.logback:logback-classic", version.ref = "lo
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }
 kotlinx-atomicfu = { module = "org.jetbrains.kotlinx:atomicfu", version.ref = "atomicfu" }
 
+lwjgl-bom = { module = "org.lwjgl:lwjgl-bom", version.ref = "lwjgl" }
+lwjgl-core = { module = "org.lwjgl:lwjgl" }
+lwjgl-glfw = { module = "org.lwjgl:lwjgl-glfw" }
+lwjgl-opengl = { module = "org.lwjgl:lwjgl-opengl" }
+
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
-kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
-compose = { id = "org.jetbrains.compose", version.ref = "compose" }
 kotlin-atomicfu = { id = "org.jetbrains.kotlin.plugin.atomicfu", version.ref = "kotlin" }
 nix-natives = { id = "dev.silenium.libs.jni.nix-natives", version.ref = "nix-natives" }
+
+[bundles]
+lwjgl = [
+    "lwjgl-core",
+    "lwjgl-glfw",
+    "lwjgl-opengl",
+]
