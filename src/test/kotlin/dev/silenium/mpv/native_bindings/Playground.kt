@@ -4,14 +4,11 @@ import dev.silenium.mpv.Mpv
 import dev.silenium.mpv.native_bindings.event.Event.Id
 import dev.silenium.mpv.native_bindings.event.EventProperty
 import dev.silenium.mpv.native_bindings.node.Node
+import dev.silenium.mpv.native_bindings.render.RenderParam
+import dev.silenium.mpv.native_bindings.render.RenderParam.ApiType.Api
+import dev.silenium.mpv.native_bindings.render.RenderParam.SWFormat
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.timeout
 import java.lang.foreign.Arena
-import kotlin.io.path.Path
-import kotlin.io.path.absolutePathString
 import kotlin.system.exitProcess
 import kotlin.test.Test
 import kotlin.time.Duration.Companion.seconds
@@ -19,6 +16,12 @@ import kotlin.time.Duration.Companion.seconds
 class MyCallback : LibMpvBindings.WakeupCallback {
     override fun invoke() {
         println("Wakeup!")
+    }
+}
+
+class MyUpdateCallback : LibMpvBindings.RenderUpdateCallback {
+    override fun invoke() {
+        println("Render Update!")
     }
 }
 
@@ -73,6 +76,17 @@ class Playground {
                 }
                 println("MPV Event: $event")
             }
+
+            val renderHandle = libmpv.mpv_render_context_create(
+                handle, listOf(
+                    RenderParam.ApiType(Api.SW),
+                    RenderParam.SWFormat(SWFormat.Format.FormatRGB0),
+                )
+            ).getOrThrow()
+            println("RenderContext Handle: $renderHandle")
+            val renderCallback = MyUpdateCallback()
+            libmpv.mpv_render_context_set_update_callback(renderHandle, renderCallback)
+            libmpv.mpv_render_context_free(renderHandle)
 
             libmpv.mpv_terminate_destroy(handle)
         }

@@ -2,8 +2,10 @@ package dev.silenium.mpv
 
 import dev.silenium.mpv.core.Core
 import dev.silenium.mpv.core.EventCallback
+import dev.silenium.mpv.core.RenderCore
 import dev.silenium.mpv.native_bindings.Error
 import dev.silenium.mpv.native_bindings.LibMpvBindings
+import dev.silenium.mpv.native_bindings.RenderContext
 import dev.silenium.mpv.native_bindings.event.CommandReply
 import dev.silenium.mpv.native_bindings.event.Event
 import dev.silenium.mpv.native_bindings.event.Event.Id
@@ -11,6 +13,7 @@ import dev.silenium.mpv.native_bindings.event.EventProperty
 import dev.silenium.mpv.native_bindings.mpv
 import dev.silenium.mpv.native_bindings.mpvFailure
 import dev.silenium.mpv.native_bindings.node.Node
+import dev.silenium.mpv.native_bindings.render.RenderParam
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.cancelAndJoin
@@ -84,4 +87,7 @@ class Mpv : EventCallback, AutoCloseable {
     override fun close() {
         core.close()
     }
+
+    fun createRender(vararg params: RenderParam<*>, updateCallback: () -> Unit = {}) =
+        RenderCore(core.handle, params.toList(), updateCallback)
 }

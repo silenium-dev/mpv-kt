@@ -6,3 +6,8 @@ import java.lang.foreign.MemorySegment
 value class Handle(internal val pointer: MemorySegment) {
     override fun toString(): String = "MpvHandle(0x%016x)".format(pointer.address())
 }
+
+@JvmInline
+value class RenderContext(internal val pointer: MemorySegment) {
+    override fun toString(): String = "MpvRenderContext(0x%016x)".format(pointer.address())
+}

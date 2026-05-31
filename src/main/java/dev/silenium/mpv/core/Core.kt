@@ -31,7 +31,9 @@ class Core(private val callback: EventCallback) : AutoCloseable {
 
     private suspend fun CoroutineScope.eventLoop() {
         while (isActive) {
-            wakeupCh.receive()
+            val receiveResult = wakeupCh.receiveCatching()
+            if (receiveResult.isClosed) break
+
             while (isActive) {
                 val event = mpv.mpv_wait_event(handle, 0.0)
                 if (event.eventId == Id.NONE) break
@@ -50,6 +52,7 @@ class Core(private val callback: EventCallback) : AutoCloseable {
 
     @Blocking
     override fun close() = runBlocking {
+        wakeupCh.close()
         eventLoopJob.cancelAndJoin()
         mpv.mpv_terminate_destroy(handle)
     }

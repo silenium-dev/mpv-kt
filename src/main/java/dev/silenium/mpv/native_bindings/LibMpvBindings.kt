@@ -6,6 +6,7 @@ import dev.silenium.mpv.native_bindings.api.parse
 import dev.silenium.mpv.native_bindings.event.Event
 import dev.silenium.mpv.native_bindings.node.Format
 import dev.silenium.mpv.native_bindings.node.Node
+import dev.silenium.mpv.native_bindings.render.RenderParam
 import java.lang.foreign.*
 import java.lang.invoke.MethodHandles
 import kotlin.reflect.jvm.javaMethod
@@ -133,10 +134,50 @@ class LibMpvBindings(val arena: Arena) {
         )
     }
 
+    private val handle_mpv_render_context_create by lazy {
+        val symbol = lookup.find("mpv_render_context_create").orElseThrow()
+        linker.downcallHandle(
+            symbol,
+            FunctionDescriptor.of(
+                ValueLayout.JAVA_INT,
+                AddressLayout.ADDRESS,
+                AddressLayout.ADDRESS,
+                AddressLayout.ADDRESS,
+            )
+        )
+    }
+
+    private val handle_mpv_render_context_free by lazy {
+        val symbol = lookup.find("mpv_render_context_free").orElseThrow()
+        linker.downcallHandle(
+            symbol,
+            FunctionDescriptor.ofVoid(
+                ValueLayout.ADDRESS,
+            )
+        )
+    }
+
+    private val handle_mpv_render_context_set_update_callback by lazy {
+        val symbol = lookup.find("mpv_render_context_set_update_callback").orElseThrow()
+        linker.downcallHandle(
+            symbol,
+            FunctionDescriptor.ofVoid(
+                AddressLayout.ADDRESS,
+                AddressLayout.ADDRESS,
+                AddressLayout.ADDRESS,
+            )
+        )
+    }
+
     interface WakeupCallback : () -> Unit {
     }
 
+    interface RenderUpdateCallback : () -> Unit {
+    }
     private class CallbackWrapper(val callback: WakeupCallback) {
+        fun invoke(unused: MemorySegment) = callback.invoke()
+    }
+    private class UpdateCallbackWrapper(val callback: RenderUpdateCallback) {
         fun invoke(unused: MemorySegment) = callback.invoke()
     }
 
@@ -205,6 +246,31 @@ class LibMpvBindings(val arena: Arena) {
 
     private fun mpv_free_node_contents(node: MemorySegment) {
         handle_mpv_free_node_contents(node)
+    }
+
+    fun mpv_render_context_create(handle: Handle, params: List<RenderParam<*>>): Result<RenderContext> =
+        Arena.ofConfined().use { arena ->
+            val paramsArray = arena.allocate(RenderParam.layout, params.size.toLong() + 1)
+            params.forEachIndexed { idx, param ->
+                val target = paramsArray.asSlice(RenderParam.layout.byteSize() * idx, RenderParam.layout.byteSize())
+                target.copyFrom(param.into(arena))
+            }
+            val output = arena.allocate(AddressLayout.ADDRESS)
+            val ret = handle_mpv_render_context_create(output, handle.pointer, paramsArray)
+            Result.mpv(Error.fromValue(ret as Int)) {
+                RenderContext(output.get(AddressLayout.ADDRESS, 0))
+            }
+        }
+
+    fun mpv_render_context_free(context: RenderContext) {
+        handle_mpv_render_context_free(context.pointer)
+    }
+
+    fun mpv_render_context_set_update_callback(context: RenderContext, callback: RenderUpdateCallback) {
+        val wrapper = UpdateCallbackWrapper(callback)
+        val method = MethodHandles.lookup().unreflect(wrapper::invoke.javaMethod!!).bindTo(wrapper)
+        val upcall = linker.upcallStub(method, FunctionDescriptor.ofVoid(AddressLayout.ADDRESS), arena)
+        handle_mpv_render_context_set_update_callback(context.pointer, upcall, MemorySegment.NULL)
     }
 
     companion object {

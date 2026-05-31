@@ -3,6 +3,8 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.compose)
+    alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.atomicfu)
     alias(libs.plugins.nix.natives) apply false
     `maven-publish`
@@ -30,6 +32,7 @@ allprojects {
         .get()
 
     repositories {
+        google()
         mavenCentral()
         maven("https://nexus.silenium.dev/repository/maven-releases/")
     }
@@ -58,6 +61,11 @@ dependencies {
     implementation(libs.kotlinx.atomicfu)
 
     testImplementation(kotlin("test"))
+    testImplementation(compose.desktop.currentOs)
+    implementation(compose.desktop.common)
+    implementation(compose.runtime)
+    implementation(compose.material3)
+    testImplementation("dev.silenium.compose.gl:compose-gl:0.11.0-rc.3")
 }
 
 kotlin {

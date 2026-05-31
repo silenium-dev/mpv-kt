@@ -1,5 +1,6 @@
 [versions]
 kotlin = "2.3.21"
+compose = "1.11.0"
 nix-natives = "0.5.1"
 
 slf4j = "2.0.18"
@@ -17,5 +18,7 @@ kotlinx-atomicfu = { module = "org.jetbrains.kotlinx:atomicfu", version.ref = "a
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+compose = { id = "org.jetbrains.compose", version.ref = "compose" }
 kotlin-atomicfu = { id = "org.jetbrains.kotlin.plugin.atomicfu", version.ref = "kotlin" }
 nix-natives = { id = "dev.silenium.libs.jni.nix-natives", version.ref = "nix-natives" }
