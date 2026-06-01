@@ -9,21 +9,42 @@
   outputs =
     { flake-parts, nixpkgs, ... } @ inputs: flake-parts.lib.mkFlake { inherit inputs; } (
       {
-        perSystem = { config, self', inputs', pkgs, system, ... }: {
+        perSystem = { config, self', inputs', pkgs, system, ... }: rec {
+          packages = {
+            jdk25-wrapped = pkgs.symlinkJoin {
+              name = "jdk25-wrapped";
+              paths = [ pkgs.jdk25 ];
+              nativeBuildInputs = with pkgs; [
+                makeWrapper
+              ];
+              buildInputs = with pkgs; [
+                libglvnd
+                mpv-unwrapped
+              ];
+
+              postBuild = ''
+                for bin in $out/bin/*; do
+                  wrapProgram "$bin" --set LD_LIBRARY_PATH="${pkgs.libglvnd}/lib:${pkgs.mpv-unwrapped}/lib"
+                done
+              '';
+            };
+          };
           devShells = rec {
             mpv-java = pkgs.stdenvNoCC.mkDerivation {
               name = "mpv-java";
               version = "0.1.0";
 
               nativeBuildInputs = with pkgs; [
-                jdk25
+                packages.jdk25-wrapped
                 gradle_9
               ];
               buildInputs = with pkgs; [
                 mpv-unwrapped
                 libglvnd
               ];
-              LD_LIBRARY_PATH = "${pkgs.libglvnd}/lib";
+              shellHook = ''
+                export JAVA_HOME="${packages.jdk25-wrapped}"
+              '';
             };
             default = mpv-java;
           };
