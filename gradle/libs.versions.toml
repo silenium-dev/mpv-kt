@@ -19,7 +19,7 @@ kotlinx-atomicfu = { module = "org.jetbrains.kotlinx:atomicfu", version.ref = "a
 
 lwjgl-bom = { module = "org.lwjgl:lwjgl-bom", version.ref = "lwjgl" }
 lwjgl-core = { module = "org.lwjgl:lwjgl" }
-lwjgl-glfw = { module = "org.lwjgl:lwjgl-glfw" }
+lwjgl-egl = { module = "org.lwjgl:lwjgl-egl" }
 lwjgl-opengl = { module = "org.lwjgl:lwjgl-opengl" }
 
 [plugins]
@@ -30,6 +30,5 @@ nix-natives = { id = "dev.silenium.libs.jni.nix-natives", version.ref = "nix-nat
 [bundles]
 lwjgl = [
     "lwjgl-core",
-    "lwjgl-glfw",
     "lwjgl-opengl",
 ]

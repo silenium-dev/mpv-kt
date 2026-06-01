@@ -60,6 +60,7 @@ dependencies {
     testImplementation(libs.logback.classic)
     testImplementation(platform(libs.lwjgl.bom))
     testImplementation(libs.bundles.lwjgl)
+    testImplementation(libs.lwjgl.egl)
     libs.bundles.lwjgl.get().forEach {
         testRuntimeOnly(variantOf(provider { it }) { classifier("natives-linux") })
     }
