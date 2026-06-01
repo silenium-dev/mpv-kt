@@ -81,6 +81,8 @@ tasks {
         useJUnitPlatform()
         javaLauncher = nixJavaLauncher()
         environment("EGL_PLATFORM", "surfaceless")
+        environment("MESA_LOADER_DRIVER_OVERRIDE", "llvmpipe")
+        environment("LIBGL_ALWAYS_SOFTWARE", "1")
         jvmArgs("--enable-native-access=ALL-UNNAMED")
     }
 
