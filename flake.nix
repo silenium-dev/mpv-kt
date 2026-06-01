@@ -19,12 +19,13 @@
               ];
               buildInputs = with pkgs; [
                 libglvnd
+                mesa
                 mpv-unwrapped
               ];
 
               postBuild = ''
                 for bin in $out/bin/*; do
-                  wrapProgram "$bin" --set LD_LIBRARY_PATH="${pkgs.libglvnd}/lib:${pkgs.mpv-unwrapped}/lib"
+                  wrapProgram "$bin" --set LD_LIBRARY_PATH="${pkgs.libglvnd}/lib:${pkgs.mpv-unwrapped}/lib:${pkgs.mesa}/lib"
                 done
               '';
             };
