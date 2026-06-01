@@ -45,10 +45,11 @@ class OffscreenRenderTest {
             GLFW.glfwSetWindowShouldClose(window, true)
         }
         while (true) {
-            GL32.glClear(GL32.GL_COLOR_BUFFER_BIT)
-            GLFW.glfwSwapBuffers(window)
             if (GLFW.glfwWindowShouldClose(window)) break
-            testMpvInstance.render(GL32.glGetInteger(GL32.GL_FRAMEBUFFER_BINDING), 1280, 720, GL32.GL_RGBA8)
+            GL32.glClear(GL32.GL_COLOR_BUFFER_BIT)
+            GL32.glViewport(0, 0, 1280, 720)
+            testMpvInstance.render(0, 1280, 720, 0)
+            GLFW.glfwSwapBuffers(window)
             GLFW.glfwWaitEvents()
         }
         testMpvInstance.dispose()
