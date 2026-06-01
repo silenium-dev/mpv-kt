@@ -46,7 +46,7 @@ class OffscreenRenderTest {
         CoroutineScope(Dispatchers.Default).launch {
             delay(1.seconds)
             testMpvInstance.mpv.commandAsync("loadfile", "src/test/resources/test.webm").getOrThrow()
-            delay(5.seconds)
+            delay(1.seconds)
             updateChan.close()
         }
         val fbo = glGenFramebuffers()
