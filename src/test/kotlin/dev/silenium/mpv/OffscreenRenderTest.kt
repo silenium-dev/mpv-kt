@@ -16,6 +16,7 @@ class OffscreenRenderTest {
     fun offscreenRenderTest() {
         val errorCallback = GLFWErrorCallback.createPrint(System.err).set()
 
+        GLFW.glfwInitHint(GLFW.GLFW_PLATFORM, GLFW.GLFW_PLATFORM_NULL)
         check(GLFW.glfwInit()) {
             "Failed to initialize GLFW"
         }
@@ -25,6 +26,7 @@ class OffscreenRenderTest {
         GLFW.glfwWindowHint(GLFW.GLFW_CONTEXT_VERSION_MINOR, 2)
         GLFW.glfwWindowHint(GLFW.GLFW_OPENGL_PROFILE, GLFW.GLFW_OPENGL_CORE_PROFILE)
         GLFW.glfwWindowHint(GLFW.GLFW_OPENGL_FORWARD_COMPAT, GLFW.GLFW_TRUE)
+        GLFW.glfwWindowHint(GLFW.GLFW_CONTEXT_CREATION_API, GLFW.GLFW_EGL_CONTEXT_API)
         GLFW.glfwSetErrorCallback(errorCallback)
 
         val window = GLFW.glfwCreateWindow(1280, 720, "MPV", 0L, 0L)

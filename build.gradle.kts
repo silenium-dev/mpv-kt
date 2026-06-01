@@ -80,6 +80,7 @@ tasks {
     test {
         useJUnitPlatform()
         javaLauncher = nixJavaLauncher()
+        environment("EGL_PLATFORM", "surfaceless")
         jvmArgs("--enable-native-access=ALL-UNNAMED")
     }
 
