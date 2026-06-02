@@ -11,21 +11,21 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.onFailure
 import org.jetbrains.annotations.Blocking
 import org.slf4j.LoggerFactory
-import java.lang.foreign.Arena
-import java.util.concurrent.Executors
-import java.util.concurrent.atomic.AtomicInteger
 import dev.silenium.mpv.native_bindings.Handle as NativeHandle
 
 class Core(private val callback: EventCallback) : AutoCloseable {
     internal val handle: NativeHandle = mpv.mpv_create()
     private val wakeupCh = Channel<Unit>(Channel.CONFLATED)
     private val wakeupCallback = WakeupCallback(wakeupCh)
-    private val dispatcher = loopDispatcher()
-    private val eventLoopJob = CoroutineScope(dispatcher).launch { eventLoop() }
-
+    private val dispatcher: ExecutorCoroutineDispatcher
+    private val eventLoopJob: Job
     private val requestIdCounter = atomic(0UL)
 
     init {
+        dispatch { eventLoop() }.let {
+            dispatcher = it.first
+            eventLoopJob = it.second
+        }
         mpv.mpv_set_wakeup_callback(handle, wakeupCallback)
     }
 
@@ -54,12 +54,13 @@ class Core(private val callback: EventCallback) : AutoCloseable {
     override fun close() = runBlocking {
         wakeupCh.close()
         eventLoopJob.cancelAndJoin()
+        dispatcher.close()
         mpv.mpv_terminate_destroy(handle)
     }
 
     internal fun nextRequestId(): ULong = requestIdCounter.updateAndGet { it + 1u }
 
-    companion object {
+    companion object: DispatcherCompanion("Mpv-Core") {
         private val log = LoggerFactory.getLogger(Core::class.java)
 
         internal val mpv = LibMpvBindings()
@@ -68,12 +69,6 @@ class Core(private val callback: EventCallback) : AutoCloseable {
         init {
             libc.setlocale(libc.LC_NUMERIC, "C")
         }
-
-        private val loopGroup = ThreadGroup("Mpv-EventLoop")
-        private val loopIndex = AtomicInteger(0)
-        private fun loopDispatcher(): ExecutorCoroutineDispatcher = Executors.newSingleThreadExecutor {
-            Thread(loopGroup, it, "Mpv-EventLoop-${loopIndex.incrementAndGet()}")
-        }.asCoroutineDispatcher()
     }
 }
 

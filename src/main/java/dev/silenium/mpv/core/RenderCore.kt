@@ -9,8 +9,6 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.onFailure
 import org.jetbrains.annotations.Blocking
 import org.slf4j.LoggerFactory
-import java.util.concurrent.Executors
-import java.util.concurrent.atomic.AtomicInteger
 
 class RenderCore private constructor(
     internal val context: RenderContext,
@@ -18,10 +16,14 @@ class RenderCore private constructor(
 ) : AutoCloseable {
     private val updateCh = Channel<Unit>(Channel.CONFLATED)
     private val callback = UpdateCallback(updateCh)
-    private val dispatcher = loopDispatcher()
-    private val eventLoopJob = CoroutineScope(dispatcher).launch { eventLoop() }
+    private val dispatcher: ExecutorCoroutineDispatcher
+    private val eventLoopJob: Job
 
     init {
+        dispatch { eventLoop() }.let {
+            dispatcher = it.first
+            eventLoopJob = it.second
+        }
         Core.mpv.mpv_render_context_set_update_callback(context, callback)
     }
 
@@ -29,6 +31,7 @@ class RenderCore private constructor(
     override fun close() = runBlocking {
         updateCh.close()
         eventLoopJob.cancelAndJoin()
+        dispatcher.close()
         Core.mpv.mpv_render_context_free(context)
     }
 
@@ -41,21 +44,14 @@ class RenderCore private constructor(
         }
     }
 
-    companion object {
+    companion object : DispatcherCompanion("Mpv-RenderCore") {
         operator fun invoke(
             handle: Handle,
             params: List<RenderParam<*>>,
             updateCallback: () -> Unit
-        ): Result<RenderCore> =
-            Core.mpv.mpv_render_context_create(handle, params).map {
-                RenderCore(it, updateCallback)
-            }
-
-        private val loopGroup = ThreadGroup("Mpv-RenderDispatcher")
-        private val loopIndex = AtomicInteger(0)
-        private fun loopDispatcher(): ExecutorCoroutineDispatcher = Executors.newSingleThreadExecutor {
-            Thread(loopGroup, it, "Mpv-RenderDispatcher-${loopIndex.incrementAndGet()}")
-        }.asCoroutineDispatcher()
+        ): Result<RenderCore> = Core.mpv.mpv_render_context_create(handle, params).map {
+            RenderCore(it, updateCallback)
+        }
     }
 }
 
