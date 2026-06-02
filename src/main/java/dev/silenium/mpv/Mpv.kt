@@ -8,7 +8,6 @@ import dev.silenium.mpv.native_bindings.LibMpvBindings
 import dev.silenium.mpv.native_bindings.event.CommandReply
 import dev.silenium.mpv.native_bindings.event.Event
 import dev.silenium.mpv.native_bindings.event.Event.Id
-import dev.silenium.mpv.native_bindings.event.EventData
 import dev.silenium.mpv.native_bindings.event.EventProperty
 import dev.silenium.mpv.native_bindings.event.LogMessage
 import dev.silenium.mpv.native_bindings.event.LogMessage.Level
@@ -16,25 +15,16 @@ import dev.silenium.mpv.native_bindings.mpv
 import dev.silenium.mpv.native_bindings.mpvFailure
 import dev.silenium.mpv.native_bindings.node.Node
 import dev.silenium.mpv.native_bindings.render.RenderParam
-import kotlinx.coroutines.CompletableDeferred
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.cancelAndJoin
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.filterIsInstance
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onStart
-import kotlinx.coroutines.launch
+import kotlinx.atomicfu.atomic
+import kotlinx.atomicfu.updateAndGet
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.*
 import org.slf4j.LoggerFactory
 import java.util.*
 
 class Mpv : EventCallback, AutoCloseable {
     internal val core: Core = Core(this)
+    private val requestIdCounter = atomic(0UL)
     private val _events = MutableSharedFlow<Event>(extraBufferCapacity = 4)
     val events = _events.asSharedFlow()
 
@@ -78,7 +68,7 @@ class Mpv : EventCallback, AutoCloseable {
         eventId: Id,
         crossinline request: LibMpvBindings.(requestId: ULong) -> Error,
     ): Result<ED> = coroutineScope {
-        val requestId = core.nextRequestId()
+        val requestId = nextRequestId()
         val subscribed = CompletableDeferred<Unit>()
         val reply = async {
             events
@@ -102,6 +92,8 @@ class Mpv : EventCallback, AutoCloseable {
     @JvmName("asyncRequestUnit")
     private suspend fun asyncRequest(eventId: Id, request: LibMpvBindings.(requestId: ULong) -> Error): Result<Unit> =
         asyncRequest<Any?>(eventId, request).map {}
+
+    private fun nextRequestId(): ULong = requestIdCounter.updateAndGet { it + 1u }
 
     override suspend fun onEvent(event: Event) = _events.emit(event)
 

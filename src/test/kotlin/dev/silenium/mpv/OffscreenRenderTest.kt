@@ -69,6 +69,7 @@ class OffscreenRenderTest {
                 glClear(GL_COLOR_BUFFER_BIT)
                 glViewport(0, 0, 1280, 720)
                 testMpvInstance.render(fbo, 1280, 720, GL_RGBA8)
+                testMpvInstance.render.reportSwap()
                 updateChan.receiveCatching().onClosed {
                     break
                 }

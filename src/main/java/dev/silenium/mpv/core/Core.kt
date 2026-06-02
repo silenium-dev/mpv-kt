@@ -19,7 +19,6 @@ class Core(private val callback: EventCallback) : AutoCloseable {
     private val wakeupCallback = WakeupCallback(wakeupCh)
     private val dispatcher: ExecutorCoroutineDispatcher
     private val eventLoopJob: Job
-    private val requestIdCounter = atomic(0UL)
 
     init {
         dispatch { eventLoop() }.let {
@@ -57,8 +56,6 @@ class Core(private val callback: EventCallback) : AutoCloseable {
         dispatcher.close()
         mpv.mpv_terminate_destroy(handle)
     }
-
-    internal fun nextRequestId(): ULong = requestIdCounter.updateAndGet { it + 1u }
 
     companion object: DispatcherCompanion("Mpv-Core") {
         private val log = LoggerFactory.getLogger(Core::class.java)
