@@ -10,6 +10,8 @@ atomicfu = "0.32.1"
 
 lwjgl = "3.3.6"
 
+jetbrains-annotations = "26.1.0"
+
 [libraries]
 slf4j-api = { module = "org.slf4j:slf4j-api", version.ref = "slf4j" }
 logback-classic = { module = "ch.qos.logback:logback-classic", version.ref = "logback" }
@@ -21,6 +23,8 @@ lwjgl-bom = { module = "org.lwjgl:lwjgl-bom", version.ref = "lwjgl" }
 lwjgl-core = { module = "org.lwjgl:lwjgl" }
 lwjgl-egl = { module = "org.lwjgl:lwjgl-egl" }
 lwjgl-opengl = { module = "org.lwjgl:lwjgl-opengl" }
+
+jetbrains-annotations = { module = "org.jetbrains:annotations", version.ref = "jetbrains-annotations" }
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }

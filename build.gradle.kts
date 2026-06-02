@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.kotlin.atomicfu)
     alias(libs.plugins.nix.natives) apply false
+    `project-report`
     `maven-publish`
 }
 
@@ -51,6 +52,7 @@ allprojects {
 }
 
 dependencies {
+    api(libs.jetbrains.annotations)
     implementation(kotlin("reflect"))
     implementation(libs.slf4j.api)
     implementation(libs.kotlinx.coroutines.core)
