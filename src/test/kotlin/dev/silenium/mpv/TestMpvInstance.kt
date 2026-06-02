@@ -18,8 +18,6 @@ class TestMpvInstance(val updateCallback: () -> Unit = {}) {
     val mpv = Mpv().apply {
         setProperty("vo", Node.String("libmpv")).getOrThrow()
         setProperty("hwdec", Node.String("no")).getOrThrow()
-        setProperty("msg-level", Node.String("all=info")).getOrThrow()
-        setProperty("terminal", Node.Flag(true)).getOrThrow()
         initialize().getOrThrow()
     }
     lateinit var render: Mpv.Render

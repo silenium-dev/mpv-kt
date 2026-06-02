@@ -8,25 +8,48 @@ import dev.silenium.mpv.native_bindings.LibMpvBindings
 import dev.silenium.mpv.native_bindings.event.CommandReply
 import dev.silenium.mpv.native_bindings.event.Event
 import dev.silenium.mpv.native_bindings.event.Event.Id
+import dev.silenium.mpv.native_bindings.event.EventData
 import dev.silenium.mpv.native_bindings.event.EventProperty
+import dev.silenium.mpv.native_bindings.event.LogMessage
+import dev.silenium.mpv.native_bindings.event.LogMessage.Level
 import dev.silenium.mpv.native_bindings.mpv
 import dev.silenium.mpv.native_bindings.mpvFailure
 import dev.silenium.mpv.native_bindings.node.Node
 import dev.silenium.mpv.native_bindings.render.RenderParam
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.launch
+import org.slf4j.LoggerFactory
 import java.util.*
 
 class Mpv : EventCallback, AutoCloseable {
     internal val core: Core = Core(this)
     private val _events = MutableSharedFlow<Event>(extraBufferCapacity = 4)
     val events = _events.asSharedFlow()
+
+    private val logReceiver = CoroutineScope(Dispatchers.Default).launch {
+        val ret = Core.mpv.mpv_request_log_messages(core.handle, Level.TRACE)
+        check(ret == Error.SUCCESS)
+        events
+            .filter { it.eventId == Id.LOG_MESSAGE }
+            .map { it.data as LogMessage }
+            .collect {
+                mpvLog(it.prefix.replace("/", "."))
+                    .atLevel(it.level.asSlf4j)
+                    .log(it.text.trim())
+            }
+    }
 
     fun initialize() =
         Result.mpv(Core.mpv.mpv_initialize(core.handle))
@@ -82,7 +105,10 @@ class Mpv : EventCallback, AutoCloseable {
 
     override suspend fun onEvent(event: Event) = _events.emit(event)
 
-    override fun close() = core.close()
+    override fun close() {
+        logReceiver.cancel()
+        core.close()
+    }
 
     fun createRender(vararg params: RenderParam.Create<*>, updateCallback: () -> Unit = {}) =
         RenderCore(core.handle, params.toList(), updateCallback).map(::Render)
@@ -107,5 +133,9 @@ class Mpv : EventCallback, AutoCloseable {
             Core.mpv.mpv_render_context_render(renderCore.context, params.toList())
 
         fun reportSwap() = Core.mpv.mpv_render_context_report_swap(renderCore.context)
+    }
+
+    companion object {
+        private fun mpvLog(prefix: String) = LoggerFactory.getLogger("mpv.$prefix")
     }
 }

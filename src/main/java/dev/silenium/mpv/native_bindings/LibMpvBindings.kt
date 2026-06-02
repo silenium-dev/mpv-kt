@@ -4,6 +4,7 @@ package dev.silenium.mpv.native_bindings
 
 import dev.silenium.mpv.native_bindings.api.parse
 import dev.silenium.mpv.native_bindings.event.Event
+import dev.silenium.mpv.native_bindings.event.LogMessage
 import dev.silenium.mpv.native_bindings.node.Format
 import dev.silenium.mpv.native_bindings.node.Node
 import dev.silenium.mpv.native_bindings.render.RenderParam
@@ -129,6 +130,18 @@ class LibMpvBindings(val arena: Arena) {
         linker.downcallHandle(
             symbol,
             FunctionDescriptor.ofVoid(
+                AddressLayout.ADDRESS,
+            )
+        )
+    }
+
+    private val handle_mpv_request_log_messages by lazy {
+        val symbol = lookup.find("mpv_request_log_messages").orElseThrow()
+        linker.downcallHandle(
+            symbol,
+            FunctionDescriptor.of(
+                ValueLayout.JAVA_INT,
+                AddressLayout.ADDRESS,
                 AddressLayout.ADDRESS,
             )
         )
@@ -281,6 +294,12 @@ class LibMpvBindings(val arena: Arena) {
 
     private fun mpv_free_node_contents(node: MemorySegment) {
         handle_mpv_free_node_contents(node)
+    }
+
+    fun mpv_request_log_messages(handle: Handle, minLevel: LogMessage.Level?): Error = Arena.ofConfined().use { arena ->
+        val levelString = arena.allocateFrom(minLevel?.string ?: "terminal-default")
+        val ret = handle_mpv_request_log_messages(handle.pointer, levelString)
+        return Error.fromValue(ret as Int)
     }
 
     fun mpv_render_context_create(handle: Handle, params: List<RenderParam<*>>): Result<RenderContext> =
