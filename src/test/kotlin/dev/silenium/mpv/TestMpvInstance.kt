@@ -5,6 +5,7 @@ import dev.silenium.mpv.native_bindings.render.GLGetProcAddress
 import dev.silenium.mpv.native_bindings.render.RenderParam
 import org.lwjgl.opengl.GL
 import org.lwjgl.system.FunctionProvider
+import org.slf4j.LoggerFactory
 import java.lang.foreign.MemorySegment
 
 class TestMpvInstance(val updateCallback: () -> Unit = {}) {
@@ -26,7 +27,7 @@ class TestMpvInstance(val updateCallback: () -> Unit = {}) {
 
     fun initialize() {
         if (initialized) return
-        println("Initializing...")
+        log.info("Initializing...")
         funcProvider = GL.getFunctionProvider()!!
         render = mpv.createRender(
             RenderParam.ApiType(RenderParam.ApiType.Api.OPENGL),
@@ -47,7 +48,11 @@ class TestMpvInstance(val updateCallback: () -> Unit = {}) {
     }
 
     fun dispose() {
-        println("Disposing...")
+        log.info("Disposing...")
         render.close()
+    }
+
+    companion object {
+        private val log = LoggerFactory.getLogger(TestMpvInstance::class.java)
     }
 }

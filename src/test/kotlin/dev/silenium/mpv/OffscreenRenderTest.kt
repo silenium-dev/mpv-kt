@@ -10,6 +10,7 @@ import org.lwjgl.opengl.GL
 import org.lwjgl.opengl.GL32.*
 import org.lwjgl.system.Configuration
 import org.lwjgl.system.MemoryUtil
+import org.slf4j.LoggerFactory
 import kotlin.test.Test
 import kotlin.time.Duration.Companion.seconds
 
@@ -23,7 +24,7 @@ class OffscreenRenderTest {
         val major = MemoryUtil.memAllocInt(1)
         val minor = MemoryUtil.memAllocInt(1)
         check(eglInitialize(eglDisplay, major, minor))
-        println("EGL initialized: ${major.get()}, ${minor.get()}")
+        log.info("EGL initialized: ${major.get()}, ${minor.get()}")
 
         check(eglBindAPI(EGL_OPENGL_API))
 
@@ -78,5 +79,9 @@ class OffscreenRenderTest {
         eglMakeCurrent(eglDisplay, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT)
         eglDestroyContext(eglDisplay, eglContext)
         eglTerminate(eglDisplay)
+    }
+
+    companion object {
+        private val log = LoggerFactory.getLogger(OffscreenRenderTest::class.java)
     }
 }
