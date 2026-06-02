@@ -94,7 +94,6 @@ object BuildRelease : BuildType({
                 |-Pdeploy.repo-url=%deploy.repo-url%
                 |-Pdeploy.username=%deploy.username%
                 |-Pdeploy.password=%deploy.password%
-                |--scan
                 |--info
             """.trimMargin().replace("\n", " ")
         }
@@ -165,7 +164,6 @@ object BuildSnapshot : BuildType({
                 |-Pdeploy.repo-url=%deploy.repo-url%
                 |-Pdeploy.username=%deploy.username%
                 |-Pdeploy.password=%deploy.password%
-                |--scan
                 |--info
             """.trimMargin().replace("\n", " ")
         }
@@ -211,7 +209,6 @@ object BuildPR : BuildType({
             """.trimMargin().replace("\n", " ")
             gradleParams = """
                 |-Pdeploy.enabled=false
-                |--scan
                 |--info
             """.trimMargin().replace("\n", " ")
         }
