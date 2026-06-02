@@ -1,5 +1,6 @@
 package dev.silenium.mpv
 
+import dev.silenium.mpv.native_bindings.node.Node
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.onClosed
@@ -12,6 +13,7 @@ import org.lwjgl.system.Configuration
 import org.lwjgl.system.MemoryUtil
 import org.slf4j.LoggerFactory
 import kotlin.test.Test
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 class OffscreenRenderTest {
@@ -74,6 +76,12 @@ class OffscreenRenderTest {
                     break
                 }
             }
+            val pos = (testMpvInstance.mpv.getPropertyAsync("time-pos/full").getOrThrow() as Node.Double).double.seconds
+            assert(pos in 0.5.seconds..1.5.seconds)
+            val voDropped = (testMpvInstance.mpv.getPropertyAsync("frame-drop-count").getOrThrow() as Node.Int64).int64
+            val decoderDropped = (testMpvInstance.mpv.getPropertyAsync("decoder-frame-drop-count").getOrThrow() as Node.Int64).int64
+            assert(voDropped == 0.toLong())
+            assert(decoderDropped == 0.toLong())
         }
         testMpvInstance.dispose()
         glDeleteFramebuffers(fbo)
