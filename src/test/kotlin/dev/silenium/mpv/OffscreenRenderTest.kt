@@ -41,7 +41,9 @@ class OffscreenRenderTest {
         GL.createCapabilities()
         val updateChan = Channel<Unit>(Channel.CONFLATED)
         val testMpvInstance = TestMpvInstance {
-            updateChan.trySend(Unit).onClosed { return@TestMpvInstance }.onFailure { println("Could not trigger update!") }
+            updateChan.trySend(Unit)
+                .onClosed { return@TestMpvInstance }
+                .onFailure { log.error("Could not trigger update!") }
         }
 
         CoroutineScope(Dispatchers.Default).launch {
