@@ -12,8 +12,9 @@ import java.lang.foreign.*
 import java.lang.invoke.MethodHandles
 import kotlin.reflect.jvm.javaMethod
 
-class LibMpvBindings(val arena: Arena) {
-    val lookup: SymbolLookup = SymbolLookup.libraryLookup(LIBMPV_PATH, arena)
+class LibMpvBindings {
+    private val arena = Arena.ofAuto()
+    val lookup: SymbolLookup = SymbolLookup.loaderLookup()
     val linker: Linker = Linker.nativeLinker()
 
     private val handle_mpv_create by lazy {
@@ -348,6 +349,8 @@ class LibMpvBindings(val arena: Arena) {
     }
 
     companion object {
-        private const val LIBMPV_PATH: String = "/nix/store/5cli1434b5882638yksclkpipw09inix-mpv-0.41.0/lib/libmpv.so"
+        init {
+            System.loadLibrary("mpv")
+        }
     }
 }

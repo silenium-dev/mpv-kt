@@ -62,8 +62,7 @@ class Core(private val callback: EventCallback) : AutoCloseable {
     companion object {
         private val log = LoggerFactory.getLogger(Core::class.java)
 
-        private val arena = Arena.ofAuto()
-        internal val mpv = LibMpvBindings(arena)
+        internal val mpv = LibMpvBindings()
         private val libc = LibcBindings()
 
         init {
