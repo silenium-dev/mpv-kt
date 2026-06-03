@@ -20,7 +20,7 @@ configure<KotlinMultiplatformExtension> {
     android {
         namespace = "dev.silenium.libs.mpv"
         compileSdk {
-            version = release(36)
+            version = release(37)
         }
         minSdk = 31
         withHostTest {
