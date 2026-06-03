@@ -1,7 +1,6 @@
 [versions]
 kotlin = "2.3.21"
-#nix-natives = "0.5.1"
-nix-natives = "0.0.0-SNAPSHOT"
+nix-natives = "0.5.1"
 agp = "9.2.1"
 
 slf4j = "2.0.18"
