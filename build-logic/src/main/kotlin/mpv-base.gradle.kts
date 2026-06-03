@@ -1,6 +1,15 @@
+import dev.silenium.libs.jni.nixJavaLauncher
+
 plugins {
     `maven-publish`
     base
+}
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+    google()
+    maven("https://nexus.silenium.dev/repository/maven-releases/")
 }
 
 val deployEnabled = (findProperty("deploy.enabled") as String?)?.toBoolean() ?: false
@@ -33,4 +42,12 @@ publishing {
             }
         }
     }
+}
+
+tasks.withType<Test> {
+    javaLauncher = nixJavaLauncher(rootProject.layout.projectDirectory)
+    environment("EGL_PLATFORM", "surfaceless")
+    environment("MESA_LOADER_DRIVER_OVERRIDE", "llvmpipe")
+    environment("LIBGL_ALWAYS_SOFTWARE", "1")
+    jvmArgs("--enable-native-access=ALL-UNNAMED")
 }

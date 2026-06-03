@@ -1,20 +1,26 @@
 plugins {
-    id("base-kotlin")
-    id("base-publish")
+    id("mpv-base")
+    id("mpv-kmp")
 }
 
 kotlin {
     sourceSets {
-        val commonMain by getting {
+        commonMain {
             dependencies {
                 api(libs.kotlinx.atomicfu)
                 api(libs.kotlinx.coroutines.core)
                 implementation(kotlin("reflect"))
                 implementation(libs.slf4j.api)
                 implementation(libs.jetbrains.annotations)
+                implementation(project(":natives"))
             }
         }
-        val jvmTest by getting {
+        jvmMain {
+            dependencies {
+                implementation(libs.jni.utils)
+            }
+        }
+        jvmTest {
             dependencies {
                 implementation(kotlin("test"))
                 implementation(libs.logback.classic)

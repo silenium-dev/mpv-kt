@@ -1,0 +1,7 @@
+[wrap-file]
+source_filename = libjpeg-turbo.tar
+lead_directory_missing = true
+patch_directory = libjpeg-turbo
+
+[provide]
+dependency_names = libjpeg, libturbojpeg

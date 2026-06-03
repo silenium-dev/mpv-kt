@@ -1,0 +1,5 @@
+[wrap-file]
+directory = mpv
+source_filename = mpv.tar
+patch_directory = mpv
+lead_directory_missing = true

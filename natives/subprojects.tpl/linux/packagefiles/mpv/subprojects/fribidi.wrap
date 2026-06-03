@@ -1,0 +1,3 @@
+[wrap-file]
+source_filename = fribidi.tar
+lead_directory_missing = true

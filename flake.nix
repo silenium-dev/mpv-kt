@@ -20,11 +20,10 @@
               buildInputs = with pkgs; [
                 libglvnd
                 mesa
-                mpv-unwrapped
               ];
 
               postBuild = let
-              libPath =  "${pkgs.libglvnd}/lib:${pkgs.mpv-unwrapped}/lib:${pkgs.mesa}/lib";
+              libPath =  "${pkgs.libglvnd}/lib:${pkgs.mesa}/lib";
               in ''
                 for bin in $out/bin/*; do
                   wrapProgram "$bin" --set LD_LIBRARY_PATH "${libPath}"
@@ -42,7 +41,6 @@
                 gradle_9
               ];
               buildInputs = with pkgs; [
-                mpv-unwrapped
                 libglvnd
               ];
               shellHook = ''

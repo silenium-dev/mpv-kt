@@ -1,0 +1,8 @@
+.idea/
+*.iml
+cmake-build-*/
+!subprojects/jni-headers.wrap
+!subprojects/packagefiles/jni-headers/
+subprojects/*
+buildDir/
+result

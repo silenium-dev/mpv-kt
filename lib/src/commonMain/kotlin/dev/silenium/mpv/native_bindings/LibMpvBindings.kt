@@ -350,7 +350,9 @@ class LibMpvBindings {
 
     companion object {
         init {
-            System.loadLibrary("mpv")
+            loadMpvLib()
         }
     }
 }
+
+internal expect fun loadMpvLib()

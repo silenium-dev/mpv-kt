@@ -1,6 +1,7 @@
 [versions]
 kotlin = "2.3.21"
-nix-natives = "0.5.1"
+#nix-natives = "0.5.1"
+nix-natives = "0.0.0-SNAPSHOT"
 agp = "9.2.1"
 
 slf4j = "2.0.18"
@@ -27,8 +28,11 @@ lwjgl-opengl = { module = "org.lwjgl:lwjgl-opengl" }
 
 jetbrains-annotations = { module = "org.jetbrains:annotations", version.ref = "jetbrains-annotations" }
 
+jni-utils = { module = "dev.silenium.libs.jni:jni-utils", version.ref = "nix-natives" }
+
 [plugins]
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-atomicfu = { id = "org.jetbrains.kotlin.plugin.atomicfu", version.ref = "kotlin" }
 android-kotlin = { id = "com.android.kotlin.multiplatform.library", version.ref = "agp" }
 nix-natives = { id = "dev.silenium.libs.jni.nix-natives", version.ref = "nix-natives" }

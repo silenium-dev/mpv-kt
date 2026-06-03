@@ -1,0 +1,6 @@
+[wrap-file]
+source_filename = zlib.tar
+lead_directory_missing = true
+
+[provide]
+zlib = zlib_dep

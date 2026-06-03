@@ -1,0 +1,6 @@
+[wrap-git]
+directory = jni-headers
+url = https://github.com/Casterlabs/jni-headers.git
+revision = 68b16cb0252c32b66b28f7260439970cec24ba04
+depth = 1
+patch_directory = jni-headers

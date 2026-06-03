@@ -1,0 +1,8 @@
+[wrap-file]
+directory = libfontconfig
+source_filename = libfontconfig.tar
+lead_directory_missing = true
+patch_directory = libfontconfig
+
+[provide]
+fontconfig = fontconfig_dep

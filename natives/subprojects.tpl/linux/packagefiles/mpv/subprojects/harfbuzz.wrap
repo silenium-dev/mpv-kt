@@ -1,0 +1,7 @@
+[wrap-file]
+source_filename = harfbuzz.tar
+lead_directory_missing = true
+patch_directory = harfbuzz
+
+[provide]
+dependency_names = harfbuzz, harfbuzz-cairo, harfbuzz-gobject, harfbuzz-icu, harfbuzz-subset
