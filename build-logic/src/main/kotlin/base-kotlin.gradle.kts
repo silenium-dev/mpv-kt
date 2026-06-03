@@ -22,6 +22,9 @@ configure<KotlinMultiplatformExtension> {
         compileSdk {
             version = release(37)
         }
+        compileSdk?.let {
+            buildToolsVersion = it.toString()
+        }
         minSdk = 31
         withHostTest {
             isIncludeAndroidResources = true

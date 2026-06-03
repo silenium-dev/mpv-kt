@@ -9,8 +9,9 @@ kotlin {
             dependencies {
                 api(libs.kotlinx.atomicfu)
                 api(libs.kotlinx.coroutines.core)
-                api(libs.slf4j.api)
-                api(kotlin("reflect"))
+                implementation(kotlin("reflect"))
+                implementation(libs.slf4j.api)
+                implementation(libs.jetbrains.annotations)
             }
         }
         val jvmTest by getting {
