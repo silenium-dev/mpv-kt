@@ -52,6 +52,7 @@
       },
       "original": {
         "owner": "silenium-dev",
+        "ref": "0.6.0",
         "repo": "jni-utils",
         "type": "github"
       }
