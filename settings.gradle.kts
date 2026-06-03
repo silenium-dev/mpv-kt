@@ -13,3 +13,4 @@ plugins {
 
 include(":lib", ":natives")
 includeBuild("build-logic")
+rootProject.name = "mpv-kt"
