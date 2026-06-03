@@ -9,12 +9,12 @@ let
   };
 in
 {
-  "x86_64-windows" = mpv {
-    arch = "x86_64";
-    hash = "sha256-XSZqaJm4uxdaaFfJPFNnnwQJUxZ6K+1luD7bA+C0i2U=";
-  };
   "aarch64-windows" = mpv {
     arch = "aarch64";
-    hash = "sha256-eDtgyMqU7adllvKzVfhg813/5vVqouN2Ly/H/T9zBNI=";
+    hash = "sha256-+u+508ddGd8dUthvkxY0D0crqBx208QANi2CxhqxGzk=";
+  };
+  "x86_64-windows" = mpv {
+    arch = "x86_64";
+    hash = "sha256-J022MrShhJ85LiBEu+r9HnB5rNBLPrKBoDqXaaHEi/Y=";
   };
 }
