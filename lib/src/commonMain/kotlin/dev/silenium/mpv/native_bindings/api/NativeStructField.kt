@@ -28,7 +28,7 @@ internal class MappedNativeStructField<T, M>(
         struct.value.varHandle(groupElement(name))
     }
 
-    override fun get(segment: MemorySegment) = mapper(rawType.cast(varHandle.get(segment, 0L)))
+    override fun get(segment: MemorySegment) = mapper(rawType.cast(varHandle.get(segment, 0L))!!)
     override fun set(segment: MemorySegment, value: M, arena: Arena) =
         varHandle.set(segment, 0L, reverseMapper(value, arena))
 }

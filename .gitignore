@@ -8,4 +8,5 @@ target/
 .kotlin
 /build/
 /*/build/
+/natives/*/build/
 local.properties

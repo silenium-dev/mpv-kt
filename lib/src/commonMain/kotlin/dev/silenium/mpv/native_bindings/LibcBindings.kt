@@ -34,7 +34,7 @@ class LibcBindings {
     }
 
     val LC_NUMERIC: Int by lazy {
-        val os = System.getProperty("os.name").lowercase()
+        val os = System.getProperty("os.name")?.lowercase().orEmpty()
         when {
             os.contains("win") -> 2
             else -> 1  // Linux, macOS, *BSD, etc.

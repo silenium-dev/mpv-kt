@@ -12,12 +12,17 @@ kotlin {
                 implementation(kotlin("reflect"))
                 implementation(libs.slf4j.api)
                 implementation(libs.jetbrains.annotations)
-                implementation(project(":natives"))
+            }
+        }
+        androidMain {
+            dependencies {
+                implementation(project(":natives:android"))
             }
         }
         jvmMain {
             dependencies {
                 implementation(libs.jni.utils)
+                implementation(project(":natives:desktop"))
             }
         }
         jvmTest {
