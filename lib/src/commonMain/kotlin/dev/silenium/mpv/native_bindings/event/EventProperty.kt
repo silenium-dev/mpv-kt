@@ -6,8 +6,8 @@ import dev.silenium.mpv.native_bindings.api.get
 import dev.silenium.mpv.native_bindings.api.parse
 import dev.silenium.mpv.native_bindings.node.Format
 import dev.silenium.mpv.native_bindings.node.Node
-import java.lang.foreign.MemorySegment
-import java.lang.foreign.ValueLayout
+import dev.silenium.libs.foreign.MemorySegment
+import dev.silenium.libs.foreign.ValueLayout
 
 data class EventProperty(
     val name: String,

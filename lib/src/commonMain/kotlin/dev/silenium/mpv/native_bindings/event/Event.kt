@@ -2,8 +2,8 @@ package dev.silenium.mpv.native_bindings.event
 
 import dev.silenium.mpv.native_bindings.Error
 import dev.silenium.mpv.native_bindings.api.*
-import java.lang.foreign.MemoryLayout
-import java.lang.foreign.MemorySegment
+import dev.silenium.libs.foreign.MemoryLayout
+import dev.silenium.libs.foreign.MemorySegment
 
 sealed interface EventData
 

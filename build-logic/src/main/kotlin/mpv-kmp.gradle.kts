@@ -4,24 +4,44 @@ plugins {
     com.android.kotlin.multiplatform.library
     org.jetbrains.kotlin.multiplatform
     org.jetbrains.kotlin.plugin.atomicfu
+    io.kotest
 }
 
 configure<KotlinMultiplatformExtension> {
-    jvmToolchain(25)
-    jvm()
+    jvmToolchain(ProjectConfig.JVM_TARGET.target.toInt())
+    jvm {
+        compilerOptions.jvmTarget = ProjectConfig.JVM_TARGET
+    }
+
+    compilerOptions {
+        freeCompilerArgs.add("-Xexpect-actual-classes")
+    }
 
     android {
-        namespace = "dev.silenium.libs.mpv"
         compileSdk {
-            version = release(37)
+            version = release(ProjectConfig.COMPILE_SDK)
         }
         compileSdk?.let {
             buildToolsVersion = it.toString()
         }
-        minSdk = 31
+        minSdk = ProjectConfig.MIN_SDK
+        compilerOptions {
+            jvmTarget = ProjectConfig.ANDROID_JVM_TARGET
+        }
         withHostTest {
-            isIncludeAndroidResources = true
             enableCoverage = true
         }
+        withDeviceTest {
+            enableCoverage = true
+            instrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+            instrumentationRunnerArguments["notPackage"] = "com.v7878"
+        }
+        packaging {
+            resources.pickFirsts += "META-INF/*"
+        }
     }
+}
+
+tasks.withType<Test> {
+    useJUnitPlatform()
 }

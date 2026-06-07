@@ -6,7 +6,7 @@ import dev.silenium.mpv.native_bindings.render.RenderParam
 import org.lwjgl.opengl.GL
 import org.lwjgl.system.FunctionProvider
 import org.slf4j.LoggerFactory
-import java.lang.foreign.MemorySegment
+import dev.silenium.libs.foreign.MemorySegment
 
 class TestMpvInstance(val updateCallback: () -> Unit = {}) {
     class LwjglGlProc(val provider: FunctionProvider) : GLGetProcAddress {

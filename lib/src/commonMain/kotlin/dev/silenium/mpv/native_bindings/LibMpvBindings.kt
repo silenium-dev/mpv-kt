@@ -8,7 +8,7 @@ import dev.silenium.mpv.native_bindings.event.LogMessage
 import dev.silenium.mpv.native_bindings.node.Format
 import dev.silenium.mpv.native_bindings.node.Node
 import dev.silenium.mpv.native_bindings.render.RenderParam
-import java.lang.foreign.*
+import dev.silenium.libs.foreign.*
 import java.lang.invoke.MethodHandles
 import kotlin.reflect.jvm.javaMethod
 
@@ -18,151 +18,154 @@ class LibMpvBindings {
     val linker: Linker = Linker.nativeLinker()
 
     private val handle_mpv_create by lazy {
-        val symbol = lookup.find("mpv_create").orElseThrow()
-        linker.downcallHandle(symbol, FunctionDescriptor.of(AddressLayout.ADDRESS))
+        val symbol = lookup.findOrThrow("mpv_create")
+        linker.downcallHandle(symbol, FunctionDescriptor.of(ValueLayout.ADDRESS))
     }
 
     private val handle_mpv_terminate_destroy by lazy {
-        val symbol = lookup.find("mpv_terminate_destroy").orElseThrow()
-        linker.downcallHandle(symbol, FunctionDescriptor.ofVoid(AddressLayout.ADDRESS))
+        val symbol = lookup.findOrThrow("mpv_terminate_destroy")
+        linker.downcallHandle(symbol, FunctionDescriptor.ofVoid(ValueLayout.ADDRESS))
     }
 
     private val handle_mpv_initialize by lazy {
-        val symbol = lookup.find("mpv_initialize").orElseThrow()
-        linker.downcallHandle(symbol, FunctionDescriptor.of(ValueLayout.JAVA_INT, AddressLayout.ADDRESS))
+        val symbol = lookup.findOrThrow("mpv_initialize")
+        linker.downcallHandle(
+            symbol,
+            FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS)
+        )
     }
 
     private val handle_mpv_set_wakeup_callback by lazy {
-        val symbol = lookup.find("mpv_set_wakeup_callback").orElseThrow()
+        val symbol = lookup.findOrThrow("mpv_set_wakeup_callback")
         linker.downcallHandle(
             symbol,
             FunctionDescriptor.ofVoid(
-                AddressLayout.ADDRESS, // mpv_handle*
-                AddressLayout.ADDRESS, // callback
-                AddressLayout.ADDRESS, // opaque
+                ValueLayout.ADDRESS, // mpv_handle*
+                ValueLayout.ADDRESS, // callback
+                ValueLayout.ADDRESS, // opaque
             )
         )
     }
 
     private val handle_mpv_wait_event by lazy {
-        val symbol = lookup.find("mpv_wait_event").orElseThrow()
+        val symbol = lookup.findOrThrow("mpv_wait_event")
         linker.downcallHandle(
             symbol,
             FunctionDescriptor.of(
-                AddressLayout.ADDRESS,   // mpv_event*
-                AddressLayout.ADDRESS,   // mpv_handle*
+                ValueLayout.ADDRESS,   // mpv_event*
+                ValueLayout.ADDRESS,   // mpv_handle*
                 ValueLayout.JAVA_DOUBLE, // timeout
             )
         )
     }
 
     private val handle_mpv_get_property_async by lazy {
-        val symbol = lookup.find("mpv_get_property_async").orElseThrow()
+        val symbol = lookup.findOrThrow("mpv_get_property_async")
         linker.downcallHandle(
             symbol,
             FunctionDescriptor.of(
                 ValueLayout.JAVA_INT,
-                AddressLayout.ADDRESS,
-                AddressLayout.JAVA_LONG,
-                AddressLayout.ADDRESS,
-                AddressLayout.JAVA_INT,
+                ValueLayout.ADDRESS,
+                ValueLayout.JAVA_LONG,
+                ValueLayout.ADDRESS,
+                ValueLayout.JAVA_INT,
             )
         )
     }
 
     private val handle_mpv_set_property by lazy {
-        val symbol = lookup.find("mpv_set_property").orElseThrow()
+        val symbol = lookup.findOrThrow("mpv_set_property")
         linker.downcallHandle(
             symbol,
             FunctionDescriptor.of(
                 ValueLayout.JAVA_INT,
-                AddressLayout.ADDRESS,
-                AddressLayout.ADDRESS,
-                AddressLayout.JAVA_INT,
-                AddressLayout.ADDRESS,
+                ValueLayout.ADDRESS,
+                ValueLayout.ADDRESS,
+                ValueLayout.JAVA_INT,
+                ValueLayout.ADDRESS,
             )
         )
     }
 
     private val handle_mpv_get_property by lazy {
-        val symbol = lookup.find("mpv_get_property").orElseThrow()
+        val symbol = lookup.findOrThrow("mpv_get_property")
         linker.downcallHandle(
             symbol,
             FunctionDescriptor.of(
                 ValueLayout.JAVA_INT,
-                AddressLayout.ADDRESS,
-                AddressLayout.ADDRESS,
-                AddressLayout.JAVA_INT,
-                AddressLayout.ADDRESS,
+                ValueLayout.ADDRESS,
+                ValueLayout.ADDRESS,
+                ValueLayout.JAVA_INT,
+                ValueLayout.ADDRESS,
             )
         )
     }
 
     private val handle_mpv_set_property_async by lazy {
-        val symbol = lookup.find("mpv_set_property_async").orElseThrow()
+        val symbol = lookup.findOrThrow("mpv_set_property_async")
         linker.downcallHandle(
             symbol,
             FunctionDescriptor.of(
                 ValueLayout.JAVA_INT,
-                AddressLayout.ADDRESS,
+                ValueLayout.ADDRESS,
                 ValueLayout.JAVA_LONG,
-                AddressLayout.ADDRESS,
-                AddressLayout.JAVA_INT,
-                AddressLayout.ADDRESS,
+                ValueLayout.ADDRESS,
+                ValueLayout.JAVA_INT,
+                ValueLayout.ADDRESS,
             )
         )
     }
 
     private val handle_mpv_command_async by lazy {
-        val symbol = lookup.find("mpv_command_async").orElseThrow()
+        val symbol = lookup.findOrThrow("mpv_command_async")
         linker.downcallHandle(
             symbol,
             FunctionDescriptor.of(
                 ValueLayout.JAVA_INT,
-                AddressLayout.ADDRESS,
+                ValueLayout.ADDRESS,
                 ValueLayout.JAVA_LONG,
-                AddressLayout.ADDRESS,
+                ValueLayout.ADDRESS,
             )
         )
     }
 
     private val handle_mpv_free_node_contents by lazy {
-        val symbol = lookup.find("mpv_free_node_contents").orElseThrow()
+        val symbol = lookup.findOrThrow("mpv_free_node_contents")
         linker.downcallHandle(
             symbol,
             FunctionDescriptor.ofVoid(
-                AddressLayout.ADDRESS,
+                ValueLayout.ADDRESS,
             )
         )
     }
 
     private val handle_mpv_request_log_messages by lazy {
-        val symbol = lookup.find("mpv_request_log_messages").orElseThrow()
+        val symbol = lookup.findOrThrow("mpv_request_log_messages")
         linker.downcallHandle(
             symbol,
             FunctionDescriptor.of(
                 ValueLayout.JAVA_INT,
-                AddressLayout.ADDRESS,
-                AddressLayout.ADDRESS,
+                ValueLayout.ADDRESS,
+                ValueLayout.ADDRESS,
             )
         )
     }
 
     private val handle_mpv_render_context_create by lazy {
-        val symbol = lookup.find("mpv_render_context_create").orElseThrow()
+        val symbol = lookup.findOrThrow("mpv_render_context_create")
         linker.downcallHandle(
             symbol,
             FunctionDescriptor.of(
                 ValueLayout.JAVA_INT,
-                AddressLayout.ADDRESS,
-                AddressLayout.ADDRESS,
-                AddressLayout.ADDRESS,
+                ValueLayout.ADDRESS,
+                ValueLayout.ADDRESS,
+                ValueLayout.ADDRESS,
             )
         )
     }
 
     private val handle_mpv_render_context_free by lazy {
-        val symbol = lookup.find("mpv_render_context_free").orElseThrow()
+        val symbol = lookup.findOrThrow("mpv_render_context_free")
         linker.downcallHandle(
             symbol,
             FunctionDescriptor.ofVoid(
@@ -172,72 +175,75 @@ class LibMpvBindings {
     }
 
     private val handle_mpv_render_context_set_update_callback by lazy {
-        val symbol = lookup.find("mpv_render_context_set_update_callback").orElseThrow()
+        val symbol = lookup.findOrThrow("mpv_render_context_set_update_callback")
         linker.downcallHandle(
             symbol,
             FunctionDescriptor.ofVoid(
-                AddressLayout.ADDRESS,
-                AddressLayout.ADDRESS,
-                AddressLayout.ADDRESS,
+                ValueLayout.ADDRESS,
+                ValueLayout.ADDRESS,
+                ValueLayout.ADDRESS,
             )
         )
     }
 
     private val handle_mpv_render_context_update by lazy {
-        val symbol = lookup.find("mpv_render_context_update").orElseThrow()
+        val symbol = lookup.findOrThrow("mpv_render_context_update")
         linker.downcallHandle(
             symbol,
             FunctionDescriptor.of(
                 ValueLayout.JAVA_LONG,
-                AddressLayout.ADDRESS,
+                ValueLayout.ADDRESS,
             )
         )
     }
 
     private val handle_mpv_render_context_report_swap by lazy {
-        val symbol = lookup.find("mpv_render_context_report_swap").orElseThrow()
+        val symbol = lookup.findOrThrow("mpv_render_context_report_swap")
         linker.downcallHandle(
             symbol,
             FunctionDescriptor.ofVoid(
-                AddressLayout.ADDRESS,
+                ValueLayout.ADDRESS,
             )
         )
     }
 
     private val handle_mpv_render_context_render by lazy {
-        val symbol = lookup.find("mpv_render_context_render").orElseThrow()
+        val symbol = lookup.findOrThrow("mpv_render_context_render")
         linker.downcallHandle(
             symbol,
             FunctionDescriptor.of(
                 ValueLayout.JAVA_INT,
-                AddressLayout.ADDRESS,
-                AddressLayout.ADDRESS,
+                ValueLayout.ADDRESS,
+                ValueLayout.ADDRESS,
             )
         )
     }
 
-    interface WakeupCallback : () -> Unit {
-    }
+    interface WakeupCallback : () -> Unit
 
-    interface RenderUpdateCallback : () -> Unit {
-    }
+    interface RenderUpdateCallback : () -> Unit
 
     private class CallbackWrapper(val callback: WakeupCallback) {
-        fun invoke(unused: MemorySegment) = callback.invoke()
+        fun invoke(@Suppress("unused") unused: MemorySegment) = callback.invoke()
     }
 
     private class UpdateCallbackWrapper(val callback: RenderUpdateCallback) {
-        fun invoke(unused: MemorySegment) = callback.invoke()
+        fun invoke(@Suppress("unused") unused: MemorySegment) = callback.invoke()
     }
 
     fun mpv_create(): Handle = Handle(handle_mpv_create() as MemorySegment)
-    fun mpv_terminate_destroy(handle: Handle) = handle_mpv_terminate_destroy(handle.pointer) as Unit
-    fun mpv_initialize(handle: Handle): Error = Error.fromValue(handle_mpv_initialize(handle.pointer) as Int)
+    fun mpv_terminate_destroy(handle: Handle) {
+        handle_mpv_terminate_destroy(handle.pointer)
+    }
+
+    fun mpv_initialize(handle: Handle): Error =
+        Error.fromValue(handle_mpv_initialize(handle.pointer) as Int)
 
     fun mpv_set_wakeup_callback(handle: Handle, callback: WakeupCallback) {
         val wrapper = CallbackWrapper(callback)
         val method = MethodHandles.lookup().unreflect(wrapper::invoke.javaMethod!!).bindTo(wrapper)
-        val upcall = linker.upcallStub(method, FunctionDescriptor.ofVoid(AddressLayout.ADDRESS), arena)
+        val upcall =
+            linker.upcallStub(method, FunctionDescriptor.ofVoid(ValueLayout.ADDRESS), arena)
         handle_mpv_set_wakeup_callback(handle.pointer, upcall, MemorySegment.NULL)
     }
 
@@ -250,7 +256,12 @@ class LibMpvBindings {
     fun mpv_get_property_async(handle: Handle, userData: ULong, property: String): Error =
         Arena.ofConfined().use { arena ->
             val propertyStr = arena.allocateFrom(property)
-            val ret = handle_mpv_get_property_async(handle.pointer, userData.toLong(), propertyStr, Format.Node.value)
+            val ret = handle_mpv_get_property_async(
+                handle.pointer,
+                userData.toLong(),
+                propertyStr,
+                Format.Node.value
+            )
             return Error.fromValue(ret as Int)
         }
 
@@ -258,7 +269,13 @@ class LibMpvBindings {
         Arena.ofConfined().use { arena ->
             val name = arena.allocateFrom(name)
             val rawNode = data.into(arena)
-            val ret = handle_mpv_set_property_async(handle.pointer, userData.toLong(), name, Format.Node.value, rawNode)
+            val ret = handle_mpv_set_property_async(
+                handle.pointer,
+                userData.toLong(),
+                name,
+                Format.Node.value,
+                rawNode
+            )
             return Error.fromValue(ret as Int)
         }
 
@@ -270,25 +287,26 @@ class LibMpvBindings {
             return Error.fromValue(ret as Int)
         }
 
-    fun mpv_get_property(handle: Handle, name: String): Result<Node> = Arena.ofConfined().use { arena ->
-        val name = arena.allocateFrom(name)
-        val rawNode = arena.allocate(Node.layout)
-        val ret = handle_mpv_get_property(handle.pointer, name, Format.Node.value, rawNode)
-        val result = Result.mpv(Error.fromValue(ret as Int)) {
-            Node.parse(rawNode).also {
-                mpv_free_node_contents(rawNode)
+    fun mpv_get_property(handle: Handle, name: String): Result<Node> =
+        Arena.ofConfined().use { arena ->
+            val name = arena.allocateFrom(name)
+            val rawNode = arena.allocate(Node.layout)
+            val ret = handle_mpv_get_property(handle.pointer, name, Format.Node.value, rawNode)
+            val result = Result.mpv(Error.fromValue(ret as Int)) {
+                Node.parse(rawNode).also {
+                    mpv_free_node_contents(rawNode)
+                }
             }
+            return result
         }
-        return result
-    }
 
     fun mpv_command_async(handle: Handle, userData: ULong, command: List<String>): Error =
         Arena.ofConfined().use { arena ->
-            val commandArray = arena.allocate(AddressLayout.ADDRESS, (command.size + 1).toLong())
+            val commandArray = arena.allocate(ValueLayout.ADDRESS, (command.size + 1).toLong())
             command.forEachIndexed { idx, cmd ->
-                commandArray.setAtIndex(AddressLayout.ADDRESS, idx.toLong(), arena.allocateFrom(cmd))
+                commandArray.setAtIndex(ValueLayout.ADDRESS, idx.toLong(), arena.allocateFrom(cmd))
             }
-            commandArray.setAtIndex(AddressLayout.ADDRESS, command.size.toLong(), MemorySegment.NULL)
+            commandArray.setAtIndex(ValueLayout.ADDRESS, command.size.toLong(), MemorySegment.NULL)
             val ret = handle_mpv_command_async(handle.pointer, userData.toLong(), commandArray)
             return Error.fromValue(ret as Int)
         }
@@ -297,19 +315,23 @@ class LibMpvBindings {
         handle_mpv_free_node_contents(node)
     }
 
-    fun mpv_request_log_messages(handle: Handle, minLevel: LogMessage.Level?): Error = Arena.ofConfined().use { arena ->
-        val levelString = arena.allocateFrom(minLevel?.string ?: "terminal-default")
-        val ret = handle_mpv_request_log_messages(handle.pointer, levelString)
-        return Error.fromValue(ret as Int)
-    }
+    fun mpv_request_log_messages(handle: Handle, minLevel: LogMessage.Level?): Error =
+        Arena.ofConfined().use { arena ->
+            val levelString = arena.allocateFrom(minLevel?.string ?: "terminal-default")
+            val ret = handle_mpv_request_log_messages(handle.pointer, levelString)
+            return Error.fromValue(ret as Int)
+        }
 
-    fun mpv_render_context_create(handle: Handle, params: List<RenderParam<*>>): Result<RenderContext> =
+    fun mpv_render_context_create(
+        handle: Handle,
+        params: List<RenderParam<*>>
+    ): Result<RenderContext> =
         Arena.ofConfined().use { arena ->
             val paramsArray = params.into(arena)
-            val output = arena.allocate(AddressLayout.ADDRESS)
+            val output = arena.allocate(ValueLayout.ADDRESS)
             val ret = handle_mpv_render_context_create(output, handle.pointer, paramsArray)
             Result.mpv(Error.fromValue(ret as Int)) {
-                RenderContext(output.get(AddressLayout.ADDRESS, 0))
+                RenderContext(output.get(ValueLayout.ADDRESS, 0))
             }
         }
 
@@ -317,10 +339,14 @@ class LibMpvBindings {
         handle_mpv_render_context_free(context.pointer)
     }
 
-    fun mpv_render_context_set_update_callback(context: RenderContext, callback: RenderUpdateCallback) {
+    fun mpv_render_context_set_update_callback(
+        context: RenderContext,
+        callback: RenderUpdateCallback
+    ) {
         val wrapper = UpdateCallbackWrapper(callback)
         val method = MethodHandles.lookup().unreflect(wrapper::invoke.javaMethod!!).bindTo(wrapper)
-        val upcall = linker.upcallStub(method, FunctionDescriptor.ofVoid(AddressLayout.ADDRESS), arena)
+        val upcall =
+            linker.upcallStub(method, FunctionDescriptor.ofVoid(ValueLayout.ADDRESS), arena)
         handle_mpv_render_context_set_update_callback(context.pointer, upcall, MemorySegment.NULL)
     }
 
@@ -342,7 +368,8 @@ class LibMpvBindings {
     private fun List<RenderParam<*>>.into(arena: Arena): MemorySegment {
         val paramsArray = arena.allocate(RenderParam.layout, size.toLong() + 1)
         forEachIndexed { idx, param ->
-            val target = paramsArray.asSlice(RenderParam.layout.byteSize() * idx, RenderParam.layout.byteSize())
+            val target =
+                paramsArray.asSlice(RenderParam.layout.byteSize * idx, RenderParam.layout.byteSize)
             target.copyFrom(param.into(arena))
         }
         return paramsArray

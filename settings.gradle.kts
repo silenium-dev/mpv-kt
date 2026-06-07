@@ -12,6 +12,6 @@ plugins {
     id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
 }
 
-include(":lib", ":natives:desktop", ":natives:android")
+include(":ffm", ":lib", ":natives:desktop", ":natives:android", ":lib:android-tests", ":examples:android")
 includeBuild("build-logic")
 rootProject.name = "mpv-kt"

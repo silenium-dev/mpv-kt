@@ -1,17 +1,16 @@
 package dev.silenium.mpv.native_bindings.api
 
-import java.lang.foreign.AddressLayout
-import java.lang.foreign.Arena
-import java.lang.foreign.MemoryLayout
-import java.lang.foreign.MemorySegment
-import java.lang.foreign.ValueLayout
+import dev.silenium.libs.foreign.Arena
+import dev.silenium.libs.foreign.MemoryLayout
+import dev.silenium.libs.foreign.MemorySegment
+import dev.silenium.libs.foreign.ValueLayout
 
 abstract class NativeStructLayout {
     @PublishedApi
     internal val entries: MutableList<Pair<String, MemoryLayout>> = mutableListOf()
 
     internal open fun layoutCreator(entries: List<MemoryLayout>): MemoryLayout =
-        MemoryLayout.structLayout(*entries.toTypedArray())
+        MemoryLayout.structLayout(entries)
 
     @PublishedApi
     internal val layoutLazy = lazy {
@@ -182,7 +181,7 @@ abstract class NativeStructLayout {
 
     private var paddingCounter = 0L
     protected fun intPadding(): NativeStructField<Unit>? {
-        if (AddressLayout.ADDRESS.byteAlignment() == 4L) return null
+        if (ValueLayout.ADDRESS.byteAlignment == 4L) return null
         return register<Any?, Unit>(
             "padding-${paddingCounter++}",
             MemoryLayout.paddingLayout(4),

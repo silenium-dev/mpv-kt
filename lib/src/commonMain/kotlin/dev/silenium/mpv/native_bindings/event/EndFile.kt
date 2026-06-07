@@ -5,7 +5,7 @@ import dev.silenium.mpv.native_bindings.api.InstantiableLayout
 import dev.silenium.mpv.native_bindings.api.NativeEnum
 import dev.silenium.mpv.native_bindings.api.NativeStructLayout
 import dev.silenium.mpv.native_bindings.api.get
-import java.lang.foreign.MemorySegment
+import dev.silenium.libs.foreign.MemorySegment
 
 data class EndFile(
     val reason: Reason,

@@ -4,6 +4,8 @@ plugins {
     alias(libs.plugins.nix.natives)
 }
 
+group = "dev.silenium.libs.mpv.natives"
+
 nixNatives {
     libName = rootProject.name
     libVersion = "0.1.0"

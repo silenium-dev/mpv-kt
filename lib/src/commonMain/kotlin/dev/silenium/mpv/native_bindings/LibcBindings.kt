@@ -2,20 +2,20 @@
 
 package dev.silenium.mpv.native_bindings
 
-import java.lang.foreign.Arena
-import java.lang.foreign.FunctionDescriptor
-import java.lang.foreign.Linker
-import java.lang.foreign.MemorySegment
-import java.lang.foreign.SymbolLookup
-import java.lang.foreign.ValueLayout
-import java.lang.invoke.MethodHandle
+import dev.silenium.libs.foreign.Arena
+import dev.silenium.libs.foreign.FunctionDescriptor
+import dev.silenium.libs.foreign.Linker
+import dev.silenium.libs.foreign.MemorySegment
+import dev.silenium.libs.foreign.SymbolLookup
+import dev.silenium.libs.foreign.ValueLayout
+import dev.silenium.libs.foreign.MethodHandle
 
 class LibcBindings {
     private val linker: Linker = Linker.nativeLinker()
     private val lookup: SymbolLookup = linker.defaultLookup()
 
     private val handle_setlocale: MethodHandle by lazy {
-        val symbol = lookup.find("setlocale").orElseThrow()
+        val symbol = lookup.findOrThrow("setlocale")
         linker.downcallHandle(
             symbol,
             FunctionDescriptor.of(

@@ -4,6 +4,10 @@ plugins {
 }
 
 kotlin {
+    android {
+        namespace = "dev.silenium.libs.mpv"
+    }
+
     sourceSets {
         commonMain {
             dependencies {
@@ -12,6 +16,14 @@ kotlin {
                 implementation(kotlin("reflect"))
                 implementation(libs.slf4j.api)
                 implementation(libs.jetbrains.annotations)
+                implementation(project(":ffm"))
+            }
+        }
+        commonTest {
+            dependencies {
+                implementation(kotlin("test"))
+                implementation(libs.slf4j.api)
+                implementation(libs.bundles.tests)
             }
         }
         androidMain {
@@ -27,7 +39,7 @@ kotlin {
         }
         jvmTest {
             dependencies {
-                implementation(kotlin("test"))
+                implementation(libs.kotest.runner.junit5)
                 implementation(libs.logback.classic)
                 implementation(project.dependencies.platform(libs.lwjgl.bom))
                 implementation(libs.bundles.lwjgl)

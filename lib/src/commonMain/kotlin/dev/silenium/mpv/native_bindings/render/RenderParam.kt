@@ -5,7 +5,7 @@ import dev.silenium.mpv.native_bindings.api.NativeStructLayout
 import dev.silenium.mpv.native_bindings.api.get
 import dev.silenium.mpv.native_bindings.api.set
 import dev.silenium.mpv.native_bindings.node.Node
-import java.lang.foreign.*
+import dev.silenium.libs.foreign.*
 import java.lang.invoke.MethodHandles
 import kotlin.reflect.jvm.javaMethod
 

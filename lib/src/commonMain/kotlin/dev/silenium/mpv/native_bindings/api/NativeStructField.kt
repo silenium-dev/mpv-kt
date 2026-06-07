@@ -1,10 +1,10 @@
 package dev.silenium.mpv.native_bindings.api
 
-import java.lang.foreign.Arena
-import java.lang.foreign.MemoryLayout
-import java.lang.foreign.MemoryLayout.PathElement.groupElement
-import java.lang.foreign.MemorySegment
-import java.lang.invoke.VarHandle
+import dev.silenium.libs.foreign.Arena
+import dev.silenium.libs.foreign.MemoryLayout
+import dev.silenium.libs.foreign.MemoryLayout.PathElement.Companion.groupElement
+import dev.silenium.libs.foreign.MemorySegment
+import dev.silenium.libs.foreign.VarHandle
 
 interface NativeStructField<T> {
     val varHandle: VarHandle?
@@ -25,7 +25,7 @@ internal class MappedNativeStructField<T, M>(
     private val reverseMapper: (M, Arena) -> T,
 ) : NativeStructField<M> {
     override val varHandle: VarHandle by lazy {
-        struct.value.varHandle(groupElement(name))
+        struct.value.varHandle(listOf(groupElement(name)))
     }
 
     override fun get(segment: MemorySegment) = mapper(rawType.cast(varHandle.get(segment, 0L))!!)
@@ -43,16 +43,16 @@ internal class EmbeddedStructField<T>(
 ) : NativeStructField<T> {
     override val varHandle: VarHandle? = null
     private val byteOffset by lazy {
-        parentLayout.value.byteOffset(groupElement(name))
+        parentLayout.value.byteOffset(listOf(groupElement(name)))
     }
 
     override fun get(segment: MemorySegment): T {
-        val slice = segment.asSlice(byteOffset, layout.byteSize())
+        val slice = segment.asSlice(byteOffset, layout.byteSize)
         return mapper(slice)
     }
 
     override fun set(segment: MemorySegment, value: T, arena: Arena) {
-        val slice = segment.asSlice(byteOffset, layout.byteSize())
+        val slice = segment.asSlice(byteOffset, layout.byteSize)
         slice.copyFrom(reverseMapper(value, arena))
     }
 }

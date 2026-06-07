@@ -1,12 +1,11 @@
 package dev.silenium.mpv.native_bindings.api
 
-import java.lang.foreign.AddressLayout
-import java.lang.foreign.Arena
-import java.lang.foreign.MemoryLayout
-import java.lang.foreign.MemoryLayout.PathElement.groupElement
-import java.lang.foreign.MemorySegment
-import java.lang.foreign.ValueLayout
-import java.lang.invoke.VarHandle
+import dev.silenium.libs.foreign.Arena
+import dev.silenium.libs.foreign.MemoryLayout
+import dev.silenium.libs.foreign.MemoryLayout.PathElement.Companion.groupElement
+import dev.silenium.libs.foreign.MemorySegment
+import dev.silenium.libs.foreign.ValueLayout
+import dev.silenium.libs.foreign.VarHandle
 
 class NativePointerList<E>(
     private val struct: Lazy<MemoryLayout>,
@@ -17,22 +16,22 @@ class NativePointerList<E>(
 ) : NativeStructField<List<E>> {
     override val layout: MemoryLayout = ValueLayout.ADDRESS
     override val varHandle: VarHandle by lazy {
-        struct.value.varHandle(groupElement(name))
+        struct.value.varHandle(listOf(groupElement(name)))
     }
 
     override fun get(segment: MemorySegment): List<E> {
         val length = lengthField.get(segment)
-        val array = (varHandle.get(segment, 0L) as MemorySegment).reinterpret(AddressLayout.ADDRESS.byteSize() * length)
+        val array = (varHandle.get(segment, 0L) as MemorySegment).reinterpret(ValueLayout.ADDRESS.byteSize * length)
         return List(length) { i ->
-            val raw = array.getAtIndex(AddressLayout.ADDRESS, i.toLong())
+            val raw = array.getAtIndex(ValueLayout.ADDRESS, i.toLong())
             mapper(raw)
         }
     }
 
     override fun set(segment: MemorySegment, value: List<E>, arena: Arena) {
-        val raw = arena.allocate(AddressLayout.ADDRESS, value.size.toLong())
+        val raw = arena.allocate(ValueLayout.ADDRESS, value.size.toLong())
         value.forEachIndexed { index, e ->
-            raw.setAtIndex(AddressLayout.ADDRESS, index.toLong(), reverseMapper(e, arena))
+            raw.setAtIndex(ValueLayout.ADDRESS, index.toLong(), reverseMapper(e, arena))
         }
         varHandle.set(segment, 0L, raw)
         lengthField.set(segment, value.size, arena)
@@ -49,14 +48,14 @@ class NativeList<E>(
 ) : NativeStructField<List<E>> {
     override val layout: MemoryLayout = ValueLayout.ADDRESS
     override val varHandle: VarHandle by lazy {
-        struct.value.varHandle(groupElement(name))
+        struct.value.varHandle(listOf(groupElement(name)))
     }
 
     override fun get(segment: MemorySegment): List<E> {
         val length = lengthField.get(segment)
-        val array = (varHandle.get(segment, 0L) as MemorySegment).reinterpret(inner.byteSize() * length)
+        val array = (varHandle.get(segment, 0L) as MemorySegment).reinterpret(inner.byteSize * length)
         return List(length) { i ->
-            val raw = array.asSlice(i * inner.byteSize(), inner.byteSize())
+            val raw = array.asSlice(i * inner.byteSize, inner.byteSize)
             mapper(raw)
         }
     }
@@ -64,7 +63,7 @@ class NativeList<E>(
     override fun set(segment: MemorySegment, value: List<E>, arena: Arena) {
         val raw = arena.allocate(inner, value.size.toLong())
         value.forEachIndexed { index, e ->
-            raw.asSlice(index * inner.byteSize(), inner.byteSize()).copyFrom(reverseMapper(e, arena))
+            raw.asSlice(index * inner.byteSize, inner.byteSize).copyFrom(reverseMapper(e, arena))
         }
         varHandle.set(segment, 0L, raw)
         lengthField.set(segment, value.size, arena)

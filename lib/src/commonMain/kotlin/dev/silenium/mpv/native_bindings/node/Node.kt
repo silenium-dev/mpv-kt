@@ -1,9 +1,15 @@
 package dev.silenium.mpv.native_bindings.node
 
-import dev.silenium.mpv.native_bindings.api.*
-import java.lang.foreign.Arena
-import java.lang.foreign.MemoryLayout
-import java.lang.foreign.MemorySegment
+import dev.silenium.libs.foreign.Arena
+import dev.silenium.libs.foreign.MemoryLayout
+import dev.silenium.libs.foreign.MemorySegment
+import dev.silenium.mpv.native_bindings.api.InstantiableLayout
+import dev.silenium.mpv.native_bindings.api.InstantiatedStruct
+import dev.silenium.mpv.native_bindings.api.NativeStructLayout
+import dev.silenium.mpv.native_bindings.api.NativeUnionLayout
+import dev.silenium.mpv.native_bindings.api.get
+import dev.silenium.mpv.native_bindings.api.parse
+import dev.silenium.mpv.native_bindings.api.set
 import java.nio.ByteBuffer
 
 sealed interface Node : InstantiatedStruct {

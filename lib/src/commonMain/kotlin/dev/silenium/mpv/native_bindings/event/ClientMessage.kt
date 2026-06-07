@@ -3,7 +3,7 @@ package dev.silenium.mpv.native_bindings.event
 import dev.silenium.mpv.native_bindings.api.InstantiableLayout
 import dev.silenium.mpv.native_bindings.api.NativeStructLayout
 import dev.silenium.mpv.native_bindings.api.get
-import java.lang.foreign.MemorySegment
+import dev.silenium.libs.foreign.MemorySegment
 
 data class ClientMessage(val args: List<String>): EventData {
     constructor(struct: MemorySegment) : this(

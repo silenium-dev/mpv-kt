@@ -37,6 +37,7 @@ dependencies {
     configurations.implementation(plugin = libs.plugins.kotlin.atomicfu)
     configurations.implementation(plugin = libs.plugins.android.kotlin)
     configurations.implementation(plugin = libs.plugins.nix.natives)
+    configurations.implementation(plugin = libs.plugins.kotest)
     implementation(gradleApi())
     implementation(gradleKotlinDsl())
     implementation(files(libs.javaClass.protectionDomain.codeSource.location.file))
