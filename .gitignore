@@ -9,4 +9,7 @@ target/
 /build/
 /*/build/
 /natives/*/build/
+/examples/*/build/
+/lib/*/build/
+.cxx/
 local.properties
