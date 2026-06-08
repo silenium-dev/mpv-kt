@@ -22,6 +22,7 @@ fun CommonExtension.commonConfig() {
         version = release(ProjectConfig.COMPILE_SDK)
     }
     ndkVersion = ProjectConfig.NDK_VERSION
+    buildToolsVersion = ProjectConfig.COMPILE_SDK.toString()
 
     defaultConfig.minSdk = ProjectConfig.MIN_SDK
     defaultConfig.testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
