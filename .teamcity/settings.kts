@@ -255,7 +255,7 @@ object Nix {
                 |   escaped_value="${"$"}{value//|/||}"
                 |   escaped_value="${"$"}{escaped_value//$'\n'/|n}"
                 |   escaped_value="${"$"}{escaped_value//$'\r'/|r}"
-                |   escaped_value="${"$"}{escaped_value//\'/|'}"
+                |   escaped_value="${"$"}{escaped_value//\'/|\'}"
                 |   escaped_value="${"$"}{escaped_value//[/|[}"
                 |   escaped_value="${"$"}{escaped_value//]/|]}"
                 |   echo "##teamcity[setParameter name='env.${"$"}{name}' value='${"$"}{escaped_value}']"
