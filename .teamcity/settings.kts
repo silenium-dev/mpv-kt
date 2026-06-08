@@ -231,6 +231,7 @@ object Nix {
     fun BuildSteps.loadNixEnv(flakeDir: String = ".", devShell: String? = null) {
         script {
             name = "Load Nix Environment"
+            // language="Shell Script"
             scriptContent = """
                 |set -xeuo pipefail
                 |
@@ -242,13 +243,15 @@ object Nix {
                 |env | sort > "${"$"}tmp_before"
                 |nix develop "${"$"}FLAKE_REF" --command env | sort > "${"$"}tmp_after"
                 |
-                |MODIFIED_ENV=$({
-                |  diff "${"$"}tmp_before" "${"$"}tmp_after" || status=${'$'}?
-                |  if [ "${"$"}{status:-0}" -gt 1 ]; then
-                |    exit "${"$"}status"
-                |  fi
-                |} | sed -n 's/^> //p')
-                |while IFS="-" read -r name value; do
+                |MODIFIED_ENV=$(
+                |  {
+                |    diff "${"$"}tmp_before" "${"$"}tmp_after" || status=${'$'}?
+                |    if [ "${"$"}{status:-0}" -gt 1 ]; then
+                |      exit "${"$"}status"
+                |    fi
+                |  } | sed -n 's/^> //p'
+                |)
+                |while IFS="=" read -r name value; do
                 |   escaped_value="${"$"}{value//|/||}"
                 |   escaped_value="${"$"}{escaped_value//$'\n'/|n}"
                 |   escaped_value="${"$"}{escaped_value//$'\r'/|r}"
@@ -256,7 +259,7 @@ object Nix {
                 |   escaped_value="${"$"}{escaped_value//[/|[}"
                 |   escaped_value="${"$"}{escaped_value//]/|]}"
                 |   echo "##teamcity[setParameter name='env.${"$"}{name}' value='${"$"}{escaped_value}']"
-                |done < "${"$"}MODIFIED_ENV"
+                |done <<< "${"$"}MODIFIED_ENV"
             """.trimMargin()
         }
     }
