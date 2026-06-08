@@ -1,5 +1,4 @@
-import dev.silenium.libs.jni.NativePlatform
-import dev.silenium.libs.mpv.build.AgpCopyCompat
+import dev.silenium.libs.mpv.build.BundleAndroidNativesTask
 
 plugins {
     id("mpv-base")
@@ -37,53 +36,18 @@ dependencies {
     androidTestImplementation(libs.bundles.androidx.test)
 }
 
-val unzipNativeLibs = tasks.register<AgpCopyCompat>("unzipNativeLibs") {
-    description = "Unzips native libraries from mpv-android debug-objs.zip"
-    from(zipTree(nativeLibs.singleFile))
-    destination.convention(layout.buildDirectory.dir("tmp/extracted-natives"))
-}
-
-val bundleLibcxx = tasks.register<AgpCopyCompat>("bundleLibcxx") {
-    description = "Bundles libc++ with the app"
-    dependsOn(unzipNativeLibs)
-    val hostTag = NativePlatform.platform().osArch
-    val abiMap = mapOf(
-        "aarch64-linux-android" to "arm64-v8a",
-        "arm-linux-androideabi" to "armeabi-v7a",
-        "i686-linux-android" to "x86",
-        "x86_64-linux-android" to "x86_64",
-    )
-    val ndkDir = androidComponents.sdkComponents.ndkDirectory
-    val sysrootLibDir = ndkDir.map { it.dir("toolchains/llvm/prebuilt/$hostTag/sysroot/usr/lib") }
-    abiMap.forEach { (triplet, abi) ->
-        val source = sysrootLibDir.map { sysrootLib ->
-            sysrootLib
-                .dir(triplet)
-                .file("libc++_shared.so")
-        }
-        from(source) {
-            into(abi)
-        }
-    }
-    from(unzipNativeLibs) {
-        include(
-            "*/libavcodec.so",
-            "*/libavdevice.so",
-            "*/libavfilter.so",
-            "*/libavformat.so",
-            "*/libavutil.so",
-            "*/libc++_shared.so",
-            "*/libmpv.so",
-            "*/libswresample.so",
-            "*/libswscale.so",
-        )
-    }
-
-    destination.convention(layout.buildDirectory.dir("tmp/bundled-natives"))
+val bundleNatives = tasks.register<BundleAndroidNativesTask>("bundleNatives") {
+    description = "Bundles all mpv native libraries for Android"
+    nativeLibsZip.from(nativeLibs)
+    ndkDirectory = androidComponents.sdkComponents.ndkDirectory
+    destination.convention(layout.buildDirectory.dir("generated/jniLibs"))
 }
 
 androidComponents.onVariants {
-    it.sources.jniLibs?.addGeneratedSourceDirectory(bundleLibcxx, AgpCopyCompat::destination)
+    it.sources.jniLibs?.addGeneratedSourceDirectory(
+        bundleNatives,
+        BundleAndroidNativesTask::destination
+    )
 }
 
 android {

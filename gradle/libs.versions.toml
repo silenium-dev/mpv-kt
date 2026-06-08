@@ -1,7 +1,7 @@
 [versions]
 kotlin = "2.4.0"
 mpv-android = "2026-04-25"
-nix-natives = "0.6.0"
+nix-natives = "0.6.1"
 agp = "9.2.1"
 
 slf4j = "2.0.18"
