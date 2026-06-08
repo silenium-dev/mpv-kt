@@ -4,6 +4,7 @@ import jetbrains.buildServer.configs.kotlin.buildFeatures.perfmon
 import jetbrains.buildServer.configs.kotlin.buildFeatures.pullRequests
 import jetbrains.buildServer.configs.kotlin.buildFeatures.vcsLabeling
 import jetbrains.buildServer.configs.kotlin.buildSteps.gradle
+import jetbrains.buildServer.configs.kotlin.buildSteps.script
 import jetbrains.buildServer.configs.kotlin.projectFeatures.UntrustedBuildsSettings
 import jetbrains.buildServer.configs.kotlin.projectFeatures.untrustedBuildsSettings
 import jetbrains.buildServer.configs.kotlin.triggers.vcs
@@ -83,6 +84,9 @@ object BuildRelease : BuildType({
     }
 
     steps {
+        with(Nix) {
+            loadNixEnv()
+        }
         gradle {
             tasks = """
                 |build
@@ -154,6 +158,9 @@ object BuildSnapshot : BuildType({
     }
 
     steps {
+        with(Nix) {
+            loadNixEnv()
+        }
         gradle {
             tasks = """
                 |build
@@ -204,6 +211,9 @@ object BuildPR : BuildType({
     }
 
     steps {
+        with(Nix) {
+            loadNixEnv()
+        }
         gradle {
             tasks = """
                 |build
@@ -216,3 +226,33 @@ object BuildPR : BuildType({
         }
     }
 })
+
+object Nix {
+    fun BuildSteps.loadNixEnv(flakeDir: String = ".", devShell: String? = null) {
+        script {
+            name = "Load Nix Environment"
+            scriptContent = """
+                |set -euo pipefail
+                |
+                |FLAKE_REF="$flakeDir#${devShell.orEmpty()}"
+                |
+                |tmp_before=$(mktemp)
+                |tmp_after=$(mktemp)
+                |
+                |env | sort > "${"$"}tmp_before"
+                |nix develop "${"$"}FLAKE_REF" --command env | sort > "${"$"}tmp_after"
+                |
+                |MODIFIED_ENV=$(diff "${"$"}tmp_before" "${"$"}tmp_after" | sed -n 's/^> //p')
+                |while IFS="-" read -r name value; do
+                |   escaped_value="${"$"}{value//|/||}"
+                |   escaped_value="${"$"}{escaped_value//$'\n'/|n}"
+                |   escaped_value="${"$"}{escaped_value//$'\r'/|r}"
+                |   escaped_value="${"$"}{escaped_value//\'/|'}"
+                |   escaped_value="${"$"}{escaped_value//[/|[}"
+                |   escaped_value="${"$"}{escaped_value//]/|]}"
+                |   echo "##teamcity[setParameter name='env.${"$"}{name}' value='${"$"}{escaped_value}']"
+                |done < "${"$"}MODIFIED_ENV"
+            """.trimMargin()
+        }
+    }
+}
