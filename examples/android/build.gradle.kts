@@ -1,7 +1,7 @@
 plugins {
-    alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
     id("mpv-base")
+    id("mpv-android-app")
 }
 
 group = "dev.silenium.libs.mpv.examples"
@@ -18,16 +18,6 @@ dependencies {
 }
 
 android {
-    compileSdk {
-        version = release(ProjectConfig.COMPILE_SDK)
-    }
-    defaultConfig {
-        minSdk = ProjectConfig.MIN_SDK
-    }
-    packaging {
-        resources.pickFirsts += "META-INF/*"
-    }
-    ndkVersion = "29.0.14206865"
     namespace = "dev.silenium.mpv.examples.android"
     externalNativeBuild {
         cmake {

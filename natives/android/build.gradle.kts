@@ -3,7 +3,7 @@ import dev.silenium.libs.mpv.build.AgpCopyCompat
 
 plugins {
     id("mpv-base")
-    alias(libs.plugins.android.library)
+    id("mpv-android-lib")
 }
 
 group = "dev.silenium.libs.mpv.natives"
@@ -25,8 +25,6 @@ repositories {
             }
         }
     }
-    google()
-    mavenCentral()
 }
 
 val nativeLibs by configurations.creating
@@ -90,15 +88,4 @@ androidComponents.onVariants {
 
 android {
     namespace = "dev.silenium.mpv.natives.android"
-    ndkVersion = "29.0.14206865"
-    compileSdk {
-        version = release(ProjectConfig.COMPILE_SDK)
-    }
-    compileOptions.targetCompatibility = JavaVersion.toVersion(ProjectConfig.ANDROID_JVM_TARGET.target)
-    compileOptions.sourceCompatibility = JavaVersion.toVersion(ProjectConfig.ANDROID_JVM_TARGET.target)
-    defaultConfig {
-        minSdk = ProjectConfig.MIN_SDK
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        testInstrumentationRunnerArguments["notPackage"] = "com.v7878"
-    }
 }

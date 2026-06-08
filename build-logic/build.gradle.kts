@@ -1,5 +1,3 @@
-import org.gradle.kotlin.dsl.implementation
-
 plugins {
     `kotlin-dsl`
 }
@@ -10,6 +8,12 @@ repositories {
     gradlePluginPortal()
     google()
     maven("https://nexus.silenium.dev/repository/maven-releases/")
+}
+
+kotlin {
+    compilerOptions {
+        freeCompilerArgs.add("-Xcontext-parameters")
+    }
 }
 
 dependencies {
