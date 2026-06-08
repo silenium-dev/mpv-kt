@@ -86,6 +86,7 @@ object BuildRelease : BuildType({
         gradle {
             tasks = """
                 |build
+                |utpGroupCheck
                 |publish
             """.trimMargin().replace("\n", " ")
             gradleParams = """
@@ -156,6 +157,7 @@ object BuildSnapshot : BuildType({
         gradle {
             tasks = """
                 |build
+                |utpGroupCheck
                 |publish
             """.trimMargin().replace("\n", " ")
             gradleParams = """
