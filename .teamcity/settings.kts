@@ -232,7 +232,7 @@ object Nix {
         script {
             name = "Load Nix Environment"
             scriptContent = """
-                |set -euo pipefail
+                |set -xeuo pipefail
                 |
                 |FLAKE_REF="$flakeDir#${devShell.orEmpty()}"
                 |
