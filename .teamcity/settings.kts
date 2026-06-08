@@ -242,7 +242,12 @@ object Nix {
                 |env | sort > "${"$"}tmp_before"
                 |nix develop "${"$"}FLAKE_REF" --command env | sort > "${"$"}tmp_after"
                 |
-                |MODIFIED_ENV=$(diff "${"$"}tmp_before" "${"$"}tmp_after" | sed -n 's/^> //p')
+                |MODIFIED_ENV=$({
+                |  diff "${"$"}tmp_before" "${"$"}tmp_after" || status=${'$'}?
+                |  if [ "${"$"}{status:-0}" -gt 1 ]; then
+                |    exit "${"$"}status"
+                |  fi
+                |} | sed -n 's/^> //p')
                 |while IFS="-" read -r name value; do
                 |   escaped_value="${"$"}{value//|/||}"
                 |   escaped_value="${"$"}{escaped_value//$'\n'/|n}"
