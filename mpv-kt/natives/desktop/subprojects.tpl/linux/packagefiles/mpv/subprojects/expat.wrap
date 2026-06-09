@@ -1,0 +1,7 @@
+[wrap-file]
+directory = expat
+source_filename = expat.tar
+lead_directory_missing = true
+
+[provide]
+expat = expat_dep

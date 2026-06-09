@@ -1,0 +1,4 @@
+[wrap-file]
+source_filename = libdisplay-info.tar
+lead_directory_missing = true
+diff_files = libdisplay-info/hwdata.patch

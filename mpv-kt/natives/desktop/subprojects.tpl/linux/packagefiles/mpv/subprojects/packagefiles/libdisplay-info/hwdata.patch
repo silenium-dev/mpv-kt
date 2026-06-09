@@ -1,0 +1,13 @@
+diff --git a/meson.build b/meson.build
+index 4012669..7bcf805 100644
+--- a/meson.build
++++ b/meson.build
+@@ -16,7 +16,7 @@ version_major = version.split('.')[0]
+ version_minor = version.split('.')[1]
+ assert(version_major == '0')
+ 
+-dep_hwdata = dependency('hwdata', required: false, native: true)
++dep_hwdata = dependency('hwdata', required: false)
+ if dep_hwdata.found()
+ 	hwdata_dir = dep_hwdata.get_variable(pkgconfig: 'pkgdatadir')
+ 	pnp_ids = files(hwdata_dir / 'pnp.ids')

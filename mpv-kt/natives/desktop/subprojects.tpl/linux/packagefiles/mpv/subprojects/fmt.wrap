@@ -1,0 +1,9 @@
+[wrap-file]
+directory = fmt
+source_filename = fmt.tar
+method = cmake
+diff_files = fmt/pic.patch
+lead_directory_missing = true
+
+[provide]
+fmt = fmt_dep

@@ -1,0 +1,6 @@
+[wrap-file]
+source_filename = freetype2.tar
+lead_directory_missing = true
+
+[provide]
+dependency_names = freetype2

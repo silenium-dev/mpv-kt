@@ -1,0 +1,3 @@
+option('libmpv', type: 'boolean', value: true)
+option('drm', type: 'feature', value: 'auto')
+option('openal', type: 'feature', value: 'auto')

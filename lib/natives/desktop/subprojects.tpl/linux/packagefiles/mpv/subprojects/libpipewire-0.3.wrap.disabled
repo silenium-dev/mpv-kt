@@ -1,8 +1,0 @@
-[wrap-git]
-url = https://gitlab.freedesktop.org/pipewire/pipewire.git
-revision = 1.4.9
-depth = 1
-clone-recursive = true
-
-[provide]
-dependency_names = libpipewire-0.3

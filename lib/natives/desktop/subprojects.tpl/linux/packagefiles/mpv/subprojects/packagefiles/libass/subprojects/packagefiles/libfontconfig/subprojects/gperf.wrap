@@ -1,7 +1,0 @@
-[wrap-file]
-directory=gperf
-source_filename=gperf.tar
-lead_directory_missing = true
-
-[provide]
-program_names=gperf

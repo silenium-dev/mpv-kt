@@ -14,12 +14,13 @@ plugins {
 
 include(
     ":ffm",
-    ":lib",
-    ":lib:natives:desktop",
-    ":lib:natives:android",
-    ":lib:android-tests",
-    ":lib:examples:android"
+    ":compose",
+    ":compose:examples:android",
+    ":mpv-kt",
+    ":mpv-kt:natives:desktop",
+    ":mpv-kt:natives:android",
+    ":mpv-kt:android-tests",
+    ":mpv-kt:examples:android",
 )
 includeBuild("build-logic")
 rootProject.name = "mpv-kt"
-project(":lib").name = "mpv-kt"

@@ -1,0 +1,7 @@
+[wrap-file]
+directory = libxml2
+source_filename = libxml2.tar
+lead_directory_missing = true
+
+[provide]
+libxml-2.0 = libxml2_dep

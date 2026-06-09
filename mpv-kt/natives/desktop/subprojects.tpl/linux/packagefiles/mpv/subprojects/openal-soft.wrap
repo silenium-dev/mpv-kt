@@ -1,0 +1,6 @@
+[wrap-file]
+source_filename = openal-soft.tar
+lead_directory_missing = true
+
+[provide]
+openal = openal_dep

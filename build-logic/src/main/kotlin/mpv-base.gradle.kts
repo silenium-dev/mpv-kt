@@ -13,6 +13,7 @@ repositories {
     mavenCentral()
     google()
     maven("https://nexus.silenium.dev/repository/maven-releases/")
+    maven("https://nexus.silenium.dev/repository/maven-snapshots/")
 }
 
 group = "dev.silenium.libs.mpv"

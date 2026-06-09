@@ -1,0 +1,9 @@
+[wrap-file]
+directory = brotli
+source_filename = brotli.tar
+lead_directory_missing = true
+patch_filename = brotli-patch.zip
+
+[provide]
+program_names = brotli
+dependency_names = libbrotlicommon, libbrotlidec, libbrotlienc

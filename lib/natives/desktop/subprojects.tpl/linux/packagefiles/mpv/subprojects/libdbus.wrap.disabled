@@ -1,8 +1,0 @@
-[wrap-git]
-url = https://gitlab.freedesktop.org/dbus/dbus.git
-revision = dbus-1.16.2
-depth = 1
-clone-recursive = true
-
-[provide]
-dependency_names = dbus-1

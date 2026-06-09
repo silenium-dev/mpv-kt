@@ -1,0 +1,4 @@
+[wrap-file]
+source_filename = libass.tar
+lead_directory_missing = true
+patch_directory = libass

@@ -1,0 +1,4 @@
+<resources>
+
+    <style name="Theme.MpvExample" parent="android:Theme.Material.NoActionBar" />
+</resources>

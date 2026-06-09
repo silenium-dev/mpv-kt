@@ -1,0 +1,8 @@
+[wrap-file]
+directory = ffmpeg
+source_filename = ffmpeg.tar
+patch_directory = ffmpeg
+lead_directory_missing = true
+
+[provide]
+dependency_names = libavcodec, libavfilter, libavformat, libavutil, libswresample, libswscale
