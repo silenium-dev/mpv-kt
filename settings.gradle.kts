@@ -22,3 +22,4 @@ include(
 )
 includeBuild("build-logic")
 rootProject.name = "mpv-kt"
+project(":lib").name = "mpv-kt"

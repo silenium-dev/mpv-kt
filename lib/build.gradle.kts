@@ -3,8 +3,6 @@ plugins {
     id("mpv-kmp")
 }
 
-base.archivesName.set("mpv-kt")
-
 kotlin {
     android {
         namespace = "dev.silenium.libs.mpv"
