@@ -28,13 +28,13 @@ kotlin {
         }
         androidMain {
             dependencies {
-                implementation(project(":natives:android"))
+                implementation(project(":lib:natives:android"))
             }
         }
         jvmMain {
             dependencies {
                 implementation(libs.jni.utils)
-                implementation(project(":natives:desktop"))
+                implementation(project(":lib:natives:desktop"))
             }
         }
         jvmTest {

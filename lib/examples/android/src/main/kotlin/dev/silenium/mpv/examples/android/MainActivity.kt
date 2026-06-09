@@ -1,8 +1,5 @@
 package dev.silenium.mpv.examples.android
 
-import android.content.res.AssetManager
-import android.opengl.EGL14
-import android.opengl.EGL15
 import android.opengl.GLES32
 import android.opengl.GLSurfaceView
 import android.os.Bundle
@@ -10,14 +7,9 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.viewinterop.AndroidView
 import dev.silenium.mpv.Mpv

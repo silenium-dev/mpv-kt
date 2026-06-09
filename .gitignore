@@ -8,8 +8,7 @@ target/
 .kotlin
 /build/
 /*/build/
-/natives/*/build/
-/examples/*/build/
-/lib/*/build/
+/*/*/build/
+/*/*/*/build/
 .cxx/
 local.properties
