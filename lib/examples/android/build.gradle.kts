@@ -7,7 +7,7 @@ plugins {
 group = "dev.silenium.libs.mpv.examples"
 
 dependencies {
-    implementation(project(":lib"))
+    implementation(project(":mpv-kt"))
     implementation(project(":ffm"))
     implementation(libs.slf4j.android)
     implementation("androidx.activity:activity-compose:1.13.0")

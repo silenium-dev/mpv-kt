@@ -4,7 +4,7 @@ plugins {
 }
 
 dependencies {
-    implementation(project(":lib"))
+    implementation(project(":mpv-kt"))
     implementation(project(":ffm"))
 }
 
