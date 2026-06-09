@@ -22,3 +22,7 @@ publishing {
         }
     }
 }
+
+mpvBase {
+    publish = true
+}

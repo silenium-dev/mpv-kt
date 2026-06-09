@@ -53,3 +53,7 @@ androidComponents.onVariants {
 android {
     namespace = "dev.silenium.mpv.natives.android"
 }
+
+mpvBase {
+    publish = true
+}

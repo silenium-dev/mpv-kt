@@ -44,3 +44,7 @@ kotlin {
         }
     }
 }
+
+mpvBase {
+    publish = true
+}

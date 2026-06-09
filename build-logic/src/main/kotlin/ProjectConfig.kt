@@ -39,12 +39,12 @@ fun CommonExtension.commonConfig() {
 
     val pixel =
         testOptions.managedDevices.allDevices.create<ManagedVirtualDevice>("pixel10X86_64") {
-        device = "Pixel 10 Pro"
-        sdkVersion = 30
-        testedAbi = "x86_64"
-        require64Bit = true
-        systemImageSource = "aosp-atd"
-    }
+            device = "Pixel 10 Pro"
+            sdkVersion = 30
+            testedAbi = "x86_64"
+            require64Bit = true
+            systemImageSource = "aosp-atd"
+        }
     testOptions.managedDevices.groups.create("utp") {
         targetDevices.add(pixel)
     }

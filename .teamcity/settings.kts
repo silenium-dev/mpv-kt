@@ -95,7 +95,7 @@ object BuildRelease : BuildType({
             """.trimMargin().replace("\n", " ")
             gradleParams = """
                 |-Pdeploy.version=%release.version%
-                |-Pdeploy.enabled=false
+                |-Pdeploy.enabled=true
                 |-Pdeploy.repo-url=%deploy.repo-url%
                 |-Pdeploy.username=%deploy.username%
                 |-Pdeploy.password=%deploy.password%
@@ -169,7 +169,7 @@ object BuildSnapshot : BuildType({
             """.trimMargin().replace("\n", " ")
             gradleParams = """
                 |-Pci=true
-                |-Pdeploy.enabled=false
+                |-Pdeploy.enabled=true
                 |-Pdeploy.repo-url=%deploy.repo-url%
                 |-Pdeploy.username=%deploy.username%
                 |-Pdeploy.password=%deploy.password%
