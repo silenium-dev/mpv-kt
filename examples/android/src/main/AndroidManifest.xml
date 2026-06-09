@@ -4,7 +4,8 @@
         <activity
             android:name=".MainActivity"
             android:exported="true"
-            android:label="MPV Example">
+            android:label="MPV Example"
+            android:theme="@style/Theme.MpvExample">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
