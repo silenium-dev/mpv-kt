@@ -16,6 +16,7 @@ include(
     ":ffm",
     ":compose",
     ":compose:examples:android",
+    ":compose:examples:desktop",
     ":mpv-kt",
     ":mpv-kt:natives:desktop",
     ":mpv-kt:natives:android",
