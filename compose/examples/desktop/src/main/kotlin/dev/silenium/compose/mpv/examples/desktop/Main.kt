@@ -1,8 +1,10 @@
 package dev.silenium.compose.mpv.examples.desktop
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
@@ -34,7 +36,7 @@ fun main() = application {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             val mpv = remember {
                 Mpv().apply {
-                    setProperty("hwdec", Node.String("vaapi-copy")).getOrThrow()
+                    setProperty("hwdec", Node.String("auto")).getOrThrow()
                     setProperty("vo", Node.String("libmpv")).getOrThrow()
                     initialize().getOrThrow()
                 }
@@ -50,11 +52,20 @@ fun main() = application {
                 color = Color.White.copy(alpha = 0.8f),
                 shape = MaterialTheme.shapes.small,
             ) {
-                Text(
-                    text = "Composable over Video Surface",
-                    fontSize = 24.sp,
-                    modifier = Modifier.padding(8.dp),
-                )
+                Column {
+                    Text(
+                        text = "Composable over Video Surface",
+                        fontSize = 24.sp,
+                        modifier = Modifier.padding(8.dp),
+                    )
+                    Button(onClick = {
+                        coroutineScope.launch {
+                            mpv.commandAsync("cycle", "pause").getOrThrow()
+                        }
+                    }) {
+                        Text("Toggle Play/Pause")
+                    }
+                }
             }
         }
     }
