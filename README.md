@@ -4,8 +4,10 @@ A KMP wrapper for mpv
 
 ## Supported platforms
 
-- Android
-- JVM
+- Android: x86_64, arm64
+- JVM: Linux, Windows
+
+*Note: macOS and iOS are unsupported, as I have no Apple devices to develop/test on*
 
 ## Modules
 
