@@ -1,13 +1,18 @@
-import jetbrains.buildServer.configs.kotlin.*
+import jetbrains.buildServer.configs.kotlin.BuildSteps
+import jetbrains.buildServer.configs.kotlin.BuildType
+import jetbrains.buildServer.configs.kotlin.DslContext
+import jetbrains.buildServer.configs.kotlin.ParameterDisplay
 import jetbrains.buildServer.configs.kotlin.buildFeatures.commitStatusPublisher
 import jetbrains.buildServer.configs.kotlin.buildFeatures.perfmon
 import jetbrains.buildServer.configs.kotlin.buildFeatures.pullRequests
-import jetbrains.buildServer.configs.kotlin.buildFeatures.vcsLabeling
+import jetbrains.buildServer.configs.kotlin.buildSteps.gitHubRelease
 import jetbrains.buildServer.configs.kotlin.buildSteps.gradle
 import jetbrains.buildServer.configs.kotlin.buildSteps.script
+import jetbrains.buildServer.configs.kotlin.project
 import jetbrains.buildServer.configs.kotlin.projectFeatures.UntrustedBuildsSettings
 import jetbrains.buildServer.configs.kotlin.projectFeatures.untrustedBuildsSettings
 import jetbrains.buildServer.configs.kotlin.triggers.vcs
+import jetbrains.buildServer.configs.kotlin.version
 
 version = "2026.1"
 
@@ -39,15 +44,6 @@ object BuildRelease : BuildType({
 
     features {
         perfmon {
-        }
-
-        vcsLabeling {
-            vcsRootId = "${DslContext.settingsRoot.id}"
-            labelingPattern = "%release.version%"
-            successfulOnly = true
-            branchFilter = """
-                |+:*
-            """.trimMargin()
         }
     }
 
@@ -101,6 +97,15 @@ object BuildRelease : BuildType({
                 |-Pdeploy.password=%deploy.password%
                 |--info
             """.trimMargin().replace("\n", " ")
+        }
+        gitHubRelease {
+            name = "Create GitHub Release"
+            targetVcsRootId = "${DslContext.settingsRoot.id}"
+            githubUrl = "https://api.github.com"
+            tagName = "%release.version%"
+            generateReleaseNotes = true
+            draft = true
+            authType = vcsRoot()
         }
     }
 })
