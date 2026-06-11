@@ -15,8 +15,10 @@ plugins {
 include(
     ":ffm",
     ":compose",
-    ":compose:examples:android",
-    ":compose:examples:desktop",
+    ":compose:examples:simple",
+    ":compose:examples:simple:android",
+    ":compose:examples:simple:desktop",
+    ":compose:examples:simple:shared",
     ":mpv-kt",
     ":mpv-kt:natives:desktop",
     ":mpv-kt:natives:android",
