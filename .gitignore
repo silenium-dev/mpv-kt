@@ -7,8 +7,6 @@ target/
 .gradle
 .kotlin
 /build/
-/*/build/
-/*/*/build/
-/*/*/*/build/
+/**/build/
 .cxx/
 local.properties
