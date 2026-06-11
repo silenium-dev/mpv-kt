@@ -4,8 +4,8 @@ A KMP wrapper for mpv
 
 ## Supported platforms
 
-- Android: x86_64, arm64
-- JVM: Linux, Windows
+- Android: x86_64, arm64 (SDK >= 26)
+- JVM: Linux, Windows (JVM >= 25, uses [Panama API](https://openjdk.org/projects/panama/))
 
 *Note: macOS and iOS are unsupported, as I have no Apple devices to develop/test on*
 
