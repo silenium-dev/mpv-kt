@@ -240,6 +240,9 @@
             *-windows)
               ;;
           esac
+          for lib in "$out"/*.so; do
+            patchelf --set-rpath '$ORIGIN' "$lib"
+          done
         '';
       };
     };
