@@ -59,7 +59,8 @@ fun VideoSurface(
                 fbo.size.width,
                 fbo.size.height,
                 GL_RGBA8,
-            )
+            ),
+            RenderParam.FlipY(true),
         )?.getOrThrow()
     }
 }
