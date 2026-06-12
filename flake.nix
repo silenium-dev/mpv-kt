@@ -20,10 +20,11 @@
               buildInputs = with pkgs; [
                 libglvnd
                 mesa
+                libva
               ];
 
               postBuild = let
-              libPath =  "${pkgs.libglvnd}/lib:${pkgs.mesa}/lib";
+              libPath =  "${pkgs.libglvnd}/lib:${pkgs.mesa}/lib:${pkgs.libva.out}/lib";
               in ''
                 for bin in $out/bin/*; do
                   wrapProgram "$bin" --set LD_LIBRARY_PATH "${libPath}"
