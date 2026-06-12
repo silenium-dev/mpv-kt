@@ -1,4 +1,4 @@
-package dev.silenium.compose.mpv.examples.desktop
+package dev.silenium.libs.mpv.compose.examples.desktop
 
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
