@@ -1,5 +1,6 @@
 import dev.silenium.gradle.conventions.*
 import dev.silenium.build.ProjectConfig
+import dev.silenium.build.configureDeviceTests
 
 plugins {
     dev.silenium.gradle.conventions.android.library
@@ -19,6 +20,7 @@ conventions {
         jvmTarget = ProjectConfig.ANDROID_JVM_TARGET
         ndkVersion = ProjectConfig.NDK_VERSION
         cmakeVersion = ProjectConfig.CMAKE_VERSION
+        configureDeviceTests()
 
         namespace = "dev.silenium.libs.mpv.android.tests"
     }

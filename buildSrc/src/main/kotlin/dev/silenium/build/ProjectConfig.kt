@@ -1,5 +1,7 @@
 package dev.silenium.build
 
+import dev.silenium.gradle.conventions.AndroidExtension
+import dev.silenium.gradle.conventions.deviceTests
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 object ProjectConfig {
@@ -9,4 +11,11 @@ object ProjectConfig {
     const val CMAKE_VERSION = "4.1.2"
     val JVM_TARGET = JvmTarget.JVM_25
     val ANDROID_JVM_TARGET = JvmTarget.JVM_11
+}
+
+fun AndroidExtension.configureDeviceTests() {
+    deviceTests {
+        enabled.set(true)
+        instrumentationExcludes.add("com.v7878")
+    }
 }
