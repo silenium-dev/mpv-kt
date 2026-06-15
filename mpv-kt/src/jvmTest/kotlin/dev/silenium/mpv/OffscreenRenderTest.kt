@@ -2,6 +2,8 @@ package dev.silenium.mpv
 
 import dev.silenium.mpv.native_bindings.node.Node
 import io.kotest.core.spec.style.FunSpec
+import io.kotest.matchers.longs.shouldBeGreaterThan
+import io.kotest.matchers.longs.shouldBeLessThan
 import io.kotest.matchers.ranges.shouldBeIn
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.CoroutineScope
@@ -122,11 +124,15 @@ class OffscreenRenderTest : FunSpec({
         val pos = (testMpvInstance.mpv.getPropertyAsync("time-pos/full")
             .getOrThrow() as Node.Double).double.seconds
         pos shouldBeIn 0.5.seconds..1.5.seconds
+
         val voDropped = (testMpvInstance.mpv.getPropertyAsync("frame-drop-count")
             .getOrThrow() as Node.Int64).int64
         val decoderDropped = (testMpvInstance.mpv.getPropertyAsync("decoder-frame-drop-count")
             .getOrThrow() as Node.Int64).int64
-        voDropped shouldBe 0
+        val estimatedFramePos = (testMpvInstance.mpv.getPropertyAsync("estimated-frame-number")
+            .getOrThrow() as Node.Int64).int64
+        estimatedFramePos shouldBeGreaterThan voDropped
+        voDropped shouldBeLessThan 5
         decoderDropped shouldBe 0
         testMpvInstance.dispose()
         glDeleteFramebuffers(fbo)

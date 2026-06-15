@@ -9,6 +9,7 @@ plugins {
 dependencies {
     implementation(project(":mpv-kt"))
     implementation(project(":ffm"))
+    implementation(libs.slf4j.api)
 }
 
 conventions {
