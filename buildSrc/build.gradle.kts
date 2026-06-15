@@ -1,19 +1,19 @@
+import org.gradle.api.NamedDomainObjectProvider
+import org.gradle.api.artifacts.Configuration
+import org.gradle.api.artifacts.ExternalModuleDependency
+import org.gradle.api.provider.Provider
+import org.gradle.plugin.use.PluginDependency
+
 plugins {
     `kotlin-dsl`
 }
 
 repositories {
-    mavenLocal()
-    mavenCentral()
     gradlePluginPortal()
+    mavenCentral()
     google()
     maven("https://nexus.silenium.dev/repository/maven-releases/")
-}
-
-kotlin {
-    compilerOptions {
-        freeCompilerArgs.add("-Xcontext-parameters")
-    }
+    maven("https://nexus.silenium.dev/repository/maven-snapshots/")
 }
 
 dependencies {
@@ -37,12 +37,5 @@ dependencies {
             }
         }
     }
-    configurations.implementation(plugin = libs.plugins.kotlin.multiplatform)
-    configurations.implementation(plugin = libs.plugins.kotlin.atomicfu)
-    configurations.implementation(plugin = libs.plugins.android.kotlin)
-    configurations.implementation(plugin = libs.plugins.nix.natives)
-    configurations.implementation(plugin = libs.plugins.kotest)
-    implementation(gradleApi())
-    implementation(gradleKotlinDsl())
-    implementation(files(libs.javaClass.protectionDomain.codeSource.location.file))
+    configurations.implementation(libs.plugins.conventions.jvm)
 }

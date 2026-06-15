@@ -5,6 +5,7 @@ pluginManagement {
         mavenLocal()
         google()
         maven("https://nexus.silenium.dev/repository/maven-releases/")
+        maven("https://nexus.silenium.dev/repository/maven-snapshots/")
     }
 }
 
@@ -25,5 +26,4 @@ include(
     ":mpv-kt:android-tests",
     ":mpv-kt:examples:android",
 )
-includeBuild("build-logic")
 rootProject.name = "mpv-kt"

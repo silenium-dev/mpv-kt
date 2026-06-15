@@ -1,7 +1,9 @@
+import dev.silenium.gradle.conventions.*
+import dev.silenium.build.ProjectConfig
+
 plugins {
-    alias(libs.plugins.kotlin.compose)
-    id("mpv-base")
-    id("mpv-android-app")
+    org.jetbrains.kotlin.plugin.compose
+    dev.silenium.gradle.conventions.android.application
 }
 
 group = "dev.silenium.libs.mpv.examples"
@@ -17,10 +19,22 @@ dependencies {
     implementation("androidx.compose.material3:material3:1.4.0")
 }
 
+conventions {
+    android {
+        compileSdk {
+            version = release(ProjectConfig.COMPILE_SDK)
+        }
+        minSdk = ProjectConfig.MIN_SDK
+        jvmTarget = ProjectConfig.ANDROID_JVM_TARGET
+
+        namespace = "dev.silenium.mpv.examples.android"
+    }
+}
+
 android {
-    namespace = "dev.silenium.mpv.examples.android"
     externalNativeBuild {
         cmake {
+            version = ProjectConfig.CMAKE_VERSION
             path = file("src/main/cpp/CMakeLists.txt")
         }
     }

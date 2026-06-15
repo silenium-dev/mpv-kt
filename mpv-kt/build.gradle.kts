@@ -1,13 +1,11 @@
+import dev.silenium.gradle.conventions.*
+import dev.silenium.build.ProjectConfig
+
 plugins {
-    id("mpv-base")
-    id("mpv-kmp")
+    dev.silenium.gradle.conventions.kmp
 }
 
 kotlin {
-    android {
-        namespace = "dev.silenium.libs.mpv"
-    }
-
     sourceSets {
         commonMain {
             dependencies {
@@ -52,6 +50,22 @@ kotlin {
     }
 }
 
-mpvBase {
-    publish = true
+conventions {
+    jvm {
+        jvmTarget = ProjectConfig.JVM_TARGET
+    }
+
+    publishing {
+        enabled = true
+    }
+
+    android {
+        compileSdk {
+            version = release(ProjectConfig.COMPILE_SDK)
+        }
+        minSdk = ProjectConfig.MIN_SDK
+        jvmTarget = ProjectConfig.ANDROID_JVM_TARGET
+
+        namespace = "dev.silenium.libs.mpv"
+    }
 }

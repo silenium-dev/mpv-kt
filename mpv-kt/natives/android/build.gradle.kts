@@ -1,8 +1,8 @@
-import dev.silenium.libs.mpv.build.BundleAndroidNativesTask
+import dev.silenium.gradle.conventions.*
+import dev.silenium.build.ProjectConfig
 
 plugins {
-    id("mpv-base")
-    id("mpv-android-lib")
+    dev.silenium.gradle.conventions.android.library
 }
 
 group = "dev.silenium.libs.mpv.natives"
@@ -36,24 +36,19 @@ dependencies {
     androidTestImplementation(libs.bundles.androidx.test)
 }
 
-val bundleNatives = tasks.register<BundleAndroidNativesTask>("bundleNatives") {
-    description = "Bundles all mpv native libraries for Android"
-    nativeLibsZip.from(nativeLibs)
-    ndkDirectory = androidComponents.sdkComponents.ndkDirectory
-    destination.convention(layout.buildDirectory.dir("generated/jniLibs"))
-}
+conventions {
+    publishing {
+        enabled = true
+    }
 
-androidComponents.onVariants {
-    it.sources.jniLibs?.addGeneratedSourceDirectory(
-        bundleNatives,
-        BundleAndroidNativesTask::destination
-    )
-}
+    android {
+        compileSdk {
+            version = release(ProjectConfig.COMPILE_SDK)
+        }
+        minSdk = ProjectConfig.MIN_SDK
+        jvmTarget = ProjectConfig.ANDROID_JVM_TARGET
+        ndkVersion = ProjectConfig.NDK_VERSION
 
-android {
-    namespace = "dev.silenium.mpv.natives.android"
-}
-
-mpvBase {
-    publish = true
+        namespace = "dev.silenium.mpv.natives.android"
+    }
 }

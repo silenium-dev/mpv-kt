@@ -1,7 +1,10 @@
+import dev.silenium.gradle.conventions.jvm
+import dev.silenium.build.ProjectConfig
+import dev.silenium.gradle.conventions.publishing
+
 plugins {
-    id("mpv-base")
-    alias(libs.plugins.kotlin.jvm)
-    alias(libs.plugins.nix.natives)
+    dev.silenium.gradle.conventions.jvm
+    dev.silenium.libs.jni.`nix-natives`
 }
 
 group = "dev.silenium.libs.mpv.natives"
@@ -15,14 +18,11 @@ nixNatives {
     showLogs = providers.environmentVariable("CI").orElse("false").map { it != "false" }
 }
 
-publishing {
-    publications {
-        create<MavenPublication>("maven") {
-            from(components["kotlin"])
-        }
+conventions {
+    publishing {
+        enabled = true
     }
-}
-
-mpvBase {
-    publish = true
+    jvm {
+        jvmTarget = ProjectConfig.JVM_TARGET
+    }
 }

@@ -1,8 +1,9 @@
 [versions]
 kotlin = "2.4.0"
 mpv-android = "2026-04-25"
-nix-natives = "0.6.1"
+nix-natives = "0.6.3"
 agp = "9.2.1"
+conventions = "0.1.5-10-g1d982eb9"
 
 slf4j = "2.0.18"
 logback = "1.5.34"
@@ -59,17 +60,13 @@ kotest-runner-junit5 = { group = "io.kotest", name = "kotest-runner-junit5", ver
 kotest-runner-junit4 = { group = "io.kotest", name = "kotest-runner-junit4", version.ref = "kotest" }
 
 [plugins]
-kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
-kotlin-atomicfu = { id = "org.jetbrains.kotlin.plugin.atomicfu", version.ref = "kotlin" }
-kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+conventions-kmp = { id = "dev.silenium.gradle.conventions.kmp", version.ref = "conventions" }
+conventions-jvm = { id = "dev.silenium.gradle.conventions.jvm", version.ref = "conventions" }
+conventions-android-application = { id = "dev.silenium.gradle.conventions.android.application", version.ref = "conventions" }
+conventions-android-library = { id = "dev.silenium.gradle.conventions.android.library", version.ref = "conventions" }
 compose = { id = "org.jetbrains.compose", version.ref = "compose" }
-android-kotlin = { id = "com.android.kotlin.multiplatform.library", version.ref = "agp" }
-android-library = { id = "com.android.library", version.ref = "agp" }
-android-application = { id = "com.android.application", version.ref = "agp" }
+kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 nix-natives = { id = "dev.silenium.libs.jni.nix-natives", version.ref = "nix-natives" }
-kotest = { id = "io.kotest", version.ref = "kotest" }
 
 [bundles]
 lwjgl = [

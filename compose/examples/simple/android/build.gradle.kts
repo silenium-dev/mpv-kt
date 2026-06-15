@@ -1,7 +1,10 @@
+import dev.silenium.gradle.conventions.android
+import dev.silenium.gradle.conventions.compileSdk
+import dev.silenium.build.ProjectConfig
+
 plugins {
-    alias(libs.plugins.kotlin.compose)
-    id("mpv-base")
-    id("mpv-android-app")
+    org.jetbrains.kotlin.plugin.compose
+    dev.silenium.gradle.conventions.android.application
 }
 
 group = "dev.silenium.libs.mpv.compose.examples"
@@ -16,6 +19,14 @@ dependencies {
     runtimeOnly(libs.slf4j.android)
 }
 
-android {
-    namespace = "dev.silenium.libs.mpv.compose.examples.android"
+conventions {
+    android {
+        compileSdk {
+            version = release(ProjectConfig.COMPILE_SDK)
+        }
+        minSdk = ProjectConfig.MIN_SDK
+        jvmTarget = ProjectConfig.ANDROID_JVM_TARGET
+
+        namespace = "dev.silenium.libs.mpv.compose.examples.android"
+    }
 }
