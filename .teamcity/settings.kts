@@ -86,15 +86,15 @@ object BuildRelease : BuildType({
         gradle {
             tasks = """
                 |build
-                |utpGroupCheck
                 |publish
             """.trimMargin().replace("\n", " ")
             gradleParams = """
                 |-Pdeploy.version=%release.version%
                 |-Pdeploy.enabled=true
-                |-Pdeploy.repo-url=%deploy.repo-url%
-                |-Pdeploy.username=%deploy.username%
-                |-Pdeploy.password=%deploy.password%
+                |-Pnexus.enabled=true
+                |-Pnexus.repo-url=%deploy.repo-url%
+                |-Pnexus.username=%deploy.username%
+                |-Pnexus.password=%deploy.password%
                 |--info
             """.trimMargin().replace("\n", " ")
         }
@@ -169,15 +169,15 @@ object BuildSnapshot : BuildType({
         gradle {
             tasks = """
                 |build
-                |utpGroupCheck
                 |publish
             """.trimMargin().replace("\n", " ")
             gradleParams = """
                 |-Pci=true
                 |-Pdeploy.enabled=true
-                |-Pdeploy.repo-url=%deploy.repo-url%
-                |-Pdeploy.username=%deploy.username%
-                |-Pdeploy.password=%deploy.password%
+                |-Pnexus.enabled=true
+                |-Pnexus.repo-url=%deploy.repo-url%
+                |-Pnexus.username=%deploy.username%
+                |-Pnexus.password=%deploy.password%
                 |--info
             """.trimMargin().replace("\n", " ")
         }
