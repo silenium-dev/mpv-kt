@@ -26,6 +26,8 @@ conventions {
         }
         minSdk = ProjectConfig.MIN_SDK
         jvmTarget = ProjectConfig.ANDROID_JVM_TARGET
+        ndkVersion = ProjectConfig.NDK_VERSION
+        cmakeVersion = ProjectConfig.CMAKE_VERSION
 
         namespace = "dev.silenium.mpv.examples.android"
     }
@@ -34,7 +36,6 @@ conventions {
 android {
     externalNativeBuild {
         cmake {
-            version = ProjectConfig.CMAKE_VERSION
             path = file("src/main/cpp/CMakeLists.txt")
         }
     }
