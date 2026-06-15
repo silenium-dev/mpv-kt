@@ -1,12 +1,14 @@
+import dev.silenium.build.ProjectConfig
 import dev.silenium.gradle.conventions.android
 import dev.silenium.gradle.conventions.compileSdk
 import dev.silenium.gradle.conventions.jvm
-import dev.silenium.build.ProjectConfig
 import dev.silenium.gradle.conventions.publishing
 
 plugins {
     dev.silenium.gradle.conventions.kmp
 }
+
+group = "dev.silenium.libs.mpv"
 
 kotlin {
     sourceSets {

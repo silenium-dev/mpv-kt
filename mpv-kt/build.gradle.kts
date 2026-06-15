@@ -5,6 +5,8 @@ plugins {
     dev.silenium.gradle.conventions.kmp
 }
 
+group = "dev.silenium.libs.mpv"
+
 kotlin {
     sourceSets {
         commonMain {

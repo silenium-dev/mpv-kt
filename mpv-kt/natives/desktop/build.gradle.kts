@@ -1,5 +1,5 @@
-import dev.silenium.gradle.conventions.jvm
 import dev.silenium.build.ProjectConfig
+import dev.silenium.gradle.conventions.jvm
 import dev.silenium.gradle.conventions.publishing
 
 plugins {

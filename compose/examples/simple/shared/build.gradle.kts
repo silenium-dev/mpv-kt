@@ -1,7 +1,7 @@
+import dev.silenium.build.ProjectConfig
 import dev.silenium.gradle.conventions.android
 import dev.silenium.gradle.conventions.compileSdk
 import dev.silenium.gradle.conventions.jvm
-import dev.silenium.build.ProjectConfig
 
 plugins {
     org.jetbrains.kotlin.plugin.compose

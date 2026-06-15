@@ -1,6 +1,8 @@
-import dev.silenium.gradle.conventions.*
 import dev.silenium.build.ProjectConfig
 import dev.silenium.build.configureDeviceTests
+import dev.silenium.gradle.conventions.android
+import dev.silenium.gradle.conventions.compileSdk
+import dev.silenium.gradle.conventions.publishing
 
 plugins {
     dev.silenium.gradle.conventions.android.library

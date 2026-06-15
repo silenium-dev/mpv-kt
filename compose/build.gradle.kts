@@ -1,14 +1,15 @@
+import dev.silenium.build.ProjectConfig
 import dev.silenium.gradle.conventions.android
 import dev.silenium.gradle.conventions.compileSdk
 import dev.silenium.gradle.conventions.jvm
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-import dev.silenium.build.ProjectConfig
 import dev.silenium.gradle.conventions.publishing
 
 plugins {
     org.jetbrains.kotlin.plugin.compose
     dev.silenium.gradle.conventions.kmp
 }
+
+group = "dev.silenium.libs.mpv"
 
 kotlin {
     sourceSets {
