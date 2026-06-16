@@ -20,12 +20,29 @@ class ComposeGLProcProvider(val wrapped: GLProcAddressProvider) : GLGetProcAddre
         MemorySegment.ofAddress(wrapped.getGlProcAddress(name))
 }
 
+/**
+ * Renders the video output of a [Mpv] player into a compose-gl [GLCanvas]
+ * The mpv property `vo` has to be set to `libmpv` to make mpv render the video into this surface
+ */
 @Composable
 fun VideoSurface(
+    /**
+     * [Mpv] player instance
+     */
     mpv: Mpv,
     modifier: Modifier = Modifier,
+    /**
+     * Is called after the [Mpv.Render] was created
+     */
     onInit: (Mpv) -> Unit = {},
-    onDispose: (Mpv) -> Unit = {}
+    /**
+     * Is called before the [Mpv.Render] is destroyed
+     */
+    onDispose: (Mpv) -> Unit = {},
+    /**
+     * If true, sets the BlockForTargetTime render parameter
+     */
+    lockFramerate: Boolean = true,
 ) {
     var render: Mpv.Render? by remember { mutableStateOf(null) }
     DisposableEffect(mpv) {
@@ -48,6 +65,7 @@ fun VideoSurface(
             render = mpv.createRender(
                 RenderParam.ApiType(RenderParam.ApiType.Api.OPENGL),
                 RenderParam.OpenGLInitParams(ComposeGLProcProvider(this)),
+                RenderParam.AdvancedControl(true),
                 updateCallback = state::requestUpdate,
             ).getOrThrow()
             onInit(mpv)
@@ -61,6 +79,7 @@ fun VideoSurface(
                 GL_RGBA8,
             ),
             RenderParam.FlipY(true),
+            RenderParam.BlockForTargetTime(lockFramerate),
         )?.getOrThrow()
     }
 }

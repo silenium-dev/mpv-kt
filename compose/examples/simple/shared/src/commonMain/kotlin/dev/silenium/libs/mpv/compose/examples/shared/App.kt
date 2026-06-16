@@ -33,12 +33,17 @@ fun App(testVideo: File) =
             }
         }
         val coroutineScope = rememberCoroutineScope()
-        VideoSurface(mpv, Modifier.fillMaxSize(), onInit = {
-            coroutineScope.launch {
-                mpv.commandAsync("loadfile", testVideo.absolutePath).getOrThrow()
-                mpv.setPropertyAsync("loop-file", Node.String("inf")).getOrThrow()
-            }
-        })
+        VideoSurface(
+            mpv,
+            Modifier.fillMaxSize(),
+            lockFramerate = false,
+            onInit = {
+                coroutineScope.launch {
+                    mpv.commandAsync("loadfile", testVideo.absolutePath).getOrThrow()
+                    mpv.setPropertyAsync("loop-file", Node.String("inf")).getOrThrow()
+                }
+            },
+        )
         Surface(
             color = Color.White.copy(alpha = 0.8f),
             shape = MaterialTheme.shapes.small,
