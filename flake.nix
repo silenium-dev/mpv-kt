@@ -20,7 +20,7 @@
               buildInputs = with pkgs; [
                 libglvnd
                 mesa
-                libva
+                libva.out
                 libpulseaudio
                 alsa-lib
                 dbus.lib
