@@ -1,9 +1,3 @@
-import org.gradle.api.NamedDomainObjectProvider
-import org.gradle.api.artifacts.Configuration
-import org.gradle.api.artifacts.ExternalModuleDependency
-import org.gradle.api.provider.Provider
-import org.gradle.plugin.use.PluginDependency
-
 plugins {
     `kotlin-dsl`
 }
