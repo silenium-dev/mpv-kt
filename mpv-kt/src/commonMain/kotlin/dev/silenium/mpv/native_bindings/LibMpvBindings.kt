@@ -122,6 +122,32 @@ class LibMpvBindings {
         )
     }
 
+    private val handle_mpv_observe_property by lazy {
+        val symbol = lookup.findOrThrow("mpv_observe_property")
+        linker.downcallHandle(
+            symbol,
+            FunctionDescriptor.of(
+                ValueLayout.JAVA_INT,
+                ValueLayout.ADDRESS,
+                ValueLayout.JAVA_LONG,
+                ValueLayout.ADDRESS,
+                ValueLayout.JAVA_INT,
+            )
+        )
+    }
+
+    private val handle_mpv_unobserve_property by lazy {
+        val symbol = lookup.findOrThrow("mpv_unobserve_property")
+        linker.downcallHandle(
+            symbol,
+            FunctionDescriptor.of(
+                ValueLayout.JAVA_INT,
+                ValueLayout.ADDRESS,
+                ValueLayout.JAVA_LONG,
+            )
+        )
+    }
+
     private val handle_mpv_command_async by lazy {
         val symbol = lookup.findOrThrow("mpv_command_async")
         linker.downcallHandle(
@@ -316,6 +342,20 @@ class LibMpvBindings {
             val ret = handle_mpv_command_async(handle.pointer, userData.toLong(), commandArray)
             return Error.fromValue(ret as Int)
         }
+
+    fun mpv_observe_property(handle: Handle, userData: ULong, name: String): Error =
+        Arena.ofConfined().use { arena ->
+            val nameString = arena.allocateFrom(name)
+            val ret = handle_mpv_observe_property(
+                handle.pointer, userData.toLong(), nameString, Format.Node.value,
+            )
+            return Error.fromValue(ret as Int)
+        }
+
+    fun mpv_unobserve_property(handle: Handle, userData: ULong): Error {
+        val ret = handle_mpv_unobserve_property(handle.pointer, userData.toLong())
+        return Error.fromValue(ret as Int)
+    }
 
     private fun mpv_free_node_contents(node: MemorySegment) {
         handle_mpv_free_node_contents(node)

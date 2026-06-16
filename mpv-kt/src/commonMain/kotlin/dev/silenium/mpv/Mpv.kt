@@ -23,11 +23,14 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 import org.slf4j.LoggerFactory
@@ -61,13 +64,36 @@ class Mpv : EventCallback, AutoCloseable {
     fun getProperty(name: String) =
         Core.mpv.mpv_get_property(core.handle, name)
 
-    suspend fun setPropertyAsync(name: String, value: Node): Result<Unit> = asyncRequest(Id.SET_PROPERTY_REPLY) {
-        mpv_set_property_async(core.handle, it, name, value)
+    suspend fun setPropertyAsync(name: String, value: Node): Result<Unit> =
+        asyncRequest(Id.SET_PROPERTY_REPLY) {
+            mpv_set_property_async(core.handle, it, name, value)
+        }
+
+    suspend fun getPropertyAsync(name: String): Result<Node> =
+        asyncRequest<EventProperty>(Id.GET_PROPERTY_REPLY) {
+            mpv_get_property_async(core.handle, it, name)
+        }.map(EventProperty::data)
+
+    inline fun <reified T : Node> observe(name: String): Result<Flow<T>> {
+        return observeProperty(name).map { flow -> flow.map { it as T } }
     }
 
-    suspend fun getPropertyAsync(name: String): Result<Node> = asyncRequest<EventProperty>(Id.GET_PROPERTY_REPLY) {
-        mpv_get_property_async(core.handle, it, name)
-    }.map(EventProperty::data)
+    fun observeProperty(name: String): Result<Flow<Node>> {
+        val requestId = nextRequestId()
+        val result = Core.mpv.mpv_observe_property(core.handle, requestId, name)
+        return Result.mpv(result) {
+            channelFlow {
+                events
+                    .filter { it.eventId == Id.PROPERTY_CHANGE && it.replyUserdata == requestId }
+                    .collect { send((it.data as EventProperty).data) }
+            }.onCompletion {
+                val result = Core.mpv.mpv_unobserve_property(core.handle, requestId)
+                if (result != Error.SUCCESS) {
+                    log.error("Failed to unobserve property: {}", result)
+                }
+            }
+        }
+    }
 
     suspend fun commandAsync(vararg args: String) = commandAsync(args.toList())
     suspend fun commandAsync(args: List<String>) = asyncRequest<CommandReply>(Id.COMMAND_REPLY) {
@@ -101,8 +127,10 @@ class Mpv : EventCallback, AutoCloseable {
     }
 
     @JvmName("asyncRequestUnit")
-    private suspend fun asyncRequest(eventId: Id, request: LibMpvBindings.(requestId: ULong) -> Error): Result<Unit> =
-        asyncRequest<Any?>(eventId, request).map {}
+    private suspend fun asyncRequest(
+        eventId: Id,
+        request: LibMpvBindings.(requestId: ULong) -> Error
+    ): Result<Unit> = asyncRequest<Any?>(eventId, request).map {}
 
     private fun nextRequestId(): ULong = requestIdCounter.updateAndGet { it + 1u }
 
@@ -140,5 +168,6 @@ class Mpv : EventCallback, AutoCloseable {
 
     companion object {
         private fun mpvLog(prefix: String) = LoggerFactory.getLogger("mpv.$prefix")
+        private val log = LoggerFactory.getLogger(Mpv::class.java)
     }
 }

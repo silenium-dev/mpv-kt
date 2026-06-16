@@ -9,6 +9,8 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -20,8 +22,11 @@ import dev.silenium.libs.mpv.compose.VideoSurface
 import dev.silenium.mpv.Mpv
 import dev.silenium.mpv.native_bindings.node.Node
 import dev.silenium.mpv.native_bindings.render.RenderParam
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import java.io.File
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 
 @Composable
 fun App(testVideo: File) =
@@ -33,6 +38,9 @@ fun App(testVideo: File) =
                 initialize().getOrThrow()
             }
         }
+        val timestamp by remember {
+            mpv.observe<Node.Double>("time-pos/full").getOrThrow().map { it.double.seconds }
+        }.collectAsState(Duration.ZERO)
         val coroutineScope = rememberCoroutineScope()
         VideoSurface(
             mpv,
@@ -54,6 +62,11 @@ fun App(testVideo: File) =
             Column {
                 Text(
                     text = "Composable over Video Surface",
+                    fontSize = 24.sp,
+                    modifier = Modifier.padding(8.dp),
+                )
+                Text(
+                    text = "Timestamp: %.3fs".format(timestamp.inWholeMilliseconds / 1000.0),
                     fontSize = 24.sp,
                     modifier = Modifier.padding(8.dp),
                 )
