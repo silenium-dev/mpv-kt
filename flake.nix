@@ -21,6 +21,8 @@
                 libglvnd
                 mesa
                 libva
+                libpulseaudio
+#                pipewire
               ];
 
               postBuild = let

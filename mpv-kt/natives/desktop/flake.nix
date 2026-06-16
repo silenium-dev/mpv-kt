@@ -62,10 +62,10 @@
             pkgs.libxcb
             pkgs.libxau
             pkgs.libxdmcp
-            pkgs.pipewire
             pkgs.libpulseaudio
             pkgs.dbus.lib
             pkgs.alsa-lib
+#            pkgs.pipewire
           ]
           else [ ];
         sources = targetSystem:
