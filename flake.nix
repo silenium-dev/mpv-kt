@@ -22,6 +22,8 @@
                 mesa
                 libva
                 libpulseaudio
+                alsa-lib
+                dbus.lib
 #                pipewire
               ];
 
