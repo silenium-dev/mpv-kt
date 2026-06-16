@@ -22,28 +22,9 @@ kotlin {
                 implementation(libs.jni.utils)
             }
         }
-        commonTest {
-            dependencies {
-                implementation(kotlin("test"))
-            }
-        }
         androidMain {
             dependencies {
                 implementation(libs.panama.android.core)
-            }
-        }
-//        androidHostTest {
-//            dependencies {
-//                implementation(libs.logback.classic)
-//            }
-//        }
-        jvmMain {
-            dependencies {
-            }
-        }
-        jvmTest {
-            dependencies {
-                implementation(libs.logback.classic)
             }
         }
     }

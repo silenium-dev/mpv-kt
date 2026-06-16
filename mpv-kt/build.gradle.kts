@@ -21,9 +21,7 @@ kotlin {
         }
         commonTest {
             dependencies {
-                implementation(kotlin("test"))
                 implementation(libs.slf4j.api)
-                implementation(libs.bundles.tests)
             }
         }
         androidMain {
@@ -39,8 +37,6 @@ kotlin {
         }
         jvmTest {
             dependencies {
-                implementation(libs.kotest.runner.junit5)
-                implementation(libs.logback.classic)
                 implementation(project.dependencies.platform(libs.lwjgl.bom))
                 implementation(libs.bundles.lwjgl)
                 implementation(libs.lwjgl.egl)

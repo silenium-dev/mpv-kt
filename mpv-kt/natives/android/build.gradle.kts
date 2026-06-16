@@ -36,7 +36,6 @@ dependencies {
         artifactType("zip")
     })
     androidTestImplementation(libs.panama.android.core)
-    androidTestImplementation(libs.bundles.androidx.test)
 }
 
 conventions {

@@ -38,4 +38,7 @@ dependencies {
         }
     }
     configurations.implementation(libs.plugins.conventions.jvm)
+    configurations.implementation(libs.plugins.conventions.kmp)
+    configurations.implementation(libs.plugins.conventions.android.library)
+    configurations.implementation(libs.plugins.conventions.android.application)
 }
