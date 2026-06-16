@@ -74,10 +74,6 @@ class Mpv : EventCallback, AutoCloseable {
             mpv_get_property_async(core.handle, it, name)
         }.map(EventProperty::data)
 
-    inline fun <reified T : Node> observe(name: String): Result<Flow<T>> {
-        return observeProperty(name).map { flow -> flow.map { it as T } }
-    }
-
     fun observeProperty(name: String): Result<Flow<Node>> {
         val requestId = nextRequestId()
         val result = Core.mpv.mpv_observe_property(core.handle, requestId, name)

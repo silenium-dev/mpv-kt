@@ -39,7 +39,8 @@ fun App(testVideo: File) =
             }
         }
         val timestamp by remember {
-            mpv.observe<Node.Double>("time-pos/full").getOrThrow().map { it.double.seconds }
+            mpv.observeProperty("time-pos/full").getOrThrow()
+                .map { (it as Node.Double).double.seconds }
         }.collectAsState(Duration.ZERO)
         val coroutineScope = rememberCoroutineScope()
         VideoSurface(
