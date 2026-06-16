@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.sp
 import dev.silenium.libs.mpv.compose.VideoSurface
 import dev.silenium.mpv.Mpv
 import dev.silenium.mpv.native_bindings.node.Node
+import dev.silenium.mpv.native_bindings.render.RenderParam
 import kotlinx.coroutines.launch
 import java.io.File
 
@@ -36,7 +37,9 @@ fun App(testVideo: File) =
         VideoSurface(
             mpv,
             Modifier.fillMaxSize(),
-            lockFramerate = false,
+            additionalRenderParams = listOf(
+                RenderParam.BlockForTargetTime(false)
+            ),
             onInit = {
                 coroutineScope.launch {
                     mpv.commandAsync("loadfile", testVideo.absolutePath).getOrThrow()
