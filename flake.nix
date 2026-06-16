@@ -11,7 +11,7 @@
       {
         perSystem = { config, self', inputs', pkgs, system, ... }: rec {
           packages = {
-            jdk25-wrapped = pkgs.symlinkJoin {
+            jdk25-wrapped = pkgs.symlinkJoin rec {
               name = "jdk25-wrapped";
               paths = [ pkgs.jdk25 ];
               nativeBuildInputs = with pkgs; [
@@ -28,7 +28,7 @@
               ];
 
               postBuild = let
-              libPath =  "${pkgs.libglvnd}/lib:${pkgs.mesa}/lib:${pkgs.libva.out}/lib";
+              libPath = builtins.concatStringsSep ":" (map (it: "${it}/lib") buildInputs);
               in ''
                 for bin in $out/bin/*; do
                   wrapProgram "$bin" --set LD_LIBRARY_PATH "${libPath}"
