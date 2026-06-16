@@ -49,10 +49,24 @@
         libName = "mpv";
         libDir = "subprojects/mpv";
 
-        additionalNativeInputs = targetSystem: pkgs: [ pkgs.p7zip pkgs.curl pkgs.cacert pkgs.python3 pkgs.pkgsCross.mingwW64.gendef ];
+        additionalNativeInputs = targetSystem: pkgs: [
+          pkgs.p7zip
+          pkgs.curl
+          pkgs.cacert
+          pkgs.python3
+          pkgs.pkgsCross.mingwW64.gendef
+        ];
         additionalInputs = targetSystem: pkgs:
           if jni-utils.lib.isLinux targetSystem
-          then [ pkgs.libxcb pkgs.libxau pkgs.libxdmcp ]
+          then [
+            pkgs.libxcb
+            pkgs.libxau
+            pkgs.libxdmcp
+            pkgs.pipewire
+            pkgs.libpulseaudio
+            pkgs.dbus.lib
+            pkgs.alsa-lib
+          ]
           else [ ];
         sources = targetSystem:
           let
