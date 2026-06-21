@@ -1,6 +1,7 @@
 import dev.silenium.build.ProjectConfig
 import dev.silenium.build.configureDeviceTests
 import dev.silenium.gradle.conventions.android
+import dev.silenium.gradle.conventions.bundleNatives
 import dev.silenium.gradle.conventions.compileSdk
 import dev.silenium.gradle.conventions.publishing
 
@@ -54,5 +55,19 @@ conventions {
 
         namespace = "dev.silenium.mpv.natives.android"
         configureDeviceTests()
+
+        bundleNatives {
+            configuration.from(nativeLibs)
+            libraries.addAll(
+                "libavcodec.so",
+                "libavdevice.so",
+                "libavfilter.so",
+                "libavformat.so",
+                "libavutil.so",
+                "libmpv.so",
+                "libswresample.so",
+                "libswscale.so",
+            )
+        }
     }
 }
