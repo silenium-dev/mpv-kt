@@ -3,7 +3,7 @@ mpv-android = "2026-04-25"
 nix-natives = "0.6.5"
 conventions = "0.1.8"
 
-slf4j = "2.0.18"
+slf4j = "2.0.19"
 logback = "1.6.3"
 
 kotlinx-coroutines = "1.11.0"
