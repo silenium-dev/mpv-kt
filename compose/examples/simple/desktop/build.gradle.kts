@@ -7,7 +7,7 @@ plugins {
     dev.silenium.gradle.conventions.jvm
 }
 
-group = "dev.silenium.libs.mpv.compose.examples"
+group = "dev.silenium.compose.mpv.examples.desktop"
 
 dependencies {
     implementation(project(":compose:examples:simple:shared"))

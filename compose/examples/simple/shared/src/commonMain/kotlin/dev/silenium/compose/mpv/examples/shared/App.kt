@@ -1,4 +1,4 @@
-package dev.silenium.libs.mpv.compose.examples.shared
+package dev.silenium.compose.mpv.examples.shared
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column

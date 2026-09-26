@@ -30,7 +30,7 @@ repositories {
     }
 }
 
-val nativeLibs by configurations.creating
+val nativeLibs = configurations.register("nativeLibs")
 
 dependencies {
     nativeLibs(project.dependencies.variantOf(libs.mpv.android) {

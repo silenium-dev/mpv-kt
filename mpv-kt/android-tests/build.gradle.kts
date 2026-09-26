@@ -8,7 +8,7 @@ plugins {
 
 dependencies {
     implementation(project(":mpv-kt"))
-    implementation(project(":ffm"))
+    implementation(libs.panama)
     implementation(libs.slf4j.api)
 }
 

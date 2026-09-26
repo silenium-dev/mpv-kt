@@ -7,6 +7,6 @@
     <root level="debug">
         <appender-ref ref="STDOUT" />
     </root>
-    <logger name="dev.silenium.compose.gl.util.DoubleDestructionProtection" level="trace" />
+    <logger name="dev.silenium.libs.foreign.ext.DoubleDestructionProtection" level="trace" />
     <logger name="mpv" level="info" />
 </configuration>

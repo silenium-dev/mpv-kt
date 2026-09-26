@@ -9,7 +9,7 @@ plugins {
     dev.silenium.gradle.conventions.kmp
 }
 
-group = "dev.silenium.libs.mpv"
+group = "dev.silenium.compose.mpv"
 
 kotlin {
     sourceSets {

@@ -1,8 +1,8 @@
-package dev.silenium.libs.mpv.compose.examples.desktop
+package dev.silenium.compose.mpv.examples.desktop
 
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
-import dev.silenium.libs.mpv.compose.examples.shared.App
+import dev.silenium.compose.mpv.examples.shared.App
 import java.nio.file.Files
 
 fun main() = application {

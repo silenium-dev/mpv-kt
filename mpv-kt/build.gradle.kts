@@ -16,7 +16,7 @@ kotlin {
                 implementation(kotlin("reflect"))
                 implementation(libs.slf4j.api)
                 implementation(libs.jetbrains.annotations)
-                api(project(":ffm"))
+                api(libs.panama)
             }
         }
         commonTest {

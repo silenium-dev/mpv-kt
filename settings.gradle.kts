@@ -14,7 +14,6 @@ plugins {
 }
 
 include(
-    ":ffm",
     ":compose",
     ":compose:examples:simple",
     ":compose:examples:simple:android",

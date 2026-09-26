@@ -8,9 +8,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import dev.silenium.compose.gl.canvas.GLCanvas
-import dev.silenium.compose.gl.canvas.GLProcAddressProvider
 import dev.silenium.compose.gl.canvas.rememberGLCanvasState
 import dev.silenium.libs.foreign.MemorySegment
+import dev.silenium.libs.gl.GLProcAddressProvider
 import dev.silenium.mpv.Mpv
 import dev.silenium.mpv.native_bindings.render.GLGetProcAddress
 import dev.silenium.mpv.native_bindings.render.RenderParam
@@ -54,7 +54,7 @@ fun VideoSurface(
     /**
      * Allows specification of additional render parameters passed to [Mpv.Render.render]
      * Preset parameters which cannot be overridden:
-     * - [RenderParam.OpenGLFBO] = [dev.silenium.compose.gl.canvas.GLDrawScope.fbo]
+     * - [RenderParam.OpenGLFBO] = [dev.silenium.libs.gl.draw.GLDrawScope.fbo]
      */
     additionalRenderParams: List<RenderParam.Render<*>> = emptyList(),
 ) {
@@ -99,7 +99,7 @@ fun VideoSurface(
         }
         render?.update()
         val renderParams = filterRenderParams + listOf(
-            RenderParam.OpenGLFBO(fbo.id, fbo.size.width, fbo.size.height, GL_RGBA8),
+            RenderParam.OpenGLFBO(fbo.value, fbo.size.width, fbo.size.height, GL_RGBA8),
         )
         render?.render(params = renderParams.toTypedArray())?.getOrThrow()
     }

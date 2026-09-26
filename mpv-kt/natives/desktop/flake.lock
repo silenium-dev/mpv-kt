@@ -43,16 +43,16 @@
         "nixpkgs": "nixpkgs_2"
       },
       "locked": {
-        "lastModified": 1780487405,
-        "narHash": "sha256-LIoIXhwlCG3TTYIuNK95KLVLHQ9oHJlKOV54Zq4DA4I=",
+        "lastModified": 1788292410,
+        "narHash": "sha256-QZDz9RkHNRcrN2C15qQ70woM2740n6fOyiYs8gwXgys=",
         "owner": "silenium-dev",
         "repo": "jni-utils",
-        "rev": "c8d266a95f34f47f3c4eb0beba8518d981518dbd",
+        "rev": "f0277eb5de57b84ee7753c2407db8019e5653446",
         "type": "github"
       },
       "original": {
         "owner": "silenium-dev",
-        "ref": "0.6.0",
+        "ref": "0.6.5",
         "repo": "jni-utils",
         "type": "github"
       }
@@ -106,16 +106,16 @@
     },
     "nixpkgs_3": {
       "locked": {
-        "lastModified": 1773282481,
-        "narHash": "sha256-b/GV2ysM8mKHhinse2wz+uP37epUrSE+sAKXy/xvBY4=",
+        "lastModified": 1790323409,
+        "narHash": "sha256-VVTPf+Hyd5ebpjBMHmrLMSBIeW6ls48Bqtosj7CNKLA=",
         "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "fe416aaedd397cacb33a610b33d60ff2b431b127",
+        "rev": "e94cb152ed51bd6e24eb4a41f1460252beb52cd2",
         "type": "github"
       },
       "original": {
         "owner": "nixos",
-        "ref": "fe416aaedd397cacb33a610b33d60ff2b431b127",
+        "ref": "nixos-unstable",
         "repo": "nixpkgs",
         "type": "github"
       }
