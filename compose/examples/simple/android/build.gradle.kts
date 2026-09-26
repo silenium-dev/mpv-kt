@@ -7,7 +7,7 @@ plugins {
     dev.silenium.gradle.conventions.android.application
 }
 
-group = "dev.silenium.libs.mpv.compose.examples"
+group = "dev.silenium.compose.mpv.examples.android"
 
 dependencies {
     implementation(project(":compose:examples:simple:shared"))
@@ -27,6 +27,6 @@ conventions {
         minSdk = ProjectConfig.MIN_SDK
         jvmTarget = ProjectConfig.ANDROID_JVM_TARGET
 
-        namespace = "dev.silenium.libs.mpv.compose.examples.android"
+        namespace = "dev.silenium.compose.mpv.examples.android"
     }
 }

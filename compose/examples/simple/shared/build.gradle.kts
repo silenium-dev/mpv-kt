@@ -9,7 +9,7 @@ plugins {
     dev.silenium.gradle.conventions.kmp
 }
 
-group = "dev.silenium.libs.mpv.compose.examples"
+group = "dev.silenium.compose.mpv.examples.shared"
 
 kotlin {
     sourceSets {
@@ -35,6 +35,6 @@ conventions {
         minSdk = ProjectConfig.MIN_SDK
         jvmTarget = ProjectConfig.ANDROID_JVM_TARGET
 
-        namespace = "dev.silenium.libs.mpv.compose.examples"
+        namespace = "dev.silenium.compose.mpv.examples.shared"
     }
 }

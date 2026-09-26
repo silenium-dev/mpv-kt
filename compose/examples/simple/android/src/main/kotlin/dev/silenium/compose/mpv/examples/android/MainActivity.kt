@@ -1,9 +1,9 @@
-package dev.silenium.libs.mpv.compose.examples.android
+package dev.silenium.compose.mpv.examples.android
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import dev.silenium.libs.mpv.compose.examples.shared.App
+import dev.silenium.compose.mpv.examples.shared.App
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

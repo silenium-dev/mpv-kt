@@ -1,5 +1,4 @@
 import jetbrains.buildServer.configs.kotlin.*
-import jetbrains.buildServer.configs.kotlin.BuildStep.ExecutionMode
 import jetbrains.buildServer.configs.kotlin.buildFeatures.commitStatusPublisher
 import jetbrains.buildServer.configs.kotlin.buildFeatures.perfmon
 import jetbrains.buildServer.configs.kotlin.buildFeatures.pullRequests
@@ -11,7 +10,7 @@ import jetbrains.buildServer.configs.kotlin.projectFeatures.UntrustedBuildsSetti
 import jetbrains.buildServer.configs.kotlin.projectFeatures.untrustedBuildsSettings
 import jetbrains.buildServer.configs.kotlin.triggers.vcs
 
-version = "2026.1"
+version = "2026.2"
 
 project {
     buildType(BuildSnapshot)
