@@ -2,8 +2,8 @@
   description = "jni build environment";
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs?ref=fe416aaedd397cacb33a610b33d60ff2b431b127";
-    jni-utils.url = "github:silenium-dev/jni-utils/0.6.0";
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+    jni-utils.url = "github:silenium-dev/jni-utils/0.6.5";
   };
 
   outputs = { nixpkgs, jni-utils, ... }:
