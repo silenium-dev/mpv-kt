@@ -5,14 +5,13 @@ import dev.silenium.libs.foreign.FunctionDescriptor
 import dev.silenium.libs.foreign.Linker
 import dev.silenium.libs.foreign.MemoryLayout
 import dev.silenium.libs.foreign.MemorySegment
+import dev.silenium.libs.foreign.MethodHandles
 import dev.silenium.libs.foreign.ValueLayout
-import dev.silenium.libs.foreign.upcallStub
 import dev.silenium.mpv.native_bindings.api.InstantiatedStruct
 import dev.silenium.mpv.native_bindings.api.NativeStructLayout
 import dev.silenium.mpv.native_bindings.api.get
 import dev.silenium.mpv.native_bindings.api.set
 import dev.silenium.mpv.native_bindings.node.Node
-import java.lang.invoke.MethodHandles
 import kotlin.reflect.jvm.javaMethod
 
 sealed class RenderParam<T> : InstantiatedStruct {
@@ -29,9 +28,9 @@ sealed class RenderParam<T> : InstantiatedStruct {
 
     abstract fun dataInto(arena: Arena): MemorySegment
 
-    sealed class Create<T>: RenderParam<T>()
+    sealed class Create<T> : RenderParam<T>()
 
-    sealed class Render<T>: RenderParam<T>()
+    sealed class Render<T> : RenderParam<T>()
 
     data object Invalid : RenderParam<Nothing?>() {
         override val value: Nothing? = null
@@ -57,11 +56,15 @@ sealed class RenderParam<T> : InstantiatedStruct {
         override val value: OpenGLInitParams get() = this
         private val wrapper = GLGetProcAddressWrapper(getProcAddress)
         override fun dataInto(arena: Arena): MemorySegment {
-            val handle =
-                MethodHandles.lookup().unreflect(wrapper::call.javaMethod!!).bindTo(wrapper)
+            val handle = MethodHandles.lookup().unreflect(wrapper::call.javaMethod!!)
+                .bindTo(wrapper)
             val stub = Linker.nativeLinker().upcallStub(
                 handle,
-                FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS),
+                FunctionDescriptor.of(
+                    ValueLayout.ADDRESS,
+                    ValueLayout.ADDRESS,
+                    ValueLayout.ADDRESS
+                ),
                 arena
             )
 

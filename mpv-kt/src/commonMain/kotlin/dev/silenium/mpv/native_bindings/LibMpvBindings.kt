@@ -6,16 +6,15 @@ import dev.silenium.libs.foreign.Arena
 import dev.silenium.libs.foreign.FunctionDescriptor
 import dev.silenium.libs.foreign.Linker
 import dev.silenium.libs.foreign.MemorySegment
+import dev.silenium.libs.foreign.MethodHandles
 import dev.silenium.libs.foreign.SymbolLookup
 import dev.silenium.libs.foreign.ValueLayout
-import dev.silenium.libs.foreign.upcallStub
 import dev.silenium.mpv.native_bindings.api.parse
 import dev.silenium.mpv.native_bindings.event.Event
 import dev.silenium.mpv.native_bindings.event.LogMessage
 import dev.silenium.mpv.native_bindings.node.Format
 import dev.silenium.mpv.native_bindings.node.Node
 import dev.silenium.mpv.native_bindings.render.RenderParam
-import java.lang.invoke.MethodHandles
 import kotlin.reflect.jvm.javaMethod
 
 class LibMpvBindings {
@@ -415,7 +414,10 @@ class LibMpvBindings {
         val paramsArray = arena.allocate(RenderParam.layout, size.toLong() + 1)
         forEachIndexed { idx, param ->
             val target =
-                paramsArray.asSlice(RenderParam.layout.byteSize * idx, RenderParam.layout.byteSize)
+                paramsArray.asSlice(
+                    RenderParam.layout.byteSize() * idx,
+                    RenderParam.layout.byteSize()
+                )
             target.copyFrom(param.into(arena))
         }
         return paramsArray

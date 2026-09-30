@@ -10,7 +10,7 @@ abstract class NativeStructLayout {
     internal val entries: MutableList<Pair<String, MemoryLayout>> = mutableListOf()
 
     internal open fun layoutCreator(entries: List<MemoryLayout>): MemoryLayout =
-        MemoryLayout.structLayout(entries)
+        MemoryLayout.structLayout(*entries.toTypedArray())
 
     @PublishedApi
     internal val layoutLazy = lazy {

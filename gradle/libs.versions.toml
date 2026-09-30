@@ -15,7 +15,7 @@ jetbrains-annotations = "26.1.0"
 
 compose = "1.12.1"
 compose-gl = "0.13.0"
-kmp-panama = "0.2.0"
+kmp-panama = "0.3.1"
 
 [libraries]
 mpv-android = { module = "mpv-android:mpv-android", version.ref = "mpv-android" }

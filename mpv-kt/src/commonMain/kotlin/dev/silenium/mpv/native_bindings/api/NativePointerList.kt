@@ -16,12 +16,12 @@ class NativePointerList<E>(
 ) : NativeStructField<List<E>> {
     override val layout: MemoryLayout = ValueLayout.ADDRESS
     override val varHandle: VarHandle by lazy {
-        struct.value.varHandle(listOf(groupElement(name)))
+        struct.value.varHandle(groupElement(name))
     }
 
     override fun get(segment: MemorySegment): List<E> {
         val length = lengthField.get(segment)
-        val array = (varHandle.get(segment, 0L) as MemorySegment).reinterpret(ValueLayout.ADDRESS.byteSize * length)
+        val array = (varHandle.get(segment, 0L) as MemorySegment).reinterpret(ValueLayout.ADDRESS.byteSize() * length)
         return List(length) { i ->
             val raw = array.getAtIndex(ValueLayout.ADDRESS, i.toLong())
             mapper(raw)
@@ -48,14 +48,14 @@ class NativeList<E>(
 ) : NativeStructField<List<E>> {
     override val layout: MemoryLayout = ValueLayout.ADDRESS
     override val varHandle: VarHandle by lazy {
-        struct.value.varHandle(listOf(groupElement(name)))
+        struct.value.varHandle(groupElement(name))
     }
 
     override fun get(segment: MemorySegment): List<E> {
         val length = lengthField.get(segment)
-        val array = (varHandle.get(segment, 0L) as MemorySegment).reinterpret(inner.byteSize * length)
+        val array = (varHandle.get(segment, 0L) as MemorySegment).reinterpret(inner.byteSize() * length)
         return List(length) { i ->
-            val raw = array.asSlice(i * inner.byteSize, inner.byteSize)
+            val raw = array.asSlice(i * inner.byteSize(), inner.byteSize())
             mapper(raw)
         }
     }
@@ -63,7 +63,7 @@ class NativeList<E>(
     override fun set(segment: MemorySegment, value: List<E>, arena: Arena) {
         val raw = arena.allocate(inner, value.size.toLong())
         value.forEachIndexed { index, e ->
-            raw.asSlice(index * inner.byteSize, inner.byteSize).copyFrom(reverseMapper(e, arena))
+            raw.asSlice(index * inner.byteSize(), inner.byteSize()).copyFrom(reverseMapper(e, arena))
         }
         varHandle.set(segment, 0L, raw)
         lengthField.set(segment, value.size, arena)

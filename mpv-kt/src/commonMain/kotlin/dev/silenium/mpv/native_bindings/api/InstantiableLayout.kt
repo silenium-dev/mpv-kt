@@ -14,5 +14,5 @@ interface InstantiatedStruct {
     fun into(arena: Arena): MemorySegment
 }
 
-fun <T> InstantiableLayout<T>.parse(segment: MemorySegment) = from(segment.asReadOnly().reinterpret(layout.byteSize))
+fun <T> InstantiableLayout<T>.parse(segment: MemorySegment) = from(segment.asReadOnly().reinterpret(layout.byteSize()))
 fun <T: InstantiatedStruct> T.into(arena: Arena): MemorySegment = into(arena)
