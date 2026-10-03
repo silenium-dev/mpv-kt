@@ -20,7 +20,7 @@ kmp-panama = "0.3.1"
 [libraries]
 mpv-android = { module = "mpv-android:mpv-android", version.ref = "mpv-android" }
 slf4j-api = { module = "org.slf4j:slf4j-api", version.ref = "slf4j" }
-slf4j-android = { module = "uk.uuid.slf4j:slf4j-android", version = "2.0.19-0" }
+slf4j-android = { module = "uk.uuid.slf4j:slf4j-android", version = "2.0.20-0" }
 logback-classic = { module = "ch.qos.logback:logback-classic", version.ref = "logback" }
 
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }
