@@ -7,6 +7,7 @@ import dev.silenium.libs.foreign.MemoryLayout
 import dev.silenium.libs.foreign.MemorySegment
 import dev.silenium.libs.foreign.MethodHandles
 import dev.silenium.libs.foreign.ValueLayout
+import dev.silenium.libs.foreign.lookup
 import dev.silenium.mpv.native_bindings.api.InstantiatedStruct
 import dev.silenium.mpv.native_bindings.api.NativeStructLayout
 import dev.silenium.mpv.native_bindings.api.get

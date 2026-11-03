@@ -2,13 +2,7 @@
 
 package dev.silenium.mpv.native_bindings
 
-import dev.silenium.libs.foreign.Arena
-import dev.silenium.libs.foreign.FunctionDescriptor
-import dev.silenium.libs.foreign.Linker
-import dev.silenium.libs.foreign.MemorySegment
-import dev.silenium.libs.foreign.MethodHandles
-import dev.silenium.libs.foreign.SymbolLookup
-import dev.silenium.libs.foreign.ValueLayout
+import dev.silenium.libs.foreign.*
 import dev.silenium.mpv.native_bindings.api.parse
 import dev.silenium.mpv.native_bindings.event.Event
 import dev.silenium.mpv.native_bindings.event.LogMessage
@@ -36,7 +30,7 @@ class LibMpvBindings {
         val symbol = lookup.findOrThrow("mpv_initialize")
         linker.downcallHandle(
             symbol,
-            FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS)
+            FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS),
         )
     }
 
@@ -48,7 +42,7 @@ class LibMpvBindings {
                 ValueLayout.ADDRESS, // mpv_handle*
                 ValueLayout.ADDRESS, // callback
                 ValueLayout.ADDRESS, // opaque
-            )
+            ),
         )
     }
 
@@ -60,7 +54,7 @@ class LibMpvBindings {
                 ValueLayout.ADDRESS,   // mpv_event*
                 ValueLayout.ADDRESS,   // mpv_handle*
                 ValueLayout.JAVA_DOUBLE, // timeout
-            )
+            ),
         )
     }
 
@@ -74,7 +68,7 @@ class LibMpvBindings {
                 ValueLayout.JAVA_LONG,
                 ValueLayout.ADDRESS,
                 ValueLayout.JAVA_INT,
-            )
+            ),
         )
     }
 
@@ -88,7 +82,7 @@ class LibMpvBindings {
                 ValueLayout.ADDRESS,
                 ValueLayout.JAVA_INT,
                 ValueLayout.ADDRESS,
-            )
+            ),
         )
     }
 
@@ -102,7 +96,7 @@ class LibMpvBindings {
                 ValueLayout.ADDRESS,
                 ValueLayout.JAVA_INT,
                 ValueLayout.ADDRESS,
-            )
+            ),
         )
     }
 
@@ -117,7 +111,7 @@ class LibMpvBindings {
                 ValueLayout.ADDRESS,
                 ValueLayout.JAVA_INT,
                 ValueLayout.ADDRESS,
-            )
+            ),
         )
     }
 
@@ -131,7 +125,7 @@ class LibMpvBindings {
                 ValueLayout.JAVA_LONG,
                 ValueLayout.ADDRESS,
                 ValueLayout.JAVA_INT,
-            )
+            ),
         )
     }
 
@@ -143,7 +137,7 @@ class LibMpvBindings {
                 ValueLayout.JAVA_INT,
                 ValueLayout.ADDRESS,
                 ValueLayout.JAVA_LONG,
-            )
+            ),
         )
     }
 
@@ -156,7 +150,7 @@ class LibMpvBindings {
                 ValueLayout.ADDRESS,
                 ValueLayout.JAVA_LONG,
                 ValueLayout.ADDRESS,
-            )
+            ),
         )
     }
 
@@ -166,7 +160,7 @@ class LibMpvBindings {
             symbol,
             FunctionDescriptor.ofVoid(
                 ValueLayout.ADDRESS,
-            )
+            ),
         )
     }
 
@@ -178,7 +172,7 @@ class LibMpvBindings {
                 ValueLayout.JAVA_INT,
                 ValueLayout.ADDRESS,
                 ValueLayout.ADDRESS,
-            )
+            ),
         )
     }
 
@@ -191,7 +185,7 @@ class LibMpvBindings {
                 ValueLayout.ADDRESS,
                 ValueLayout.ADDRESS,
                 ValueLayout.ADDRESS,
-            )
+            ),
         )
     }
 
@@ -201,7 +195,7 @@ class LibMpvBindings {
             symbol,
             FunctionDescriptor.ofVoid(
                 ValueLayout.ADDRESS,
-            )
+            ),
         )
     }
 
@@ -213,7 +207,7 @@ class LibMpvBindings {
                 ValueLayout.ADDRESS,
                 ValueLayout.ADDRESS,
                 ValueLayout.ADDRESS,
-            )
+            ),
         )
     }
 
@@ -224,7 +218,7 @@ class LibMpvBindings {
             FunctionDescriptor.of(
                 ValueLayout.JAVA_LONG,
                 ValueLayout.ADDRESS,
-            )
+            ),
         )
     }
 
@@ -234,7 +228,7 @@ class LibMpvBindings {
             symbol,
             FunctionDescriptor.ofVoid(
                 ValueLayout.ADDRESS,
-            )
+            ),
         )
     }
 
@@ -246,7 +240,7 @@ class LibMpvBindings {
                 ValueLayout.JAVA_INT,
                 ValueLayout.ADDRESS,
                 ValueLayout.ADDRESS,
-            )
+            ),
         )
     }
 
@@ -256,10 +250,20 @@ class LibMpvBindings {
 
     private class CallbackWrapper(val callback: WakeupCallback) {
         fun invoke(@Suppress("unused") unused: MemorySegment) = callback.invoke()
+
+        companion object {
+            val handle = MethodHandles.lookup()
+                .unreflect(CallbackWrapper::invoke.javaMethod!!.apply { isAccessible = true })
+        }
     }
 
     private class UpdateCallbackWrapper(val callback: RenderUpdateCallback) {
         fun invoke(@Suppress("unused") unused: MemorySegment) = callback.invoke()
+
+        companion object {
+            val handle = MethodHandles.lookup()
+                .unreflect(UpdateCallbackWrapper::invoke.javaMethod!!.apply { isAccessible = true })
+        }
     }
 
     fun mpv_create(): Handle = Handle(handle_mpv_create() as MemorySegment)
@@ -272,7 +276,7 @@ class LibMpvBindings {
 
     fun mpv_set_wakeup_callback(handle: Handle, callback: WakeupCallback) {
         val wrapper = CallbackWrapper(callback)
-        val method = MethodHandles.lookup().unreflect(wrapper::invoke.javaMethod!!).bindTo(wrapper)
+        val method = CallbackWrapper.handle.bindTo(wrapper)
         val upcall =
             linker.upcallStub(method, FunctionDescriptor.ofVoid(ValueLayout.ADDRESS), arena)
         handle_mpv_set_wakeup_callback(handle.pointer, upcall, MemorySegment.NULL)
@@ -291,7 +295,7 @@ class LibMpvBindings {
                 handle.pointer,
                 userData.toLong(),
                 propertyStr,
-                Format.Node.value
+                Format.Node.value,
             )
             return Error.fromValue(ret as Int)
         }
@@ -305,7 +309,7 @@ class LibMpvBindings {
                 userData.toLong(),
                 name,
                 Format.Node.value,
-                rawNode
+                rawNode,
             )
             return Error.fromValue(ret as Int)
         }
@@ -369,7 +373,7 @@ class LibMpvBindings {
 
     fun mpv_render_context_create(
         handle: Handle,
-        params: List<RenderParam<*>>
+        params: List<RenderParam<*>>,
     ): Result<RenderContext> =
         Arena.ofConfined().use { arena ->
             val paramsArray = params.into(arena)
@@ -386,10 +390,10 @@ class LibMpvBindings {
 
     fun mpv_render_context_set_update_callback(
         context: RenderContext,
-        callback: RenderUpdateCallback
+        callback: RenderUpdateCallback,
     ) {
         val wrapper = UpdateCallbackWrapper(callback)
-        val method = MethodHandles.lookup().unreflect(wrapper::invoke.javaMethod!!).bindTo(wrapper)
+        val method = UpdateCallbackWrapper.handle.bindTo(wrapper)
         val upcall =
             linker.upcallStub(method, FunctionDescriptor.ofVoid(ValueLayout.ADDRESS), arena)
         handle_mpv_render_context_set_update_callback(context.pointer, upcall, MemorySegment.NULL)
@@ -416,7 +420,7 @@ class LibMpvBindings {
             val target =
                 paramsArray.asSlice(
                     RenderParam.layout.byteSize() * idx,
-                    RenderParam.layout.byteSize()
+                    RenderParam.layout.byteSize(),
                 )
             target.copyFrom(param.into(arena))
         }
