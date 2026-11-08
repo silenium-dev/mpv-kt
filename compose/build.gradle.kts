@@ -41,3 +41,9 @@ conventions {
         namespace = "dev.silenium.compose.mpv"
     }
 }
+
+tasks {
+    stabilityCheck {
+        dependsOn(compileAndroidMain)
+    }
+}
