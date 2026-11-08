@@ -36,7 +36,7 @@ dependencies {
     nativeLibs(project.dependencies.variantOf(libs.mpv.android) {
         artifactType("zip")
     })
-    androidTestImplementation(libs.panama.android.core)
+    androidTestImplementation(libs.panama)
 }
 
 conventions {

@@ -7,6 +7,7 @@ import dev.silenium.gradle.conventions.publishing
 plugins {
     org.jetbrains.kotlin.plugin.compose
     dev.silenium.gradle.conventions.kmp
+    alias(libs.plugins.stability.analyzer)
 }
 
 group = "dev.silenium.compose.mpv"

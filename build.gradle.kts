@@ -4,6 +4,7 @@ import org.jetbrains.dokka.gradle.DokkaExtension
 
 plugins {
     dev.silenium.gradle.conventions.jvm
+    alias(libs.plugins.stability.analyzer) apply false
 }
 
 allprojects {

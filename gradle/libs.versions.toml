@@ -1,7 +1,7 @@
 [versions]
 mpv-android = "2026-04-25"
 nix-natives = "0.6.5"
-conventions = "0.1.8"
+conventions = "0.1.9"
 
 slf4j = "2.0.20"
 logback = "1.6.6"
@@ -31,7 +31,6 @@ lwjgl-core = { module = "org.lwjgl:lwjgl" }
 lwjgl-egl = { module = "org.lwjgl:lwjgl-egl" }
 lwjgl-opengl = { module = "org.lwjgl:lwjgl-opengl" }
 
-panama-android-core = { module = "io.github.vova7878.panama:Core", version.ref = "panama-android" }
 panama = { module = "dev.silenium.libs.panama:kmp-panama", version.ref = "kmp-panama" }
 jni-utils = { module = "dev.silenium.libs.jni:jni-utils", version.ref = "nix-natives" }
 jetbrains-annotations = { module = "org.jetbrains:annotations", version.ref = "jetbrains-annotations" }
@@ -49,6 +48,7 @@ conventions-kmp = { id = "dev.silenium.gradle.conventions.kmp", version.ref = "c
 conventions-jvm = { id = "dev.silenium.gradle.conventions.jvm", version.ref = "conventions" }
 conventions-android-application = { id = "dev.silenium.gradle.conventions.android.application", version.ref = "conventions" }
 conventions-android-library = { id = "dev.silenium.gradle.conventions.android.library", version.ref = "conventions" }
+stability-analyzer = { id = "com.github.skydoves.compose.stability.analyzer", version = "0.15.0" }
 
 [bundles]
 lwjgl = [

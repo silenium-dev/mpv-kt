@@ -1,6 +1,6 @@
 package dev.silenium.libs.mpv.android
 
-import com.v7878.foreign.SymbolLookup
+import dev.silenium.libs.foreign.SymbolLookup
 import io.kotest.runner.junit4.FunSpec
 
 class LoadingTest : FunSpec({
