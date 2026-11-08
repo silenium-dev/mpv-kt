@@ -34,6 +34,8 @@ conventions {
         }
         minSdk = ProjectConfig.MIN_SDK
         jvmTarget = ProjectConfig.ANDROID_JVM_TARGET
+        ndkVersion = ProjectConfig.NDK_VERSION
+        cmakeVersion = ProjectConfig.CMAKE_VERSION
 
         namespace = "dev.silenium.compose.mpv.examples.shared"
     }
