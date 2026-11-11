@@ -12,9 +12,9 @@ group = "dev.silenium.compose.mpv.examples.android"
 dependencies {
     implementation(project(":compose:examples:simple:shared"))
     implementation("androidx.activity:activity-compose:1.13.0")
-    implementation("androidx.compose.ui:ui:1.12.1")
-    implementation("androidx.compose.foundation:foundation:1.12.1")
-    implementation("androidx.compose.runtime:runtime:1.12.1")
+    implementation("androidx.compose.ui:ui:1.12.2")
+    implementation("androidx.compose.foundation:foundation:1.12.2")
+    implementation("androidx.compose.runtime:runtime:1.12.2")
     implementation("androidx.compose.material3:material3:1.4.0")
     runtimeOnly(libs.slf4j.android)
 }
