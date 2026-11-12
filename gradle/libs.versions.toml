@@ -1,6 +1,6 @@
 [versions]
 mpv-android = "2026-09-17"
-nix-natives = "0.6.5-18-gaf220241"
+nix-natives = "0.6.5-22-g876e7ef2"
 conventions = "0.1.10"
 
 slf4j = "2.0.20"
