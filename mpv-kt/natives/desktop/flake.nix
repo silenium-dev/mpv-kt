@@ -11,12 +11,12 @@
       pkgs = nixpkgs.legacyPackages."x86_64-linux";
       fs = nixpkgs.lib.fileset;
     in
-    {
+    rec {
       devShells."x86_64-linux" = {
         default = pkgs.mkShell {
           hardeningDisable = [ "fortify" ];
           nativeBuildInputs = with pkgs; [
-            p7zip
+            _7zip-zstd
             curl
             cacert
             python3
@@ -30,12 +30,23 @@
             gdb
             libxcb
             libX11
-            libGL
-            eglexternalplatform
-            egl-wayland
+            libglvnd
             mpv
           ];
         };
+      };
+
+      lib = rec {
+        architectures =
+          let
+            arch = native: { inherit native; jni = jni-utils.lib.systemNativesMapping."${native}"; };
+          in
+          [
+            (arch "x86_64-linux")
+            (arch "aarch64-linux")
+            (arch "x86_64-windows")
+            (arch "aarch64-windows")
+          ];
       };
 
       packages."x86_64-linux" = jni-utils.lib.buildJNILib rec {
@@ -48,9 +59,10 @@
         buildType = "release";
         libName = "mpv";
         libDir = "subprojects/mpv";
+        targetSystems = (map (x: x.native) lib.architectures);
 
         additionalNativeInputs = targetSystem: pkgs: [
-          pkgs.p7zip
+          pkgs._7zip-zstd
           pkgs.curl
           pkgs.cacert
           pkgs.python3
@@ -65,7 +77,7 @@
             pkgs.libpulseaudio
             pkgs.dbus.lib
             pkgs.alsa-lib
-#            pkgs.pipewire
+            #            pkgs.pipewire
           ]
           else [ ];
         sources = targetSystem:

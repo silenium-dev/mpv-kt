@@ -11,6 +11,10 @@ group = "dev.silenium.compose.mpv.examples.desktop"
 
 dependencies {
     implementation(project(":compose:examples:simple:shared"))
+    implementation(project(":mpv-kt:natives:desktop", "natives-linux-x86_64"))
+    implementation(project(":mpv-kt:natives:desktop", "natives-linux-arm64"))
+    implementation(project(":mpv-kt:natives:desktop", "natives-windows-x86_64"))
+    implementation(project(":mpv-kt:natives:desktop", "natives-windows-arm64"))
     implementation(libs.compose.desktop)
     runtimeOnly(libs.logback.classic)
     runtimeOnly(compose.desktop.currentOs)

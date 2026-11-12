@@ -1,5 +1,6 @@
 plugins {
     `kotlin-dsl`
+    embeddedKotlin("plugin.serialization")
 }
 
 repositories {
@@ -35,4 +36,6 @@ dependencies {
     configurations.implementation(libs.plugins.conventions.kmp)
     configurations.implementation(libs.plugins.conventions.android.library)
     configurations.implementation(libs.plugins.conventions.android.application)
+    configurations.implementation(libs.plugins.nix.natives)
+    configurations.implementation(libs.kotlinx.serialization.json)
 }

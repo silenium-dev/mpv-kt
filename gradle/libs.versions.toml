@@ -1,12 +1,13 @@
 [versions]
-mpv-android = "2026-04-25"
-nix-natives = "0.6.5"
+mpv-android = "2026-09-17"
+nix-natives = "0.6.5-18-gaf220241"
 conventions = "0.1.10"
 
 slf4j = "2.0.20"
 logback = "1.6.6"
 
 kotlinx-coroutines = "1.11.0"
+kotlinx-serialization = "1.12.0"
 atomicfu = "0.33.0"
 
 lwjgl = "3.4.3"
@@ -23,6 +24,7 @@ slf4j-android = { module = "uk.uuid.slf4j:slf4j-android", version = "2.0.20-0" }
 logback-classic = { module = "ch.qos.logback:logback-classic", version.ref = "logback" }
 
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }
+kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
 kotlinx-atomicfu = { module = "org.jetbrains.kotlinx:atomicfu", version.ref = "atomicfu" }
 
 lwjgl-bom = { module = "org.lwjgl:lwjgl-bom", version.ref = "lwjgl" }
@@ -48,6 +50,7 @@ conventions-jvm = { id = "dev.silenium.gradle.conventions.jvm", version.ref = "c
 conventions-android-application = { id = "dev.silenium.gradle.conventions.android.application", version.ref = "conventions" }
 conventions-android-library = { id = "dev.silenium.gradle.conventions.android.library", version.ref = "conventions" }
 stability-analyzer = { id = "com.github.skydoves.compose.stability.analyzer", version = "0.15.0" }
+nix-natives = { id = "dev.silenium.libs.jni.nix-natives", version.ref = "nix-natives" }
 
 [bundles]
 lwjgl = [

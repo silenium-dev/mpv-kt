@@ -21,6 +21,7 @@ include(
     ":compose:examples:simple:shared",
     ":mpv-kt",
     ":mpv-kt:natives:desktop",
+    ":mpv-kt:natives:desktop:all",
     ":mpv-kt:natives:android",
     ":mpv-kt:android-tests",
     ":mpv-kt:examples:android",
