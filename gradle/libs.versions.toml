@@ -4,7 +4,7 @@ nix-natives = "0.6.5-22-g876e7ef2"
 conventions = "0.1.10"
 
 slf4j = "2.0.20"
-logback = "1.6.6"
+logback = "1.6.8"
 
 kotlinx-coroutines = "1.11.0"
 kotlinx-serialization = "1.12.0"
